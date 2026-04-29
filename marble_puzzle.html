@@ -1253,8 +1253,10 @@ function bgStart() {
   let i=0;
   function next() {
     if (!_bgOn) return;
+    // BPM 100(600ms) 기본, 잔여시간 30초 이하이면 BPM 140(429ms)으로 전환
+    const interval = (gameActive && timeLeft <= 30) ? 429 : 600;
     if (mel[i%mel.length]) playTone(mel[i%mel.length],'sine',.04,.28);
-    i++; _bgT.push(setTimeout(next,330));
+    i++; _bgT.push(setTimeout(next, interval));
   }
   next();
 }
@@ -1287,6 +1289,7 @@ let eraserCount  = 0;
 let bombUsed     = false;
 let lockedCells  = [];
 let taCountdown  = TA_INTERVAL;
+let nextPiece    = null;
 
 const ESCAPE_LINES = [
   { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
@@ -1398,7 +1401,10 @@ function startGame(diff) {
     const hasSpecial=tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
     tray.push(mkPiece(hasSpecial));
   }
+  const _hasSpecialInit=tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
+  nextPiece=mkPiece(_hasSpecialInit);
   renderTray();
+  renderNextPreview();
   updateHUD();
   updateUndoBtn();
   resetEscapeBar();
@@ -1491,6 +1497,7 @@ function renderBoard() {
     if (!el) continue;
     el.classList.remove('ok','bad','sparkle','rainbow-wave');
     const cur=board[r][c];
+    el.classList.toggle('filled', !!cur);
     if (cur) {
       if (!el.firstChild || el.firstChild._color!==cur) {
         el.innerHTML='';
@@ -1666,6 +1673,31 @@ function renderTray() {
 }
 
 // ════════════════════════════════════════════
+// NEXT PREVIEW
+// ════════════════════════════════════════════
+function renderNextPreview() {
+  const slot = document.getElementById('next-piece-slot');
+  if (!slot) return;
+  slot.innerHTML = '';
+  if (!nextPiece) return;
+  const piece = nextPiece;
+  const maxR = Math.max(...piece.cells.map(c => c[0]));
+  const maxC = Math.max(...piece.cells.map(c => c[1]));
+  const cs = TRAY_CELL + 2;
+  const rawW = (maxC+1)*cs + 4;
+  const rawH = (maxR+1)*cs + 4;
+  slot.style.width  = rawW + 'px';
+  slot.style.height = rawH + 'px';
+  slot.style.position = 'relative';
+  piece.cells.forEach(([r,c]) => {
+    const m = mkMarbleEl(piece.color, TRAY_CELL, 'normal');
+    m.style.left = (c*cs + 2) + 'px';
+    m.style.top  = (r*cs + 2) + 'px';
+    slot.appendChild(m);
+  });
+}
+
+// ════════════════════════════════════════════
 // SPECIAL MARBLE TOOLTIPS
 // ════════════════════════════════════════════
 const SPECIAL_TIPS = {
@@ -1731,7 +1763,10 @@ function undoMove() {
   curLevel=undoState.curLevel;
   undoState=null; undoAvail=false;
   updateUndoBtn();
-  renderBoard(); renderTray(); updateHUD();
+  // nextPiece 재생성 (되돌리기 후 tray 상태 기준)
+  const _fn=tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
+  nextPiece=mkPiece(_fn);
+  renderBoard(); renderTray(); renderNextPreview(); updateHUD();
   sndUndo();
 }
 
@@ -1780,6 +1815,8 @@ function beginDrag(idx, e) {
   }
 
   drag = { idx, piece, x: pos.x, y: pos.y, offsetX, offsetY, isTouch: pos.isTouch };
+  // 터치 드래그 중 페이지 스크롤 방지
+  if (pos.isTouch) document.body.style.overflow = 'hidden';
   // 드래그 시작 시 하단 툴팁 즉시 숨기기
   document.getElementById('special-tooltip').style.display = 'none';
   const slotEl = document.querySelector(`.tray-slot[data-idx="${idx}"]`);
@@ -1803,6 +1840,8 @@ function onMove(e) {
 function onUp(e) {
   if (!drag) return;
   e.preventDefault();
+  // 터치 드래그 종료: overflow 원복
+  document.body.style.overflow = '';
   clearPreview();
   document.getElementById('drag-ghost').style.display = 'none';
   const slot = document.querySelector(`.tray-slot[data-idx="${drag.idx}"]`);
@@ -1988,9 +2027,11 @@ function commitPlace(piece,r0,c0,trayIdx) {
     if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*100); }
   }
 
-  const _forceNormal=tray.some((p,i)=>i!==trayIdx&&p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
-  tray[trayIdx]=mkPiece(_forceNormal);
-  renderBoard(); renderTray(); updateHUD();
+  // nextPiece를 현재 슬롯에 넣고, 새 nextPiece 생성
+  tray[trayIdx] = nextPiece;
+  const _forceNormal = tray.some((p,i) => p && (p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
+  nextPiece = mkPiece(_forceNormal);
+  renderBoard(); renderTray(); renderNextPreview(); updateHUD();
   // bounce + star: 일반 구슬 배치 후에만 실행
   if (placed>0) triggerBounceStar(r0,c0,piece.cells);
   updateEscapeBar();
@@ -2186,35 +2227,43 @@ function findConnectedGroups() {
 // ════════════════════════════════════════════
 function sparkleGroups(groups, onDone) {
   if (!groups.length) { setTimeout(onDone,200); return; }
-  let total=0;
-  groups.forEach((group,gi)=>{
-    group.forEach(([r,c])=>{
-      setTimeout(()=>{
-        // surprised face
-        const cell=document.getElementById(`c${r}_${c}`);
+  const totalCells = groups.reduce((s,g)=>s+g.length, 0);
+  let clearedCells = 0;
+  groups.forEach((group, gi) => {
+    const groupDelay = gi * 100; // 그룹 간 0.1초 간격
+    group.forEach(([r,c]) => {
+      setTimeout(() => {
+        const cell = document.getElementById(`c${r}_${c}`);
         if (!cell) return;
-        const marble=cell.querySelector('.marble');
+        const marble = cell.querySelector('.marble');
         if (marble) {
-          const old=marble.querySelector('.marble-face');
+          const old = marble.querySelector('.marble-face');
           if (old) old.remove();
           marble.appendChild(mkFaceSVG('surprised'));
         }
         sndSparkle();
-        setTimeout(()=>{
+        setTimeout(() => {
           if (cell) {
             cell.classList.add('sparkle');
-            spawnSparkleParticles(r,c);
-            setTimeout(()=>{
-              board[r][c]=null;
-              cell.classList.remove('sparkle');
-              cell.innerHTML='';
-              total++;
-              if (total===groups.reduce((s,g)=>s+g.length,0)) onDone();
-            },680);
+            spawnSparkleParticles(r, c);
+            setTimeout(() => {
+              board[r][c] = null;
+              cell.classList.remove('sparkle', 'filled');
+              cell.innerHTML = '';
+              clearedCells++;
+              if (clearedCells === totalCells) onDone();
+            }, 680);
           }
-        },80);
-      }, gi*150);
+        }, 80);
+      }, groupDelay);
     });
+    // 그룹 스파클 시작 시점에 그룹 점수 팝업 표시
+    setTimeout(() => {
+      const pts = group.length * 200;
+      const avgR = Math.round(group.reduce((s,[r])=>s+r, 0) / group.length);
+      const avgC = Math.round(group.reduce((s,[,c])=>s+c, 0) / group.length);
+      spawnScorePop(avgR, avgC, pts);
+    }, groupDelay + 80);
   });
 }
 
@@ -2246,6 +2295,21 @@ function showLvlBanner() {
   setTimeout(()=>b.remove(),2400);
   playTone(880,'triangle',.2,.15);
   setTimeout(()=>playTone(1047,'triangle',.2,.2),200);
+}
+
+// ════════════════════════════════════════════
+// COUNT-UP ANIMATION
+// ════════════════════════════════════════════
+function countupAnim(el, from, to, duration) {
+  const start = performance.now();
+  function step(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    el.textContent = Math.round(from + (to - from) * eased);
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 // ════════════════════════════════════════════
@@ -2293,18 +2357,23 @@ function doWin() {
       saveHS();
       addCumulativeScore(score);
 
-      document.getElementById('clear-score').textContent=score;
       let bonusTxt=bonus>0?'⏱ 시간 보너스 +'+bonus+'점':'';
       if (dailyBonus>0) bonusTxt+=(bonusTxt?' · ':'')+'📅 일일 미션 +500점!';
       document.getElementById('clear-bonus').textContent=bonusTxt;
+      document.getElementById('clear-score').textContent='0';
 
       setTimeout(()=>{
         showScreen('clear');
         showStarRating(stars);
+        // 점수 카운트업 애니메이션 (0 → 최종 점수)
+        setTimeout(()=>{
+          const scoreEl=document.getElementById('clear-score');
+          countupAnim(scoreEl, 0, score, 1200);
+        }, 350);
         initDailyMission();
         checkAndShowAchievements(winTime);
         // 명예의 전당 이름 입력 (잠시 후)
-        setTimeout(()=>showNameInputPopup(score,()=>{}), 1400);
+        setTimeout(()=>showNameInputPopup(score,()=>{}), 1600);
       },700);
     });
   },680);
