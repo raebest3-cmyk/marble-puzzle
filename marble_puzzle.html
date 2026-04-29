@@ -770,6 +770,7 @@ body {
 .hof-name { flex:1; color:#fff; font-size:.9em; font-weight:700; }
 .hof-score { color:#FFD700; font-weight:900; font-size:.92em; white-space:nowrap; }
 .hof-date { font-size:.65em; color:rgba(255,255,255,.45); white-space:nowrap; margin-left:4px; }
+.hof-diff { font-size:.62em; color:rgba(255,200,100,.75); white-space:nowrap; margin-left:4px; }
 .hof-empty { color:rgba(255,255,255,.4); font-size:.85em; text-align:center; padding:10px 0; line-height:1.7; }
 
 /* ── Name Input Popup ── */
@@ -956,10 +957,11 @@ body {
       <span id="timer-val">3:00</span>
     </div>
     <div class="hud-divider"></div>
-    <!-- ③ 레벨·남은칸 (작게, 2줄) -->
+    <!-- ③ 레벨·남은칸·난이도 (작게, 3줄) -->
     <div class="hud-block" id="hud-meta">
       <div class="hud-meta-row" id="hud-lv-item">📊 Lv.<strong id="hud-level">1</strong></div>
       <div class="hud-meta-row">🔮 <strong id="hud-remain">49</strong>칸</div>
+      <div class="hud-meta-row" id="hud-diff-item"><strong id="hud-diff-label">보통 ×1.5</strong></div>
     </div>
   </div>
   <div id="game-board"></div>
@@ -1057,7 +1059,7 @@ body {
     <h3>📊 레벨업 (보통)</h3>
     <p>25개 배치 시 레벨 2로 상승 (더 복잡한 조각 등장)</p>
     <h3>⭐ 점수</h3>
-    <p>구슬 1개 배치 = 100점 / 클리어 시 남은 시간 × 10점 보너스<br>별 3개: 60초↑ / 별 2개: 30초↑ / 별 1개: 30초 미만</p>
+    <p>구슬 1개 배치: 쉬움 100점 / 보통 150점 / 어려움 200점<br>시간 보너스: 남은시간 × (쉬움 ×5 / 보통 ×10 / 어려움 ×20)<br>별 3개: 60초↑ / 별 2개: 30초↑ / 별 1개: 30초 미만</p>
   </div>
   <button class="btn btn-pink" style="margin-top:14px" onclick="goBackFromHelp()">← 돌아가기</button>
 </div>
@@ -1161,6 +1163,13 @@ const DAILY_MISSIONS = [
 ];
 
 const TA_INTERVAL = 30; // 타임어택: 30초마다 자동배치
+
+const DIFF_CONFIG = {
+  easy:       { pts:100, bonusMult:5,  label:'쉬움 ×1.0' },
+  normal:     { pts:150, bonusMult:10, label:'보통 ×1.5' },
+  hard:       { pts:200, bonusMult:20, label:'어려움 ×2.0' },
+  timeattack: { pts:100, bonusMult:10, label:'타임어택 ×1.0' },
+};
 
 // ════════════════════════════════════════════
 // AUDIO
@@ -1459,6 +1468,8 @@ function updateHUD() {
   document.getElementById('hud-level').textContent=curLevel;
   const empty=board.flat().filter(v=>!v).length;
   document.getElementById('hud-remain').textContent=empty;
+  const diffEl=document.getElementById('hud-diff-label');
+  if (diffEl) diffEl.textContent=(DIFF_CONFIG[difficulty]||DIFF_CONFIG.normal).label;
 }
 
 // ════════════════════════════════════════════
@@ -2013,6 +2024,7 @@ function commitPlace(piece,r0,c0,trayIdx) {
     spawnBombExplosion(r0,c0,exploded);
     if (exploded.length>0) spawnScorePop(r0,c0,exploded.length*30);
   } else {
+    const diffCfg = DIFF_CONFIG[difficulty] || DIFF_CONFIG.normal;
     piece.cells.forEach(([dr,dc])=>{
       const r=r0+dr, c=c0+dc;
       if (piece.isEraser||piece.isEraser2||piece.isEraser3) {
@@ -2021,10 +2033,10 @@ function commitPlace(piece,r0,c0,trayIdx) {
         lockedCells=lockedCells.filter(([lr,lc])=>!(lr===r&&lc===c));
         board[r][c]=null; sndErase();
       } else {
-        board[r][c]=piece.color; score+=100; placed++; placedTotal++;
+        board[r][c]=piece.color; score+=diffCfg.pts; placed++; placedTotal++;
       }
     });
-    if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*100); }
+    if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*diffCfg.pts); }
   }
 
   // nextPiece를 현재 슬롯에 넣고, 새 nextPiece 생성
@@ -2324,7 +2336,7 @@ function doWin() {
   sndFanfare();
 
   const winTime=timeLeft;
-  const bonus=winTime*10;
+  const bonus=winTime*(DIFF_CONFIG[difficulty]||DIFF_CONFIG.normal).bonusMult;
   const stars=winTime>=60?3:winTime>=30?2:1;
 
   // 1. Rainbow wave on all cells
@@ -2710,7 +2722,7 @@ function getHOF()        { return JSON.parse(localStorage.getItem('marble_hof')|
 function saveHOF(list)   { localStorage.setItem('marble_hof',JSON.stringify(list)); }
 function addToHOF(name,sc) {
   const list=getHOF();
-  list.push({name:name.slice(0,10)||'익명', score:sc, date:new Date().toLocaleDateString('ko-KR')});
+  list.push({name:name.slice(0,10)||'익명', score:sc, date:new Date().toLocaleDateString('ko-KR'), diff:difficulty});
   list.sort((a,b)=>b.score-a.score);
   saveHOF(list.slice(0,5));
 }
@@ -2728,9 +2740,12 @@ function renderHOF() {
   list.forEach((e,i)=>{
     const row=document.createElement('div');
     row.className='hof-row';
+    const DIFF_LABELS={'easy':'쉬움','normal':'보통','hard':'어려움','timeattack':'타임어택'};
+    const diffTag=e.diff?`<span class="hof-diff">${DIFF_LABELS[e.diff]||e.diff}</span>`:'';
     row.innerHTML=`<span class="hof-rank">${ICONS[i]}</span>`
       +`<span class="hof-name">${e.name}</span>`
       +`<span class="hof-score">${e.score}점</span>`
+      +diffTag
       +`<span class="hof-date">${e.date||''}</span>`;
     con.appendChild(row);
   });
