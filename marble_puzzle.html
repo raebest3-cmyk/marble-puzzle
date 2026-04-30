@@ -1944,8 +1944,16 @@ function boardCell(x, y) {
 // 드래그 중 실제 배치 판정에 쓸 셀 좌표 반환
 // 터치·마우스 모두 손가락/커서 실제 위치를 직접 boardCell에 전달
 // → previewBoard(미리보기)와 onUp(배치) 모두 동일 공식 사용 → 위치 일치
+// [DEBUG] 터치 시 col/row -1 보정: 실제 손가락 위치보다 1칸 오른쪽·아래에 배치되는 문제 수정
 function dragBoardCell(x, y) {
-  return boardCell(x, y);
+  const cell = boardCell(x, y);
+  if (!cell) return cell;
+  if (drag && drag.isTouch) {
+    const c = Math.max(0, Math.min(GRID - 1, cell.c - 1));
+    const r = Math.max(0, Math.min(GRID - 1, cell.r - 1));
+    return { r, c };
+  }
+  return cell;
 }
 
 // ════════════════════════════════════════════
