@@ -1758,10 +1758,11 @@ function renderBoard() {
     const cur=board[r][c];
     el.classList.toggle('filled', !!cur);
     if (cur) {
-      if (!el.firstChild || el.firstChild._color!==cur) {
+      const _sk=getActiveSkin();
+      if (!el.firstChild || el.firstChild._color!==cur || el.firstChild._skin!==_sk) {
         el.innerHTML='';
         const m=mkMarbleEl(cur,CELL_SIZE,'normal');
-        m._color=cur;
+        m._color=cur; m._skin=_sk;
         el.appendChild(m);
       }
     } else {
@@ -2844,7 +2845,7 @@ function applySkinOverlay(marbleEl, color, size) {
   const ns='http://www.w3.org/2000/svg';
   const svg=document.createElementNS(ns,'svg');
   svg.setAttribute('viewBox','0 0 50 50');
-  svg.style.cssText=`position:absolute;top:0;left:0;width:${size}px;height:${size}px;pointer-events:none;z-index:3;opacity:.32;`;
+  svg.style.cssText=`position:absolute;top:0;left:0;width:${size}px;height:${size}px;pointer-events:none;z-index:3;opacity:.72;`;
   let shape;
   if (skin==='star') {
     shape=document.createElementNS(ns,'polygon');
@@ -2939,8 +2940,8 @@ function renderShop() {
     const cd=document.createElement('div'); cd.className='skin-cost';
     cd.textContent=isUnlocked?(isActive?'✓ 사용 중':'선택하기'):(canBuy?'해금 ('+skin.cost+'점)':skin.cost+'점 필요');
     item.appendChild(cd);
-    if (isUnlocked) item.onclick=()=>{ setActiveSkin(skin.id); renderShop(); };
-    else if (canBuy) item.onclick=()=>{ unlockSkin(skin.id); setActiveSkin(skin.id); renderShop(); };
+    if (isUnlocked) item.onclick=()=>{ setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
+    else if (canBuy) item.onclick=()=>{ unlockSkin(skin.id); setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
     grid.appendChild(item);
   });
 }
