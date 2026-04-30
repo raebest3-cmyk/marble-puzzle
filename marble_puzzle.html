@@ -1949,7 +1949,7 @@ function dragBoardCell(x, y) {
   const cell = boardCell(x, y);
   if (!cell) return cell;
   if (drag && drag.isTouch) {
-    const c = Math.max(0, Math.min(GRID - 1, cell.c - 1));
+    const c = Math.max(0, Math.min(GRID - 1, cell.c));
     const r = Math.max(0, Math.min(GRID - 1, cell.r - 1));
     return { r, c };
   }
