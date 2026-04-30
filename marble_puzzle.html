@@ -2529,19 +2529,29 @@ function beginDrag(idx, e) {
   if (!piece) return;
   const pos = evPos(e);
 
-  // 터치 시: 트레이 슬롯 내 손가락 위치(offset)를 저장
-  // ghost 이동 시 offset만큼 보정하여 "잡은 위치 그대로" 따라오게 함
-  let offsetX = 0, offsetY = 0;
-  if (pos.isTouch) {
-    const slot = document.querySelector(`.tray-slot[data-idx="${idx}"]`);
-    if (slot) {
-      const sr = slot.getBoundingClientRect();
-      offsetX = pos.x - sr.left;
-      offsetY = pos.y - sr.top;
-    }
+  // 조각 내 잡힌 셀 인덱스 계산 (앵커)
+  // 트레이 슬롯은 슬롯 크기가 min 48px이라 centering offset(slotOffX/Y)이 생김
+  const tcs   = TRAY_CELL + 2;  // tray cell step = 30px
+  const maxR  = piece.cells.length ? Math.max(...piece.cells.map(c => c[0])) : 0;
+  const maxC  = piece.cells.length ? Math.max(...piece.cells.map(c => c[1])) : 0;
+  const rawW  = (maxC + 1) * tcs + 4;
+  const rawH  = (maxR + 1) * tcs + 4;
+  const slotW = Math.max(48, rawW);
+  const slotH = Math.max(48, rawH);
+  const slotOffX = Math.floor((slotW - rawW) / 2);
+  const slotOffY = Math.floor((slotH - rawH) / 2);
+  let anchorR = 0, anchorC = 0;
+  const slotEl = document.querySelector(`.tray-slot[data-idx="${idx}"]`);
+  if (slotEl) {
+    const sr = slotEl.getBoundingClientRect();
+    // 손가락/커서 위치를 조각 내 좌표로 변환 (centering + 2px border 제거)
+    const relX = pos.x - sr.left - slotOffX - 2;
+    const relY = pos.y - sr.top  - slotOffY - 2;
+    anchorC = Math.max(0, Math.min(maxC, Math.floor(relX / tcs)));
+    anchorR = Math.max(0, Math.min(maxR, Math.floor(relY / tcs)));
   }
 
-  drag = { idx, piece, x: pos.x, y: pos.y, offsetX, offsetY, isTouch: pos.isTouch };
+  drag = { idx, piece, x: pos.x, y: pos.y, isTouch: pos.isTouch, anchorR, anchorC };
   // 터치 드래그 중 페이지 스크롤 방지
   if (pos.isTouch) document.body.style.overflow = 'hidden';
   // 드래그 시작 시 하단 툴팁 즉시 숨기기
@@ -2573,10 +2583,7 @@ function onUp(e) {
   document.getElementById('drag-ghost').style.display = 'none';
   const slot = document.querySelector(`.tray-slot[data-idx="${drag.idx}"]`);
   if (slot) slot.classList.remove('ghost', 'selected');
-  const isTouch = drag.isTouch;
-  const rawX = drag.x, rawY = drag.y;
-  const gp = dragBoardCell(rawX, rawY);
-  if (isTouch) showDropDebug(rawX, rawY, gp);
+  const gp = dragBoardCell(drag.x, drag.y);
   if (gp && canPlace(drag.piece, gp.r, gp.c)) {
     commitPlace(drag.piece, gp.r, gp.c, drag.idx);
   } else if (gp) {
@@ -2584,28 +2591,6 @@ function onUp(e) {
     shakeBoard();
   }
   drag = null;
-}
-
-function showDropDebug(rawX, rawY, gp) {
-  const popup = document.getElementById('drop-debug');
-  if (!popup) return;
-  const boardEl = document.getElementById('game-board');
-  const rect = boardEl.getBoundingClientRect();
-  const rawGp = boardCell(rawX, rawY);
-  const ox = parseFloat(localStorage.getItem('marble_touch_offset_x') || '0');
-  const oy = parseFloat(localStorage.getItem('marble_touch_offset_y') || '0');
-  const pxOx = (ox * STEP).toFixed(1), pxOy = (oy * STEP - TOUCH_LIFT).toFixed(1);
-  popup.textContent = [
-    `touch: (${rawX.toFixed(0)}, ${rawY.toFixed(0)})`,
-    `board: L=${rect.left.toFixed(0)} T=${rect.top.toFixed(0)}`,
-    `raw cell: r=${rawGp?rawGp.r:'?'} c=${rawGp?rawGp.c:'?'}`,
-    `cal offset: X=${ox.toFixed(2)}칸 Y=${oy.toFixed(2)}칸`,
-    `px delta: (${pxOx}, ${pxOy})  lift=${TOUCH_LIFT}px`,
-    `final cell: r=${gp?gp.r:'?'} c=${gp?gp.c:'?'}`,
-  ].join('\n');
-  popup.style.display = 'block';
-  clearTimeout(popup._t);
-  popup._t = setTimeout(() => { popup.style.display = 'none'; }, 2000);
 }
 
 function shakeBoard() {
@@ -2623,16 +2608,16 @@ function shakeBoard() {
 // GHOST
 // ════════════════════════════════════════════
 
-// 터치 drag offset + lift를 반영한 ghost의 화면 좌표(top-left)를 반환
+// 앵커 셀을 손가락/커서 아래에 맞춘 ghost top-left 좌표 반환
 function getDragAnchor(x, y) {
-  if (drag && drag.isTouch) {
-    return {
-      left: x - drag.offsetX,
-      top:  y - drag.offsetY - TOUCH_LIFT   // 손가락 위쪽으로 올림
-    };
+  if (!drag) return { left: x, top: y };
+  const gcs = GHOST_CELL + 3;  // ghost cell step = 49px
+  const ax = drag.anchorC * gcs;
+  const ay = drag.anchorR * gcs;
+  if (drag.isTouch) {
+    return { left: x - ax, top: y - ay - TOUCH_LIFT };
   }
-  // 마우스: 기존 동작 유지
-  return { left: x, top: y };
+  return { left: x - ax, top: y - ay };
 }
 
 function showGhost(x, y) {
@@ -2694,14 +2679,20 @@ function boardCell(x, y) {
 }
 
 // 드래그 중 실제 배치 판정에 쓸 셀 좌표 반환
-// 터치: TOUCH_LIFT(고스트 시각 들어올림) 보정 + 캘리브레이션 칸단위 offset × STEP
+// 손가락/커서 위치 → 앵커 셀 위치 → 조각 [0,0] 위치로 변환
 function dragBoardCell(x, y) {
-  if (drag && drag.isTouch) {
+  if (!drag) return boardCell(x, y);
+  let gp;
+  if (drag.isTouch) {
     const ox = parseFloat(localStorage.getItem('marble_touch_offset_x') || '0');
     const oy = parseFloat(localStorage.getItem('marble_touch_offset_y') || '0');
-    return boardCell(x + ox * STEP, y + oy * STEP - TOUCH_LIFT);
+    gp = boardCell(x + ox * STEP, y + oy * STEP - TOUCH_LIFT);
+  } else {
+    gp = boardCell(x, y);
   }
-  return boardCell(x, y);
+  if (!gp) return null;
+  // 잡은 셀(앵커)이 손가락 위치에 오므로, 조각 [0,0]은 앵커만큼 앞에 위치
+  return { r: gp.r - drag.anchorR, c: gp.c - drag.anchorC };
 }
 
 // ════════════════════════════════════════════
@@ -4091,11 +4082,6 @@ if (!localStorage.getItem('marble_touch_offset_x') && ('ontouchstart' in window)
 }
 </script>
 
-<!-- 드롭 디버그 팝업 -->
-<div id="drop-debug" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.85);color:#0f0;font-family:monospace;font-size:.72em;
-  padding:8px 14px;border-radius:8px;z-index:10000;display:none;
-  white-space:pre;pointer-events:none;line-height:1.7;text-align:left"></div>
 
 </body>
 </html>
