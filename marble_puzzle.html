@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>document.charset="UTF-8";</script>
-<meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>援ъ뒳?占쎌쫹 ?占?占쎌텧</title>
+<title>구슬퍼즐 대탈출</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
@@ -16,7 +15,7 @@ body {
   user-select:none; -webkit-user-select:none; touch-action:none;
 }
 
-/* ?占?占?Screens ?占?占?*/
+/* ── Screens ── */
 .screen { display:none; width:100vw; height:100vh; position:fixed; top:0; left:0;
   flex-direction:column; align-items:center; justify-content:center; }
 @keyframes screenFadeIn {
@@ -31,12 +30,12 @@ body {
   display:flex;
   animation:screenFadeIn .3s ease-out both;
 }
-/* ?占쎈━???占쎈㈃: 諛곌꼍 洹몃씪?占쎌씠??+ ?占쎈씪?占쎈뱶???占쎌떆 */
+/* 클리어 화면: 배경 그라데이션 + 슬라이드업 동시 */
 #clear-screen.active {
   animation:gradFlow 3s ease infinite, screenSlideUp .38s cubic-bezier(.34,1.3,.64,1) both;
 }
 
-/* ?占?占?Tutorial Overlay ?占?占?*/
+/* ── Tutorial Overlay ── */
 #tutorial-overlay {
   display:none; position:fixed; top:0; left:0; width:100%; height:100%;
   background:rgba(0,0,0,.6); z-index:9900; align-items:center; justify-content:center;
@@ -61,7 +60,7 @@ body {
 .tut-arrow-row { display:flex; align-items:center; gap:10px; font-size:1.3em;
   margin-bottom:14px; background:#fce4ec; border-radius:12px; padding:10px 18px; }
 
-/* ?占?占?Start Screen ?占?占?*/
+/* ── Start Screen ── */
 #start-screen { background:linear-gradient(160deg,#ffe0ec 0%,#FFB6C1 40%,#ff85a1 100%); }
 .start-title { font-size:clamp(1.6em,5.5vw,2.6em); font-weight:900; color:#fff;
   text-shadow:0 3px 12px rgba(200,40,100,.4); letter-spacing:3px; margin-bottom:4px; text-align:center; }
@@ -121,7 +120,7 @@ body {
 .btn-white:hover { transform:translateY(-2px); background:#fff; }
 .btn-row { display:flex; flex-direction:column; align-items:center; gap:9px; }
 
-/* ?占?占?HUD ?占?占?*/
+/* ── HUD ── */
 #hud {
   display:flex; align-items:center; justify-content:center;
   padding:7px 12px; gap:0;
@@ -129,30 +128,30 @@ body {
   margin-bottom:9px; font-family:'Jua',sans-serif; color:#b71c4e;
   box-shadow:0 3px 16px rgba(200,50,100,.18);
 }
-/* 占??占쎌뀡 釉붾줉 */
+/* 각 섹션 블록 */
 .hud-block {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   padding:2px 16px; line-height:1.15;
 }
-/* 釉붾줉 ?占쎌씠 援щ텇??*/
+/* 블록 사이 구분선 */
 .hud-divider {
   width:1.5px; height:40px; flex-shrink:0;
   background:linear-gradient(180deg,
     transparent 0%, rgba(233,30,99,.28) 20%,
     rgba(233,30,99,.28) 80%, transparent 100%);
 }
-/* ?占쎌뀡 ?占쎌씠占?(?占쏙옙? ?占쎌뒪?? */
+/* 섹션 레이블 (작은 텍스트) */
 .hud-label {
   font-size:.65em; color:#e91e63; opacity:.62;
   letter-spacing:.4px; line-height:1.2;
 }
-/* ???占쎌닔 ??媛???占쎄쾶 */
+/* ① 점수 — 가장 크게 */
 #hud-score {
   font-size:2.1em; color:#e91e63; line-height:1;
   text-shadow:0 1px 0 rgba(255,255,255,.7);
   letter-spacing:-.5px;
 }
-/* ???占?占쎈㉧ 釉붾줉 ???占쎌씠占?+ ?占쎌옄 媛占?諛곗튂 */
+/* ② 타이머 블록 — 아이콘 + 숫자 가로 배치 */
 #hud-timer-block { flex-direction:row; gap:5px; padding:2px 14px; }
 .hud-timer-icon { font-size:1.3em; line-height:1; }
 #timer-val {
@@ -162,7 +161,7 @@ body {
 }
 #timer-val.danger { color:#c62828; animation:blink .5s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
-/* ???占쎈꺼쨌?占쏙옙?占????占쎄쾶, ?占쎈줈 2占?*/
+/* ③ 레벨·남은칸 — 작게, 세로 2줄 */
 #hud-meta { gap:3px; padding:2px 14px; }
 .hud-meta-row {
   display:flex; align-items:center; gap:4px;
@@ -171,7 +170,7 @@ body {
 }
 .hud-meta-row strong { font-size:1.25em; color:#e91e63; line-height:1; }
 
-/* ?占?占?Game Board ?占?占?*/
+/* ── Game Board ── */
 #game-board { display:grid; grid-template-columns:repeat(7,48px); grid-template-rows:repeat(7,48px);
   gap:4px; background:#FFE4EF; padding:8px; border-radius:14px;
   box-shadow:0 6px 24px rgba(180,40,90,.22),inset 0 2px 8px rgba(255,255,255,.35);
@@ -180,7 +179,7 @@ body {
   border:1.5px solid #F9A8C9;
   position:relative; transition:background .08s, box-shadow .08s; overflow:visible;
   box-shadow:inset 2px 2px 5px rgba(0,0,0,.1), inset -1px -1px 3px rgba(255,255,255,.6); }
-/* 援ъ뒳??梨꾩썙占??占? 蹂쇰줉 ?占쎄낵 */
+/* 구슬이 채워진 셀: 볼록 효과 */
 .cell.filled {
   box-shadow:0 3px 8px rgba(0,0,0,.18), inset 0 1px 2px rgba(255,255,255,.3);
 }
@@ -195,7 +194,7 @@ body {
   box-shadow:inset 0 0 0 3px rgba(220,50,50,.8) !important;
 }
 .cell.bad::after {
-  content:'??; position:absolute; top:50%; left:50%;
+  content:'✕'; position:absolute; top:50%; left:50%;
   transform:translate(-50%,-50%); font-size:1.3em;
   color:rgba(220,50,50,.9); font-weight:900; pointer-events:none; z-index:5;
 }
@@ -218,11 +217,11 @@ body {
 }
 .cell.rainbow-wave .marble { animation:rainbowWave .55s ease-out forwards !important; }
 
-/* ?占?占?Marbles ?占?占?*/
+/* ── Marbles ── */
 .marble { border-radius:50%; position:absolute;
   box-shadow:inset -2px -2px 5px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.2); }
 
-/* ?占쎌씠?占쎌씠??諛섏젏 ??湲由щ㉧ ?占쎈땲硫붿씠??*/
+/* 하이라이트 반점 — 글리머 애니메이션 */
 @keyframes marbleGlimmer {
   0%,100% { opacity:.58; transform:rotate(-30deg) scale(1); }
   48%,52% { opacity:.95; transform:rotate(-30deg) scale(1.18); filter:brightness(1.4); }
@@ -235,7 +234,7 @@ body {
   animation-delay:var(--glimmer-delay,0s);
 }
 
-/* 蹂댁“ ?占쎌씠?占쎌씠????*/
+/* 보조 하이라이트 점 */
 @keyframes marbleSparkDot {
   0%,38%,62%,100% { opacity:0; transform:scale(0); }
   50% { opacity:.92; transform:scale(1); }
@@ -248,21 +247,21 @@ body {
   animation:marbleSparkDot var(--glimmer-dur,3.2s) ease-in-out infinite;
   animation-delay:var(--glimmer-delay,0s);
 }
-/* ?占쎈젅??hover/select ???占쎌씠?占쎌씠??諛앹븘占?*/
+/* 트레이 hover/select 시 하이라이트 밝아짐 */
 .tray-slot:hover .marble::before,
 .tray-slot.selected .marble::before {
   background:radial-gradient(ellipse at 35% 35%, rgba(255,255,255,1), rgba(255,255,255,.55) 65%, transparent);
   filter:brightness(1.25);
 }
 
-/* ?占쏀깢 ?占쎌긽 */
+/* 사탕 색상 */
 .m-yellow { background:radial-gradient(circle at 36% 32%,#fffde7,#FFD93D 52%,#e6a800 92%); }
 .m-green  { background:radial-gradient(circle at 36% 32%,#e8fbec,#6BCB77 52%,#3a9948 92%); }
 .m-ivory  { background:radial-gradient(circle at 36% 32%,#ffffff,#FFF9E6 55%,#ede3c0 92%);
   box-shadow:inset -2px -2px 5px rgba(0,0,0,.12), 0 2px 5px rgba(0,0,0,.12); }
 .m-blue   { background:radial-gradient(circle at 36% 32%,#dceeff,#4D96FF 52%,#1a62cc 92%); }
 
-/* ?占쎌닔 援ъ뒳?占?::before ::after 鍮꾪솢??*/
+/* 특수 구슬은 ::before ::after 비활성 */
 .m-eraser::before,  .m-eraser::after,
 .m-eraser2::before, .m-eraser2::after,
 .m-eraser3::before, .m-eraser3::after,
@@ -281,14 +280,14 @@ body {
   transform:translate(-50%,-50%); font-size:1.1em; color:#546e7a;
   font-weight:900; pointer-events:none; z-index:3; }
 
-/* ?占?占?Special Marble Gold Glow ?占?占?*/
+/* ── Special Marble Gold Glow ── */
 @keyframes specialGlow {
   0%,100%{ box-shadow:0 0 0 2px #FFD700,0 0 6px rgba(255,215,0,.45),inset -2px -2px 5px rgba(0,0,0,.22); }
   50%    { box-shadow:0 0 0 2.5px #FFD700,0 0 15px rgba(255,215,0,.9),inset -2px -2px 5px rgba(0,0,0,.22); }
 }
 .marble.special-marble { animation:specialGlow 1.8s ease-in-out infinite; }
 
-/* ?占쎈젅???占쎈’ 湲덉깋 諭껓옙? */
+/* 트레이 슬롯 금색 뱃지 */
 .special-badge {
   position:absolute; top:-4px; right:-4px;
   background:linear-gradient(135deg,#FFD700,#FFA000);
@@ -299,7 +298,7 @@ body {
   white-space:nowrap;
 }
 
-/* ?占?占?Special Marbles ?占?占?*/
+/* ── Special Marbles ── */
 .m-eraser2 { border-radius:6px !important;
   background:linear-gradient(135deg,#f3e5f5,#ce93d8 60%,#9c27b0);
   box-shadow:inset -2px -2px 5px rgba(0,0,0,.22); }
@@ -342,7 +341,7 @@ body {
   font-size:.52em; font-weight:900; color:#0288d1; opacity:.75; pointer-events:none;
 }
 
-/* Special Tooltip ???占쎈떒 怨좎젙 占?*/
+/* Special Tooltip — 하단 고정 바 */
 #special-tooltip {
   position:fixed; left:0; right:0; bottom:0;
   background:rgba(25,25,25,.94); color:#fff;
@@ -359,7 +358,7 @@ body {
 .marble-face { position:absolute; top:0; left:0; width:100%; height:100%;
   pointer-events:none; z-index:2; }
 
-/* ?占?占?Board Shake (invalid drop) ?占?占?*/
+/* ── Board Shake (invalid drop) ── */
 @keyframes boardShake {
   0%,100%{ transform:translateX(0); }
   18%    { transform:translateX(-7px); }
@@ -373,13 +372,13 @@ body {
     0 6px 24px rgba(180,40,90,.22), inset 0 2px 8px rgba(255,255,255,.35) !important;
 }
 
-/* ?占?占?Bomb Target Preview ?占?占?*/
+/* ── Bomb Target Preview ── */
 .cell.bomb-target {
   background:rgba(220,50,50,.30) !important;
   box-shadow:inset 0 0 0 2.5px rgba(220,50,50,.75) !important;
 }
 
-/* ?占?占?Stuck Popup ?占?占?*/
+/* ── Stuck Popup ── */
 #stuck-popup {
   display:none; position:fixed; inset:0; z-index:9500;
   align-items:center; justify-content:center;
@@ -407,13 +406,13 @@ body {
 .stuck-btns button:last-child  { background:#f5f5f5; color:#888; }
 .stuck-btns button:active { transform:scale(.94); }
 
-/* ?占?占?Piece Tray ?占?占?*/
+/* ── Piece Tray ── */
 #piece-tray { display:flex; gap:10px; margin-top:0; padding:10px 12px;
   background:rgba(255,255,255,.65); border-radius:20px; min-height:80px;
   align-items:center; justify-content:center; flex-wrap:nowrap;
   box-shadow:0 3px 14px rgba(200,50,100,.12); overflow:visible; }
 
-/* ?占?占?Tray Area (tray + NEXT preview wrapper) ?占?占?*/
+/* ── Tray Area (tray + NEXT preview wrapper) ── */
 #tray-area { display:flex; gap:8px; align-items:center; margin-top:11px; }
 #next-preview {
   background:rgba(255,255,255,.62); border-radius:16px;
@@ -428,7 +427,7 @@ body {
 }
 #next-piece-slot { position:relative; }
 
-/* ?占?占?Game Layout (portrait default) ?占?占?*/
+/* ── Game Layout (portrait default) ── */
 #game-main { display:flex; flex-direction:column; align-items:center; }
 #game-controls { display:flex; flex-direction:column; align-items:center; width:100%; max-width:400px; }
 .tray-slot {
@@ -444,16 +443,16 @@ body {
 }
 .tray-slot.ghost { opacity:.22; cursor:default; transform:none !important; box-shadow:none !important; }
 
-/* ?占?占?Drag Ghost ?占?占?*/
+/* ── Drag Ghost ── */
 #drag-ghost { position:fixed; pointer-events:none; z-index:9000; display:none; }
 
-/* ?占?占?Score Popup ?占?占?*/
+/* ── Score Popup ── */
 .score-pop { position:fixed; font-size:1.1em; font-weight:800; color:#e91e63;
   pointer-events:none; animation:floatUp .9s ease-out forwards; z-index:8000;
   text-shadow:0 1px 4px rgba(255,255,255,.8); }
 @keyframes floatUp { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-55px);opacity:0} }
 
-/* ?占?占?Marble Bounce-In ?占?占?*/
+/* ── Marble Bounce-In ── */
 @keyframes marbleBounceIn {
   0%   { transform:scale(1.35); }
   52%  { transform:scale(.88); }
@@ -462,7 +461,7 @@ body {
 }
 .marble.bounce-in { animation:marbleBounceIn .36s cubic-bezier(.34,1.56,.64,1) forwards !important; }
 
-/* ?占?占?Place Star Particles ?占?占?*/
+/* ── Place Star Particles ── */
 @keyframes placeStar {
   0%   { transform:translate(0,0) scale(1.1); opacity:1; }
   100% { transform:translate(var(--sdx),var(--sdy)) scale(.25); opacity:0; }
@@ -470,7 +469,7 @@ body {
 .place-star { position:fixed; font-size:.9em; pointer-events:none; z-index:8200;
   animation:placeStar .5s ease-out forwards; }
 
-/* ?占?占?Sparkle Particles ?占?占?*/
+/* ── Sparkle Particles ── */
 @keyframes sparkPart {
   0%   { transform:translate(0,0) scale(1); opacity:1; }
   100% { transform:translate(var(--px),var(--py)) scale(0); opacity:0; }
@@ -478,7 +477,7 @@ body {
 .spark-part { position:fixed; border-radius:50%; pointer-events:none; z-index:8500;
   animation:sparkPart .55s ease-out forwards; }
 
-/* ?占?占?Level-up Banner ?占?占?*/
+/* ── Level-up Banner ── */
 .lvl-banner { position:fixed; top:50%; left:50%;
   transform:translate(-50%,-50%) scale(0);
   background:linear-gradient(135deg,#f06292,#ffd600); color:#fff;
@@ -494,7 +493,7 @@ body {
   100%{transform:translate(-50%,-50%) scale(.4);  opacity:0}
 }
 
-/* ?占?占?Flying Marbles ?占?占?*/
+/* ── Flying Marbles ── */
 .fly-marble { position:fixed; border-radius:50%; pointer-events:none; z-index:6000;
   animation:flyAway .9s ease-out forwards; }
 @keyframes flyAway {
@@ -502,7 +501,7 @@ body {
   100% {transform:translate(var(--tx),var(--ty)) scale(.2) rotate(540deg);opacity:0}
 }
 
-/* ?占?占?Game Button Group (pause / undo / help) ?占?占?*/
+/* ── Game Button Group (pause / undo / help) ── */
 #game-btn-group {
   position:fixed; top:12px; right:12px;
   display:none; gap:8px; align-items:center; z-index:500;
@@ -520,13 +519,13 @@ body {
 #undo-btn:disabled { opacity:.32; cursor:not-allowed; }
 #undo-btn:disabled:hover  { transform:none !important; background:rgba(255,255,255,.86) !important; }
 
-/* ?占?占?Pause Screen ?占?占?*/
+/* ── Pause Screen ── */
 #pause-screen { background:rgba(233,30,99,.88); backdrop-filter:blur(6px);
   -webkit-backdrop-filter:blur(6px); }
 #pause-screen h2 { color:#fff; font-size:2em; margin-bottom:28px;
   text-shadow:0 2px 8px rgba(0,0,0,.2); }
 
-/* ?占?占?Clear Screen ?占?占?*/
+/* ── Clear Screen ── */
 #clear-screen { background:linear-gradient(135deg,#f06292,#ffd740,#80cbc4,#f06292);
   background-size:300% 300%; }
 @keyframes gradFlow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
@@ -536,7 +535,7 @@ body {
 .rainbow-ball { width:82px; height:82px; border-radius:50%; margin:10px auto 14px;
   animation:rainbowAnim 1.2s linear infinite; box-shadow:0 0 28px 5px rgba(255,255,255,.5);
   position:relative; }
-.rainbow-ball::before { content:'?占쏙옙'; position:absolute; top:50%; left:50%;
+.rainbow-ball::before { content:'😄'; position:absolute; top:50%; left:50%;
   transform:translate(-50%,-50%); font-size:1.9em; }
 @keyframes rainbowAnim {
   0%  {background:radial-gradient(circle at 38% 36%,#fff,#ff1744)}
@@ -562,31 +561,31 @@ body {
   text-shadow:0 2px 6px rgba(0,0,0,.2); margin-bottom:5px; text-align:center; }
 .clear-bonus-txt { color:rgba(255,255,255,.88); font-size:.92em; margin-bottom:16px; text-align:center; }
 
-/* ?占?占?Game Over Screen ?占?占?*/
+/* ── Game Over Screen ── */
 #gameover-screen { background:linear-gradient(160deg,#424242,#212121); }
 #gameover-screen h2 { color:#ef9a9a; font-size:2em; margin-bottom:10px; }
 .go-info { color:#aaa; font-size:1em; margin-bottom:6px; }
 .go-info span { color:#fff; font-weight:700; }
 .go-hs { color:#ffd54f; font-size:.88em; margin-bottom:20px; }
 .go-hs span { font-weight:700; }
-/* ?占쎈룄??踰꾪듉: ?占쎄퀬 吏꾪븯占?*/
+/* 재도전 버튼: 크고 진하게 */
 .btn-restart {
   padding:15px 48px; font-size:1.18em !important; min-width:220px;
   background:linear-gradient(135deg,#e53935,#b71c1c) !important;
   box-shadow:0 6px 22px rgba(183,28,28,.45) !important;
 }
 .btn-restart:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(183,28,28,.5) !important; }
-/* ?占쏙옙?占?踰꾪듉: ?占쎄퀬 ?占쏀븯占?*/
+/* 나가기 버튼: 작고 연하게 */
 .btn-exit {
   padding:9px 26px; font-size:.85em !important; min-width:0 !important;
   background:rgba(255,255,255,.12) !important; color:rgba(255,255,255,.58) !important;
   box-shadow:none !important; border:1.5px solid rgba(255,255,255,.22) !important;
 }
 .btn-exit:hover { background:rgba(255,255,255,.2) !important; color:rgba(255,255,255,.8) !important; }
-/* ??踰꾪듉 ?占쎌씠 媛꾧꺽 */
+/* 두 버튼 사이 간격 */
 #gameover-screen .btn-row { gap:24px; }
 
-/* ?占?占?Help Screen ?占?占?*/
+/* ── Help Screen ── */
 #help-screen { background:linear-gradient(160deg,#fce4ec,#FFB6C1); overflow-y:auto; }
 .help-box { background:rgba(255,255,255,.88); border-radius:20px; padding:20px 22px;
   max-width:370px; width:90vw; max-height:62vh; overflow-y:auto; color:#333; line-height:1.85; }
@@ -594,7 +593,7 @@ body {
 .help-box h3:first-child { margin-top:0; }
 .help-box p { font-size:.85em; }
 
-/* ?占?占?Escape Progress Bar ?占?占?*/
+/* ── Escape Progress Bar ── */
 #escape-wrap {
   display:flex; align-items:center; gap:8px;
   margin-top:6px; padding:7px 14px;
@@ -606,7 +605,7 @@ body {
 #escape-track {
   flex:1; height:18px; border-radius:10px;
   position:relative; overflow:visible;
-  /* 25%쨌50%쨌75% 援ш컙 ?占쎌떆 ?占쎄툑??*/
+  /* 25%·50%·75% 구간 표시 눈금선 */
   background:
     linear-gradient(90deg,
       transparent 24.5%, rgba(200,50,100,.35) 24.5%, rgba(200,50,100,.35) 25.5%,
@@ -634,7 +633,7 @@ body {
   flex-shrink:0; min-width:34px; text-align:right;
 }
 
-/* ?占?占?Character Dialogue Bubble ?占?占?*/
+/* ── Character Dialogue Bubble ── */
 #char-bubble {
   position:fixed; left:50%; bottom:110px;
   transform:translateX(-50%) translateY(14px);
@@ -657,7 +656,7 @@ body {
   #char-bubble { bottom:80px; font-size:.85em; padding:8px 16px; }
 }
 
-/* ?占?占?Background Floating Bubbles ?占?占?*/
+/* ── Background Floating Bubbles ── */
 #bg-bubbles { position:fixed; top:0; left:0; width:100%; height:100%;
   pointer-events:none; overflow:hidden; }
 #bg-bubbles span {
@@ -672,7 +671,7 @@ body {
   88%  { opacity:var(--bop,.18); }
   100% { transform:translateY(-105vh) scale(1.08); opacity:0; }
 }
-/* 8占?踰꾨툝 ???占쎌튂쨌?占쎄린쨌?占쎈룄쨌?占쎈젅??媛쒕퀎 吏??*/
+/* 8개 버블 — 위치·크기·속도·딜레이 개별 지정 */
 #bg-bubbles span:nth-child(1) { width:16px;height:16px;left:6%;  --bop:.16; animation-duration:13s; animation-delay:0s;  }
 #bg-bubbles span:nth-child(2) { width:22px;height:22px;left:18%; --bop:.12; animation-duration:17s; animation-delay:2.5s;}
 #bg-bubbles span:nth-child(3) { width:12px;height:12px;left:31%; --bop:.20; animation-duration:10s; animation-delay:5s;  }
@@ -682,10 +681,10 @@ body {
 #bg-bubbles span:nth-child(7) { width:18px;height:18px;left:83%; --bop:.15; animation-duration:11s; animation-delay:9s;  }
 #bg-bubbles span:nth-child(8) { width:10px;height:10px;left:93%; --bop:.19; animation-duration:16s; animation-delay:4.5s;}
 
-/* ?占?占?Timeattack Diff Button ?占?占?*/
+/* ── Timeattack Diff Button ── */
 .d-timeattack { background:linear-gradient(135deg,#ffa726,#e65100); box-shadow:0 4px 14px rgba(230,81,0,.3); }
 
-/* ?占?占?Marble Name Tooltip ?占?占?*/
+/* ── Marble Name Tooltip ── */
 #marble-name-tip {
   position:fixed; pointer-events:none; z-index:8800;
   background:rgba(20,20,36,.93); color:#fff;
@@ -694,7 +693,7 @@ body {
   font-family:'Jua',sans-serif; border:1.5px solid rgba(255,215,0,.42);
 }
 
-/* ?占?占?Locked Cell ?占?占?*/
+/* ── Locked Cell ── */
 .m-locked::before,.m-locked::after { display:none; }
 .m-locked {
   border-radius:6px !important;
@@ -712,7 +711,7 @@ body {
 }
 .marble.m-locked { animation:lockPulse 2s ease-in-out infinite; }
 
-/* ?占?占?Achievement Popup ?占?占?*/
+/* ── Achievement Popup ── */
 #achievement-popup {
   display:none; position:fixed; inset:0; z-index:9600;
   align-items:flex-start; justify-content:center;
@@ -734,7 +733,7 @@ body {
 .ach-name { font-size:1.05em; letter-spacing:.4px; }
 .ach-desc { font-size:.75em; opacity:.88; margin-top:3px; }
 
-/* ?占?占?Shop Screen ?占?占?*/
+/* ── Shop Screen ── */
 #shop-screen { background:linear-gradient(160deg,#ffe0ec 0%,#FFB6C1 40%,#ff85a1 100%); overflow-y:auto; }
 .shop-box { background:rgba(255,255,255,.88); border-radius:20px; padding:20px 16px;
   max-width:360px; width:92vw; max-height:62vh; overflow-y:auto; }
@@ -752,14 +751,14 @@ body {
 .skin-name { font-size:.82em; font-weight:700; color:#c2185b; }
 .skin-cost { font-size:.68em; color:#888; margin-top:3px; }
 
-/* ?占?占?Daily Mission ?占?占?*/
+/* ── Daily Mission ── */
 .daily-mission { background:rgba(255,255,255,.78); border-radius:16px; padding:8px 16px;
   font-size:.82em; color:#c2185b; font-weight:700; margin-bottom:10px;
   box-shadow:0 2px 8px rgba(200,50,100,.12); text-align:center; max-width:300px; }
 .dm-label { font-size:.68em; opacity:.65; letter-spacing:.5px; margin-bottom:2px; }
 .dm-done { color:#2e7d32 !important; }
 
-/* ?占?占?Hall of Fame Screen ?占?占?*/
+/* ── Hall of Fame Screen ── */
 #hof-screen { background:linear-gradient(160deg,#1a237e,#283593,#3949ab); }
 .hof-box { background:rgba(255,255,255,.1); border-radius:22px; padding:20px 16px;
   max-width:330px; width:90vw; }
@@ -771,10 +770,9 @@ body {
 .hof-name { flex:1; color:#fff; font-size:.9em; font-weight:700; }
 .hof-score { color:#FFD700; font-weight:900; font-size:.92em; white-space:nowrap; }
 .hof-date { font-size:.65em; color:rgba(255,255,255,.45); white-space:nowrap; margin-left:4px; }
-.hof-diff { font-size:.62em; color:rgba(255,200,100,.75); white-space:nowrap; margin-left:4px; }
 .hof-empty { color:rgba(255,255,255,.4); font-size:.85em; text-align:center; padding:10px 0; line-height:1.7; }
 
-/* ?占?占?Name Input Popup ?占?占?*/
+/* ── Name Input Popup ── */
 #name-input-popup { display:none; position:fixed; inset:0; z-index:9700;
   align-items:center; justify-content:center;
   background:rgba(0,0,0,.55); backdrop-filter:blur(4px); }
@@ -795,7 +793,7 @@ body {
 .ni-reg  { background:linear-gradient(135deg,#f06292,#e91e63); color:#fff; box-shadow:0 4px 12px rgba(233,30,99,.3); }
 .ni-skip { background:#f5f5f5; color:#888; }
 
-/* ?占?占?Timeattack Warning Bar ?占?占?*/
+/* ── Timeattack Warning Bar ── */
 #ta-warn { display:none; position:fixed; top:62px; left:50%; transform:translateX(-50%);
   background:rgba(183,28,28,.93); color:#fff; padding:5px 18px;
   border-radius:20px; font-size:.82em; font-weight:700; z-index:550;
@@ -805,7 +803,7 @@ body {
   0%,100%{transform:translateX(-50%) scale(1)} 50%{transform:translateX(-50%) scale(1.06)}
 }
 
-/* ?占?占?Responsive ?占?占?*/
+/* ── Responsive ── */
 @media (max-width:420px) {
   #game-board { grid-template-columns:repeat(7,40px); grid-template-rows:repeat(7,40px); }
   .cell { width:40px; height:40px; }
@@ -825,7 +823,7 @@ body {
   .hud-meta-row { font-size:.66em; }
   .jail-wrap { transform:scale(.85); margin-bottom:6px; }
 }
-/* ?占?占?Landscape Layout ?占?占?*/
+/* ── Landscape Layout ── */
 @media (orientation:landscape) and (max-height:520px) {
   #game-screen { flex-direction:row !important; align-items:center; justify-content:center; gap:14px; padding:6px 10px; }
   #game-main { flex-direction:column; align-items:center; gap:0; }
@@ -848,13 +846,13 @@ body {
 </head>
 <body>
 
-<!-- ?占썩븧 Background Bubbles ?占썩븧 -->
+<!-- ══ Background Bubbles ══ -->
 <div id="bg-bubbles" aria-hidden="true">
   <span></span><span></span><span></span><span></span>
   <span></span><span></span><span></span><span></span>
 </div>
 
-<!-- ?占썩븧 Tutorial Overlay ?占썩븧 -->
+<!-- ══ Tutorial Overlay ══ -->
 <div id="tutorial-overlay">
   <div class="tut-box">
     <div class="tut-dots">
@@ -863,37 +861,37 @@ body {
       <div class="tut-dot"    id="td3"></div>
     </div>
     <div class="tut-step show" id="tut-step-1">
-      <span class="tut-icon">?占쏙옙</span>
-      <h3>1?占쎄퀎: 援ъ뒳 ?占쏀깮</h3>
-      <div class="tut-arrow-row">?占쏙옙占?<span style="font-size:.75em;color:#555">?占쎈떒 援ъ뒳 ?占쎌쫹???占쎌튂/?占쎈┃!</span></div>
-      <p>?占쎈㈃ ?占쎈옒履쎌뿉 ?占쏙옙??占쎈뒗 援ъ뒳 ?占쎌쫹 議곌컖??br>留덉슦?占쎈굹 ?占쏙옙??占쎌쑝占??占쎈Ⅴ?占쎌슂.</p>
-      <button class="btn btn-pink" onclick="tutNext(2)" style="min-width:0;padding:10px 28px">?占쎌쓬 ??/button>
+      <span class="tut-icon">🔮</span>
+      <h3>1단계: 구슬 선택</h3>
+      <div class="tut-arrow-row">🖱️ <span style="font-size:.75em;color:#555">하단 구슬 퍼즐을 터치/클릭!</span></div>
+      <p>화면 아래쪽에 나타나는 구슬 퍼즐 조각을<br>마우스나 손가락으로 누르세요.</p>
+      <button class="btn btn-pink" onclick="tutNext(2)" style="min-width:0;padding:10px 28px">다음 →</button>
     </div>
     <div class="tut-step" id="tut-step-2">
-      <span class="tut-icon">??/span>
-      <h3>2?占쎄퀎: ?占쎈옒占??占쎈룞</h3>
-      <div class="tut-arrow-row">?占쏙옙 ???占쏙옙 <span style="font-size:.75em;color:#555">寃뚯엫?占쎌쑝占??占쎌뼱???占쎄린</span></div>
-      <p>?占쎈Ⅸ 梨꾨줈 ?占쎌뼱??7횞7 寃뚯엫???占쎌뿉<br>?占쎌쑝占?援ъ뒳??諛곗튂?占쎈땲??<br>珥덈줉??= 諛곗튂 媛??/ 鍮④컙??= 遺덌옙???/p>
-      <button class="btn btn-pink" onclick="tutNext(3)" style="min-width:0;padding:10px 28px">?占쎌쓬 ??/button>
+      <span class="tut-icon">✋</span>
+      <h3>2단계: 드래그 이동</h3>
+      <div class="tut-arrow-row">🔮 → 🎯 <span style="font-size:.75em;color:#555">게임판으로 끌어다 놓기</span></div>
+      <p>누른 채로 끌어서 7×7 게임판 위에<br>놓으면 구슬이 배치됩니다.<br>초록색 = 배치 가능 / 빨간색 = 불가능</p>
+      <button class="btn btn-pink" onclick="tutNext(3)" style="min-width:0;padding:10px 28px">다음 →</button>
     </div>
     <div class="tut-step" id="tut-step-3">
-      <span class="tut-icon">?占쏙옙</span>
-      <h3>3?占쎄퀎: 49占??占쎌꽦!</h3>
-      <div class="tut-arrow-row">?占쏙옙횞49 ??<span style="font-size:.75em;color:#e91e63;font-weight:700">?占?占쎌텧!</span></div>
-      <p>7횞7 = 49移몄쓣 紐⑤몢 梨꾩슦占?br>媛숋옙? ??2~5占??占쎄껐 援ъ뒳??癒쇽옙? ?占쎌텧?占쎄퀬<br>?占쎈㉧吏 援ъ뒳??紐⑤몢 ?占쎌텧?占쎈땲??</p>
-      <button class="btn btn-pink" onclick="tutDone()" style="min-width:0;padding:10px 28px">?占쏙옙 ?占쎌옉!</button>
+      <span class="tut-icon">🏆</span>
+      <h3>3단계: 49칸 완성!</h3>
+      <div class="tut-arrow-row">🔮×49 → <span style="font-size:.75em;color:#e91e63;font-weight:700">대탈출!</span></div>
+      <p>7×7 = 49칸을 모두 채우면<br>같은 색 2~5개 연결 구슬이 먼저 탈출하고<br>나머지 구슬도 모두 탈출합니다!</p>
+      <button class="btn btn-pink" onclick="tutDone()" style="min-width:0;padding:10px 28px">🎮 시작!</button>
     </div>
   </div>
 </div>
 
-<!-- ?占썩븧 Start Screen ?占썩븧 -->
+<!-- ══ Start Screen ══ -->
 <div id="start-screen" class="screen active">
-  <div class="start-title">?占쏙옙 援ъ뒳?占쎌쫹 ?占?占쎌텧 ?占쏙옙</div>
-  <div class="start-sub">49移몄쓣 援ъ뒳占?媛??梨꾩썙 ?占쎌텧?占쎌폒??</div>
-  <div class="hs-badge">?占쏙옙 理쒓퀬 ?占쎌닔: <span id="start-hs-val">0</span>??/div>
+  <div class="start-title">🔮 구슬퍼즐 대탈출 🔮</div>
+  <div class="start-sub">49칸을 구슬로 가득 채워 탈출시켜라!</div>
+  <div class="hs-badge">🏆 최고 점수: <span id="start-hs-val">0</span>점</div>
   <div class="daily-mission" id="daily-mission-wrap">
-    <div class="dm-label">?占쏙옙 ?占쎈뒛??誘몄뀡</div>
-    <div id="dm-text">濡쒕뵫 占?..</div>
+    <div class="dm-label">📅 오늘의 미션</div>
+    <div id="dm-text">로딩 중...</div>
   </div>
   <div class="jail-wrap">
     <div class="jail-bg"></div>
@@ -910,71 +908,70 @@ body {
       <rect x="0" y="24" width="110" height="9" fill="#333" rx="4"/>
       <rect x="0" y="96" width="110" height="9" fill="#333" rx="4"/>
     </svg>
-    <div class="speech">?占쎈젮以섏슂~!! ?占쏙옙</div>
+    <div class="speech">살려줘요~!! 😭</div>
   </div>
-  <div class="diff-label">?占쎌씠???占쏀깮</div>
+  <div class="diff-label">난이도 선택</div>
   <div class="diff-row">
     <button class="diff-btn d-easy"   onclick="setDiff('easy')">
-      <span class="diff-icon">?占쏙옙</span>
-      <span class="diff-name">?占쏙옙?</span>
-      <span class="diff-desc">3占?쨌 3媛吏 ??/span>
+      <span class="diff-icon">😊</span>
+      <span class="diff-name">쉬움</span>
+      <span class="diff-desc">3분 · 3가지 색</span>
     </button>
     <button class="diff-btn d-normal" onclick="setDiff('normal')">
-      <span class="diff-icon">?占쏙옙</span>
-      <span class="diff-name">蹂댄넻</span>
-      <span class="diff-desc">2占?쨌 4媛吏 ??/span>
+      <span class="diff-icon">🎯</span>
+      <span class="diff-name">보통</span>
+      <span class="diff-desc">2분 · 4가지 색</span>
     </button>
     <button class="diff-btn d-hard"   onclick="setDiff('hard')">
-      <span class="diff-icon">??</span>
-      <span class="diff-name">?占쎈젮?占?/span>
-      <span class="diff-desc">1占?쨌 ?占쎌븷占?3占?/span>
+      <span class="diff-icon">💀</span>
+      <span class="diff-name">어려움</span>
+      <span class="diff-desc">1분 · 장애물 3개</span>
     </button>
     <button class="diff-btn d-timeattack" onclick="setDiff('timeattack')">
-      <span class="diff-icon">??/span>
-      <span class="diff-name">?占?占쎌뼱??/span>
-      <span class="diff-desc">30珥덈쭏???占쎈룞諛곗튂</span>
+      <span class="diff-icon">⚡</span>
+      <span class="diff-name">타임어택</span>
+      <span class="diff-desc">30초마다 자동배치</span>
     </button>
   </div>
   <div class="btn-row">
-    <button class="btn btn-white" onclick="showScreen('help')">???占쏙옙?占?/button>
-    <button class="btn btn-white" onclick="showShop()">?占쏙옙占?援ъ뒳 ?占쎌젏</button>
-    <button class="btn btn-white" onclick="showHOF()">?占쏙옙 紐낆삁???占쎈떦</button>
+    <button class="btn btn-white" onclick="showScreen('help')">❓ 도움말</button>
+    <button class="btn btn-white" onclick="showShop()">🛍️ 구슬 상점</button>
+    <button class="btn btn-white" onclick="showHOF()">🏆 명예의 전당</button>
   </div>
 </div>
 
-<!-- ?占썩븧 Game Screen ?占썩븧 -->
+<!-- ══ Game Screen ══ -->
 <div id="game-screen" class="screen">
   <div id="game-main">
   <div id="hud">
-    <!-- ???占쎌닔 (媛???占쎄쾶) -->
+    <!-- ① 점수 (가장 크게) -->
     <div class="hud-block" id="hud-score-block">
-      <span class="hud-label">占??占쎌닔</span>
+      <span class="hud-label">⭐ 점수</span>
       <strong id="hud-score">0</strong>
     </div>
     <div class="hud-divider"></div>
-    <!-- ???占?占쎈㉧ (?占쎌씠占?+ ?占쎌옄 ?占쏙옙??? -->
+    <!-- ② 타이머 (아이콘 + 숫자 나란히) -->
     <div class="hud-block" id="hud-timer-block">
-      <span class="hud-timer-icon">??/span>
+      <span class="hud-timer-icon">⏱</span>
       <span id="timer-val">3:00</span>
     </div>
     <div class="hud-divider"></div>
-    <!-- ???占쎈꺼쨌?占쏙옙?移맞룸궃?占쎈룄 (?占쎄쾶, 3占? -->
+    <!-- ③ 레벨·남은칸 (작게, 2줄) -->
     <div class="hud-block" id="hud-meta">
-      <div class="hud-meta-row" id="hud-lv-item">?占쏙옙 Lv.<strong id="hud-level">1</strong></div>
-      <div class="hud-meta-row">?占쏙옙 <strong id="hud-remain">49</strong>占?/div>
-      <div class="hud-meta-row" id="hud-diff-item"><strong id="hud-diff-label">蹂댄넻 횞1.5</strong></div>
+      <div class="hud-meta-row" id="hud-lv-item">📊 Lv.<strong id="hud-level">1</strong></div>
+      <div class="hud-meta-row">🔮 <strong id="hud-remain">49</strong>칸</div>
     </div>
   </div>
   <div id="game-board"></div>
   </div><!-- #game-main -->
   <div id="game-controls">
     <div id="escape-wrap">
-      <span class="esc-icon">?占쏙옙</span>
+      <span class="esc-icon">🔒</span>
       <div id="escape-track">
         <div id="escape-fill"></div>
-        <div id="escape-marble">?占쏙옙</div>
+        <div id="escape-marble">😭</div>
       </div>
-      <span class="esc-icon">?占쏙옙</span>
+      <span class="esc-icon">🚪</span>
       <span id="escape-pct">0%</span>
     </div>
     <div id="tray-area">
@@ -989,127 +986,127 @@ body {
 <div id="char-bubble"><span id="char-bubble-txt"></span></div>
 <div id="special-tooltip"></div>
 
-<!-- ?占썩븧 Stuck Popup ?占썩븧 -->
+<!-- ══ Stuck Popup ══ -->
 <div id="stuck-popup">
   <div class="stuck-box">
-    <div class="stuck-icon">?占쏙옙</div>
-    <p>留됲삍?占쎌슂!<br>吏?占쎄컻占??占쎈┫源뚯슂?</p>
+    <div class="stuck-icon">😰</div>
+    <p>막혔어요!<br>지우개를 드릴까요?</p>
     <div class="stuck-btns">
-      <button onclick="giveEraser()">?? 二쇱꽭??</button>
-      <button onclick="closeStuck()">愿쒖갖?占쎌슂</button>
+      <button onclick="giveEraser()">네, 주세요!</button>
+      <button onclick="closeStuck()">괜찮아요</button>
     </div>
   </div>
 </div>
 <div id="game-btn-group">
-  <button id="undo-btn"  class="game-btn" onclick="undoMove()" disabled title="?占쎈룎由ш린">??/button>
-  <button id="help-btn"  class="game-btn" onclick="showGameHelp()" title="?占쏙옙?占?>??/button>
-  <button id="pause-btn" class="game-btn" onclick="togglePause()" title="?占쎌떆?占쏙옙?">??/button>
+  <button id="undo-btn"  class="game-btn" onclick="undoMove()" disabled title="되돌리기">↩</button>
+  <button id="help-btn"  class="game-btn" onclick="showGameHelp()" title="도움말">❓</button>
+  <button id="pause-btn" class="game-btn" onclick="togglePause()" title="일시정지">⏸</button>
 </div>
 
-<!-- ?占썩븧 Drag Ghost ?占썩븧 -->
+<!-- ══ Drag Ghost ══ -->
 <div id="drag-ghost"></div>
 
-<!-- ?占썩븧 Pause Screen ?占썩븧 -->
+<!-- ══ Pause Screen ══ -->
 <div id="pause-screen" class="screen">
-  <h2>???占쎌떆?占쏙옙?</h2>
+  <h2>⏸ 일시정지</h2>
   <div class="btn-row">
-    <button class="btn btn-white" onclick="togglePause()">??怨꾩냽?占쎄린</button>
-    <button class="btn btn-white" onclick="quitGame()">?占쏙옙 ?占쏙옙?占?/button>
+    <button class="btn btn-white" onclick="togglePause()">▶ 계속하기</button>
+    <button class="btn btn-white" onclick="quitGame()">🚪 나가기</button>
   </div>
 </div>
 
-<!-- ?占썩븧 Clear Screen ?占썩븧 -->
+<!-- ══ Clear Screen ══ -->
 <div id="clear-screen" class="screen">
-  <h2>?占쏙옙 ?占쎌텧 ?占쎄났!! ?占쏙옙</h2>
+  <h2>🎉 탈출 성공!! 🎉</h2>
   <div id="star-container"></div>
   <div class="rainbow-ball"></div>
-  <div class="clear-score-txt">理쒖쥌 ?占쎌닔: <span id="clear-score">0</span>??/div>
+  <div class="clear-score-txt">최종 점수: <span id="clear-score">0</span>점</div>
   <div class="clear-bonus-txt" id="clear-bonus"></div>
   <div class="btn-row">
-    <button class="btn btn-pink"  onclick="startGame(window._lastDiff||'normal')">?占쏙옙 ?占쎌떆 ?占쎄린</button>
-    <button class="btn btn-white" onclick="showScreen('start')">?占쏙옙 泥섏쓬?占쎈줈</button>
+    <button class="btn btn-pink"  onclick="startGame(window._lastDiff||'normal')">🔄 다시 하기</button>
+    <button class="btn btn-white" onclick="showScreen('start')">🏠 처음으로</button>
   </div>
 </div>
 
-<!-- ?占썩븧 Game Over Screen ?占썩븧 -->
+<!-- ══ Game Over Screen ══ -->
 <div id="gameover-screen" class="screen">
-  <h2>?占쏙옙 ?占쎌텧 ?占쏀뙣...</h2>
-  <div class="go-info">?占쎈뱷 ?占쎌닔: <span id="go-score">0</span>??/div>
-  <div class="go-hs">?占쏙옙 理쒓퀬 ?占쎌닔: <span id="go-hs-val">0</span>??/div>
+  <h2>💔 탈출 실패...</h2>
+  <div class="go-info">획득 점수: <span id="go-score">0</span>점</div>
+  <div class="go-hs">🏆 최고 점수: <span id="go-hs-val">0</span>점</div>
   <div class="btn-row">
-    <button class="btn btn-pink btn-restart" onclick="startGame(window._lastDiff||'normal')">?占쏙옙 ?占쎈룄??/button>
-    <button class="btn btn-exit"             onclick="showScreen('start')">?占쏙옙 ?占쏙옙?占?/button>
+    <button class="btn btn-pink btn-restart" onclick="startGame(window._lastDiff||'normal')">🔄 재도전</button>
+    <button class="btn btn-exit"             onclick="showScreen('start')">🏠 나가기</button>
   </div>
 </div>
 
-<!-- ?占썩븧 Help Screen ?占썩븧 -->
+<!-- ══ Help Screen ══ -->
 <div id="help-screen" class="screen">
   <div class="help-box">
-    <h3>?占쏙옙 寃뚯엫 諛⑸쾿</h3>
-    <p>?占쎈떒 援ъ뒳 ?占쎌쫹???占쎈옒洹명빐??7횞7 寃뚯엫?占쎌뿉 ?占쎈젮?占쎌쑝?占쎌슂. 49移몄쓣 紐⑤몢 梨꾩슦占?援ъ뒳???占쎌텧?占쎈땲??</p>
-    <h3>?占쏙툘 ?占쎌씠??/h3>
-    <p>?占쏙옙 ?占쏙옙?: 3占? 3??援ъ뒳, 2~4占?議곌컖<br>?占쏙옙 蹂댄넻: 2占? 4??援ъ뒳, 2~5占?議곌컖<br>?? ?占쎈젮?占? 1占? 4??援ъ뒳, 3~5占?議곌컖 + ?占쎌븷占?3占?/p>
-    <h3>?占쏙옙 ?占쎄껐 ?占쎌텧 洹쒖튃</h3>
-    <p>49占??占쎌꽦 ??媛숋옙? ?占쎌쑝占?2~5占??占쎄껐??援ъ뒳??癒쇽옙? 諛섏쭩?占쎈ŉ ?占쎌텧?占쎈땲??</p>
-    <h3>?占쏙옙 吏?占쎄컻 援ъ뒳</h3>
-    <p>?占쎌깋 吏곸궗媛곹삎 吏?占쎄컻占?梨꾩썙占?移몄뿉 ?占쎈━占??占쎈떦 移몄쓣 吏?占쎈땲??</p>
-    <h3>?占쏙옙 ?占쎌븷占?(?占쎈젮?占?</h3>
-    <p>誘몃━ ?占쎌씤 ?占쎈몢??移몄쑝占? 諛곗튂?占쎄굅??吏?????占쎌뒿?占쎈떎.</p>
-    <h3>???占쎈룎由ш린</h3>
-    <p>?占쎈Ⅸ占??占쎈떒 ??踰꾪듉?占쎈줈 留덌옙?占??占쎈룞??痍⑥냼?????占쎌뒿?占쎈떎. ?占쎈떦 1?占쎈쭔 ?占쎌슜 媛?占쏀빀?占쎈떎.</p>
-    <h3>?占쏙옙 ?占쎈꺼??(蹂댄넻)</h3>
-    <p>25占?諛곗튂 ???占쎈꺼 2占??占쎌듅 (??蹂듭옟??議곌컖 ?占쎌옣)</p>
-    <h3>占??占쎌닔</h3>
-    <p>援ъ뒳 1占?諛곗튂: ?占쏙옙? 100??/ 蹂댄넻 150??/ ?占쎈젮?占?200??br>?占쎄컙 蹂대꼫?? ?占쏙옙??占쎄컙 횞 (?占쏙옙? 횞5 / 蹂댄넻 횞10 / ?占쎈젮?占?횞20)<br>占?3占? 60珥댿넁 / 占?2占? 30珥댿넁 / 占?1占? 30占?誘몃쭔</p>
+    <h3>🎮 게임 방법</h3>
+    <p>하단 구슬 퍼즐을 드래그해서 7×7 게임판에 올려놓으세요. 49칸을 모두 채우면 구슬이 탈출합니다!</p>
+    <h3>⚙️ 난이도</h3>
+    <p>😊 쉬움: 3분, 3색 구슬, 2~4개 조각<br>🎯 보통: 2분, 4색 구슬, 2~5개 조각<br>💀 어려움: 1분, 4색 구슬, 3~5개 조각 + 장애물 3개</p>
+    <h3>💥 연결 탈출 규칙</h3>
+    <p>49칸 완성 시 같은 색으로 2~5개 연결된 구슬이 먼저 반짝이며 탈출합니다!</p>
+    <h3>🧹 지우개 구슬</h3>
+    <p>회색 직사각형 지우개를 채워진 칸에 올리면 해당 칸을 지웁니다.</p>
+    <h3>🚫 장애물 (어려움)</h3>
+    <p>미리 놓인 어두운 칸으로, 배치하거나 지울 수 없습니다.</p>
+    <h3>↩ 되돌리기</h3>
+    <p>오른쪽 상단 ↩ 버튼으로 마지막 이동을 취소할 수 있습니다. 턴당 1회만 사용 가능합니다.</p>
+    <h3>📊 레벨업 (보통)</h3>
+    <p>25개 배치 시 레벨 2로 상승 (더 복잡한 조각 등장)</p>
+    <h3>⭐ 점수</h3>
+    <p>구슬 1개 배치 = 100점 / 클리어 시 남은 시간 × 10점 보너스<br>별 3개: 60초↑ / 별 2개: 30초↑ / 별 1개: 30초 미만</p>
   </div>
-  <button class="btn btn-pink" style="margin-top:14px" onclick="goBackFromHelp()">???占쎌븘媛占?/button>
+  <button class="btn btn-pink" style="margin-top:14px" onclick="goBackFromHelp()">← 돌아가기</button>
 </div>
 
-<!-- ?占썩븧 Shop Screen ?占썩븧 -->
+<!-- ══ Shop Screen ══ -->
 <div id="shop-screen" class="screen">
   <div class="shop-box">
-    <div class="shop-title">?占쏙옙占?援ъ뒳 ?占쎌젏</div>
-    <div class="shop-cumul" id="shop-cumul-score">?占쎌쟻 ?占쎌닔: 0??/div>
+    <div class="shop-title">🛍️ 구슬 상점</div>
+    <div class="shop-cumul" id="shop-cumul-score">누적 점수: 0점</div>
     <div class="skin-grid" id="skin-grid"></div>
   </div>
-  <button class="btn btn-pink" style="margin-top:14px" onclick="goBackFromShop()">???占쎌븘媛占?/button>
+  <button class="btn btn-pink" style="margin-top:14px" onclick="goBackFromShop()">← 돌아가기</button>
 </div>
 
-<!-- ?占썩븧 Hall of Fame Screen ?占썩븧 -->
+<!-- ══ Hall of Fame Screen ══ -->
 <div id="hof-screen" class="screen">
   <div class="hof-box">
-    <div class="hof-title">?占쏙옙 紐낆삁???占쎈떦</div>
+    <div class="hof-title">🏆 명예의 전당</div>
     <div id="hof-list"></div>
   </div>
-  <button class="btn btn-white" style="margin-top:14px" onclick="showScreen('start')">???占쎌븘媛占?/button>
+  <button class="btn btn-white" style="margin-top:14px" onclick="showScreen('start')">← 돌아가기</button>
 </div>
 
-<!-- ?占썩븧 Achievement Popup ?占썩븧 -->
+<!-- ══ Achievement Popup ══ -->
 <div id="achievement-popup"></div>
 
-<!-- ?占썩븧 Name Input Popup ?占썩븧 -->
+<!-- ══ Name Input Popup ══ -->
 <div id="name-input-popup">
   <div class="ni-box">
-    <h3>?占쏙옙 ?占쎌텧 ?占쎄났!</h3>
-    <p>?占쎈뱷 ?占쎌닔: <strong id="ni-score-txt">0??/strong><br>紐낆삁???占쎈떦???占쎈쫫???占쎈줉?占쎌꽭??</p>
-    <input type="text" id="name-input-field" maxlength="10" placeholder="?占쎈쫫 ?占쎈젰 (理쒙옙? 10??">
+    <h3>🏆 탈출 성공!</h3>
+    <p>획득 점수: <strong id="ni-score-txt">0점</strong><br>명예의 전당에 이름을 등록하세요!</p>
+    <input type="text" id="name-input-field" maxlength="10" placeholder="이름 입력 (최대 10자)">
     <div class="ni-btns">
-      <button class="ni-reg"  id="ni-register-btn">?占쎈줉 ?占쏙옙</button>
-      <button class="ni-skip" id="ni-skip-btn">嫄대꼫?占쎄린</button>
+      <button class="ni-reg"  id="ni-register-btn">등록 🏆</button>
+      <button class="ni-skip" id="ni-skip-btn">건너뛰기</button>
     </div>
   </div>
 </div>
 
-<!-- ?占썩븧 Marble Name Tooltip ?占썩븧 -->
+<!-- ══ Marble Name Tooltip ══ -->
 <div id="marble-name-tip"></div>
 
-<!-- ?占썩븧 Timeattack Warning ?占썩븧 -->
+<!-- ══ Timeattack Warning ══ -->
 <div id="ta-warn"></div>
 
 <script>
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // CONSTANTS
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 const GRID      = 7;
 const CELL_SIZE = 48;
 const GAP       = 4;
@@ -1133,44 +1130,41 @@ const SHAPES = {
      [[0,0],[1,0],[1,1],[1,2],[2,2]]]
 };
 
-// ?占?占?援ъ뒳 ?占쎈쫫 ?占?占?const MARBLE_NAMES = {
-  'm-yellow': ['?占쎈옉??,'?占쎈룎??,'?占쎌궡??,'誘쇰뱾??,'?占쎈が??,'?占쎈컮?占쎄린','轅踰뚯씠','湲덈튆??],
-  'm-green':  ['珥덈줉??,'?占쎌떦??,'誘쇳듃','?占쎌깉','?占쎈줈占?,'珥덈”??,'?占?占쎌씠','?占쎈찓?占쎈뱶'],
-  'm-ivory':  ['?占쎌씠蹂대━','?占쎌쑀占?,'吏꾩＜','?占쎈┝??,'?占쏀깢??,'?占쎈뫁??,'?占쎌넚??,'諛?占쏀떚'],
-  'm-blue':   ['?占쎈옉??,'諛붾떎','?占쎈뒛??,'?占쏙옙?占?,'臾쇰갑??,'?占쎈퀎','?占쎈룄','?占쎌퓼??],
+// ── 구슬 이름 ──
+const MARBLE_NAMES = {
+  'm-yellow': ['노랑이','해돌이','햇살이','민들레','레몬이','해바라기','꿀벌이','금빛이'],
+  'm-green':  ['초록이','새싹이','민트','잎새','클로버','초롱이','풀잎이','에메랄드'],
+  'm-ivory':  ['아이보리','우유빛','진주','크림이','설탕이','흰둥이','눈송이','밀크티'],
+  'm-blue':   ['파랑이','바다','하늘이','파란콩','물방울','샛별','파도','아쿠아'],
 };
 
-// ?占?占??占쎌쟻 ?占?占?const ACHIEVEMENTS = [
-  { id:'first_clear', icon:'?占쏙옙', name:'占??占쎌텧!',    desc:'泥섏쓬?占쎈줈 ?占쎈━?占쏀뻽?占쎌슂' },
-  { id:'speed_clear', icon:'??, name:'踰덇컻 ?占쎌텧!',   desc:'1占??占쎌긽 ?占쎄린占??占쎈━?? },
-  { id:'no_eraser',   icon:'?占쏙옙', name:'?占쎌닔???占쎌텧!', desc:'吏?占쎄컻쨌??占쏙옙 ?占쎌씠 ?占쎈━?? },
+// ── 업적 ──
+const ACHIEVEMENTS = [
+  { id:'first_clear', icon:'🏆', name:'첫 탈출!',    desc:'처음으로 클리어했어요' },
+  { id:'speed_clear', icon:'⚡', name:'번개 탈출!',   desc:'1분 이상 남기고 클리어' },
+  { id:'no_eraser',   icon:'💎', name:'순수한 탈출!', desc:'지우개·폭탄 없이 클리어' },
 ];
 
-// ?占?占??占쏀궓 ?占?占?const SKINS = [
-  { id:'circle', name:'湲곕낯 援ъ뒳', cost:0 },
-  { id:'star',   name:'占?援ъ뒳',   cost:1000 },
-  { id:'heart',  name:'?占쏀듃 援ъ뒳', cost:2000 },
-  { id:'flower', name:'占?援ъ뒳',   cost:3000 },
+// ── 스킨 ──
+const SKINS = [
+  { id:'circle', name:'기본 구슬', cost:0 },
+  { id:'star',   name:'별 구슬',   cost:1000 },
+  { id:'heart',  name:'하트 구슬', cost:2000 },
+  { id:'flower', name:'꽃 구슬',   cost:3000 },
 ];
 
-// ?占?占??占쎌씪 誘몄뀡 ?占?占?const DAILY_MISSIONS = [
-  { id:'place30', text:'援ъ뒳 30占??占쎌긽 諛곗튂?占쎄린',  check:(d)=>d.placed>=30 },
-  { id:'eraser3', text:'吏?占쎄컻占?3???占쎌긽 ?占쎌슜?占쎄린', check:(d)=>d.eraserCount>=3 },
-  { id:'no_bomb', text:'??占쏙옙 ?占쎌씠 ?占쎈━?占쏀븯占?,      check:(d)=>d.cleared&&!d.bombUsed },
+// ── 일일 미션 ──
+const DAILY_MISSIONS = [
+  { id:'place30', text:'구슬 30개 이상 배치하기',  check:(d)=>d.placed>=30 },
+  { id:'eraser3', text:'지우개를 3회 이상 사용하기', check:(d)=>d.eraserCount>=3 },
+  { id:'no_bomb', text:'폭탄 없이 클리어하기',      check:(d)=>d.cleared&&!d.bombUsed },
 ];
 
-const TA_INTERVAL = 30; // ?占?占쎌뼱?? 30珥덈쭏???占쎈룞諛곗튂
+const TA_INTERVAL = 30; // 타임어택: 30초마다 자동배치
 
-const DIFF_CONFIG = {
-  easy:       { pts:100, bonusMult:5,  label:'?占쏙옙? 횞1.0' },
-  normal:     { pts:150, bonusMult:10, label:'蹂댄넻 횞1.5' },
-  hard:       { pts:200, bonusMult:20, label:'?占쎈젮?占?횞2.0' },
-  timeattack: { pts:100, bonusMult:10, label:'?占?占쎌뼱??횞1.0' },
-};
-
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // AUDIO
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 let _ac = null;
 function ac() {
   if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
@@ -1205,9 +1199,10 @@ function sndUndo() { playTone(400,'sine',.15,.08,300); }
 function sndBomb() {
   try {
     const ctx=ac();
-    // ??? 二쇳뙆??援됱쓬
+    // 낮은 주파수 굉음
     playTone(55,'sawtooth',.45,.5,28);
-    // ?占쎌씠占?踰꾩뒪??    const buf=ctx.createBuffer(1,ctx.sampleRate*.45,ctx.sampleRate);
+    // 노이즈 버스트
+    const buf=ctx.createBuffer(1,ctx.sampleRate*.45,ctx.sampleRate);
     const d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*.12));
     const src=ctx.createBufferSource();
@@ -1224,12 +1219,13 @@ function spawnBombExplosion(r0,c0,exploded) {
   const rect=boardEl.getBoundingClientRect();
   const cx=rect.left+PADDING+c0*STEP+CELL_SIZE/2;
   const cy=rect.top +PADDING+r0*STEP+CELL_SIZE/2;
-  // ?占쎈옒?? ??占쏙옙 ?占??移몃뱾 媛뺤“
+  // 플래시: 폭발 대상 칸들 강조
   exploded.forEach(({r,c})=>{
     const el=document.getElementById(`c${r}_${c}`);
     if(el){ el.classList.add('bomb-flash'); setTimeout(()=>el.classList.remove('bomb-flash'),420); }
   });
-  // ?占쏀떚??  const cols=['#ff5722','#ff9800','#ffeb3b','#f44336','#ff6f00','#fff176'];
+  // 파티클
+  const cols=['#ff5722','#ff9800','#ffeb3b','#f44336','#ff6f00','#fff176'];
   for(let i=0;i<20;i++){
     const p=document.createElement('div');
     p.className='bomb-particle';
@@ -1257,7 +1253,7 @@ function bgStart() {
   let i=0;
   function next() {
     if (!_bgOn) return;
-    // BPM 100(600ms) 湲곕낯, ?占쎌뿬?占쎄컙 30占??占쏀븯?占쎈㈃ BPM 140(429ms)?占쎈줈 ?占쏀솚
+    // BPM 100(600ms) 기본, 잔여시간 30초 이하이면 BPM 140(429ms)으로 전환
     const interval = (gameActive && timeLeft <= 30) ? 429 : 600;
     if (mel[i%mel.length]) playTone(mel[i%mel.length],'sine',.04,.28);
     i++; _bgT.push(setTimeout(next, interval));
@@ -1266,9 +1262,9 @@ function bgStart() {
 }
 function bgStop() { _bgOn=false; _bgT.forEach(clearTimeout); _bgT.length=0; }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // STATE
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 let board        = [];
 let score        = 0;
 let difficulty   = 'normal';
@@ -1296,24 +1292,24 @@ let taCountdown  = TA_INTERVAL;
 let nextPiece    = null;
 
 const ESCAPE_LINES = [
-  { pct:0.01, text:'?? 萸뷂옙? ?占쎈━??占?媛숈븘...! ?占쎌꽌!!' },
-  { pct:0.25, text:'1?占쎄퀎 ?占쎈━??! 議곌툑占???! ?占쏙옙' },
-  { pct:0.50, text:'2?占쎄퀎 ?占쎈━??! 占??占쎌뿀??! ?占쏙옙' },
-  { pct:0.75, text:'3?占쎄퀎 ?占쎈━??! 嫄곗쓽 ?占쎌텧?占쎌빞!!! ?占쏙옙' },
+  { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
+  { pct:0.25, text:'1단계 클리어!! 조금만 더!! 💪' },
+  { pct:0.50, text:'2단계 클리어!! 반 넘었다!! 🔥' },
+  { pct:0.75, text:'3단계 클리어!! 거의 탈출이야!!! 🤩' },
 ];
-const MARBLE_EMOJIS = ['?占쏙옙','?占쏙옙','?占쏙옙','?占쏙옙','?占쏙옙'];
+const MARBLE_EMOJIS = ['😭','😊','😄','🤩','🎉'];
 
 window._lastDiff = 'normal';
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // HIGH SCORE
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function getHS()  { return parseInt(localStorage.getItem('marble_hs')||'0'); }
 function saveHS() { if (score>getHS()) localStorage.setItem('marble_hs',score); }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // SCREEN
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(name+'-screen').classList.add('active');
@@ -1331,9 +1327,9 @@ function goBackFromHelp() {
   else { showScreen('start'); }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // TUTORIAL
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 let _tutCallback = null;
 
 function setDiff(diff) {
@@ -1362,9 +1358,9 @@ function tutDone() {
   if (_tutCallback) { _tutCallback(); _tutCallback=null; }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // GAME INIT
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function startGame(diff) {
   resumeAC();
   difficulty   = diff || 'normal';
@@ -1419,9 +1415,9 @@ function startGame(diff) {
   bgStop(); bgStart();
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // OBSTACLES (hard mode)
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function placeObstacles(count) {
   let placed=0;
   while (placed<count) {
@@ -1435,9 +1431,9 @@ function placeObstacles(count) {
   }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // TIMER & HUD
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function tick() {
   if (!gameActive||isPaused) return;
   timeLeft--;
@@ -1446,7 +1442,7 @@ function tick() {
     const el=document.getElementById('ta-warn');
     if (taCountdown<=10 && el) {
       el.style.display='block';
-      el.textContent=`??${taCountdown}占????占쎈룞諛곗튂!`;
+      el.textContent=`⚡ ${taCountdown}초 후 자동배치!`;
     } else if (el) el.style.display='none';
     if (taCountdown<=0) { autoPlaceMarble(); taCountdown=TA_INTERVAL; }
   }
@@ -1463,13 +1459,11 @@ function updateHUD() {
   document.getElementById('hud-level').textContent=curLevel;
   const empty=board.flat().filter(v=>!v).length;
   document.getElementById('hud-remain').textContent=empty;
-  const diffEl=document.getElementById('hud-diff-label');
-  if (diffEl) diffEl.textContent=(DIFF_CONFIG[difficulty]||DIFF_CONFIG.normal).label;
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // BOARD DOM
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function buildBoard() {
   const el=document.getElementById('game-board');
   el.innerHTML='';
@@ -1479,7 +1473,7 @@ function buildBoard() {
     el.appendChild(cell);
   }
   renderBoard();
-  // 援ъ뒳 ?占쎈쫫 ?占쏀똻 ?占쎈깽??(?占쎈깽???占쎌엫)
+  // 구슬 이름 툴팁 이벤트 (이벤트 위임)
   el.addEventListener('mousemove', e=>{
     if (drag) { hideNameTip(); return; }
     const cell=e.target.closest('.cell');
@@ -1517,9 +1511,9 @@ function renderBoard() {
   }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // MARBLE FACE SVG
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function mkFaceSVG(mood) {
   const ns='http://www.w3.org/2000/svg';
   const svg=document.createElementNS(ns,'svg');
@@ -1551,9 +1545,9 @@ function mkFaceSVG(mood) {
   return svg;
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // MARBLE DOM ELEMENT
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 const TRAY_CELL =28;
 const GHOST_CELL=46;
 
@@ -1563,7 +1557,7 @@ function mkMarbleEl(color, size, mood) {
   const m=document.createElement('div');
   const isSpecialColor = SPECIAL_COLORS.has(color);
   m.className='marble '+color+(isSpecialColor?' special-marble':'');
-  // ?占쎈컲 ?占쎌긽 援ъ뒳占?湲由щ㉧ ?占쎈땲硫붿씠??(?占쎌닔 援ъ뒳?占?specialGlow媛 ?占??
+  // 일반 색상 구슬만 글리머 애니메이션 (특수 구슬은 specialGlow가 대신)
   const isColorMarble = !isSpecialColor && color!=='m-obstacle';
   const glimmerDelay = isColorMarble ? (Math.random()*3).toFixed(2)+'s' : '0s';
   const glimmerDur   = isColorMarble ? (2.6+Math.random()*1.4).toFixed(2)+'s' : '0s';
@@ -1571,22 +1565,22 @@ function mkMarbleEl(color, size, mood) {
     +`--glimmer-delay:${glimmerDelay};--glimmer-dur:${glimmerDur};`;
   if (color==='m-eraser') {
     const x=document.createElement('span');
-    x.className='eraser-x'; x.textContent='??; m.appendChild(x);
+    x.className='eraser-x'; x.textContent='✕'; m.appendChild(x);
   } else if (color==='m-eraser2') {
     const x=document.createElement('span');
-    x.className='eraser-x'; x.textContent='??; m.appendChild(x);
+    x.className='eraser-x'; x.textContent='✕'; m.appendChild(x);
   } else if (color==='m-eraser3') {
     const x=document.createElement('span');
-    x.className='eraser-x'; x.textContent='??; m.appendChild(x);
+    x.className='eraser-x'; x.textContent='✕'; m.appendChild(x);
   } else if (color==='m-bomb') {
     const x=document.createElement('span');
-    x.className='bomb-icon'; x.textContent='?占쏙옙'; m.appendChild(x);
+    x.className='bomb-icon'; x.textContent='💣'; m.appendChild(x);
   } else if (color==='m-locked') {
     const x=document.createElement('span');
-    x.className='lock-icon'; x.textContent='?占쏙옙'; m.appendChild(x);
+    x.className='lock-icon'; x.textContent='🔒'; m.appendChild(x);
   } else if (color==='m-obstacle') {
     const x=document.createElement('span');
-    x.className='obs-x'; x.textContent='??; m.appendChild(x);
+    x.className='obs-x'; x.textContent='✕'; m.appendChild(x);
   } else if (mood && mood!=='none') {
     m.appendChild(mkFaceSVG(mood));
     applySkinOverlay(m, color, size);
@@ -1594,9 +1588,9 @@ function mkMarbleEl(color, size, mood) {
   return m;
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // TRAY RENDERING
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function renderTray() {
   const el=document.getElementById('piece-tray');
   el.innerHTML='';
@@ -1608,7 +1602,7 @@ function renderTray() {
     const slot=document.createElement('div');
     slot.className='tray-slot';
     slot.dataset.idx=idx;
-    // 理쒖냼 ?占쎌튂 ?占쏙옙?48px 蹂댁옣, 援ъ뒳 ?占쎌슜 以묒븰 ?占쎈젹
+    // 최소 터치 타깃 48px 보장, 구슬 내용 중앙 정렬
     const rawW=(maxC+1)*cs+4, rawH=(maxR+1)*cs+4;
     const slotW=Math.max(48,rawW), slotH=Math.max(48,rawH);
     const offX=Math.floor((slotW-rawW)/2), offY=Math.floor((slotH-rawH)/2);
@@ -1620,25 +1614,27 @@ function renderTray() {
       m.style.top= (r*cs+2+offY)+'px';
       slot.appendChild(m);
     });
-    // eraser3 占??占쎌옣 ?占쏀듃 (寃뚯엫??1??
+    // eraser3 첫 등장 힌트 (게임당 1회)
     if (piece.isEraser3 && !_eraser3HintShown) {
       _eraser3HintShown = true;
-      setTimeout(()=>showCharBubble('???占쎈툝??占쏙옙占??占쎌쟾?占쎌슂!'), 350);
+      setTimeout(()=>showCharBubble('↺ 더블탭하면 회전해요!'), 350);
     }
 
-    // ?占쎌닔 援ъ뒳: 湲덉깋 諭껓옙? + ?占쎌쟾 ?占쏀듃 + ?占쎈떒 ?占쏀똻 占?    const isSpecial = piece.isEraser||piece.isEraser2||piece.isEraser3||piece.isBomb;
+    // 특수 구슬: 금색 뱃지 + 회전 힌트 + 하단 툴팁 바
+    const isSpecial = piece.isEraser||piece.isEraser2||piece.isEraser3||piece.isBomb;
     if (piece.isEraser3) slot.classList.add('rotatable');
     if (isSpecial) {
-      // 湲덉깋 諭껓옙? (?占쏀삎 ?占쎌떆)
+      // 금색 뱃지 (유형 표시)
       const BADGE_LABELS = {
-        'm-eraser':'?占쏙툘횞1','m-eraser2':'?占쏙툘횞2','m-eraser3':'?占쏙툘횞3','m-bomb':'?占쏙옙'
+        'm-eraser':'✏️×1','m-eraser2':'✏️×2','m-eraser3':'✏️×3','m-bomb':'💣'
       };
       const badge = document.createElement('span');
       badge.className = 'special-badge';
-      badge.textContent = BADGE_LABELS[piece.color] || '??;
+      badge.textContent = BADGE_LABELS[piece.color] || '✦';
       slot.appendChild(badge);
 
-      // ?占쎈떒 ?占쏀똻 占?      const tip = SPECIAL_TIPS[piece.color];
+      // 하단 툴팁 바
+      const tip = SPECIAL_TIPS[piece.color];
       const showTip = () => {
         selectedTrayIdx = idx;
         if (!tip || drag) return;
@@ -1659,7 +1655,7 @@ function renderTray() {
       slot.addEventListener('mouseleave', () => { if(selectedTrayIdx===idx) selectedTrayIdx=null; });
     }
 
-    // ?占쎈툝??占쏙옙占?eraser3 ?占쎌쟾
+    // 더블탭으로 eraser3 회전
     slot.addEventListener('touchend', e => {
       const now = Date.now();
       if (_lastTap.idx === idx && now - _lastTap.time < 320) {
@@ -1676,9 +1672,9 @@ function renderTray() {
   });
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // NEXT PREVIEW
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function renderNextPreview() {
   const slot = document.getElementById('next-piece-slot');
   if (!slot) return;
@@ -1701,19 +1697,19 @@ function renderNextPreview() {
   });
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // SPECIAL MARBLE TOOLTIPS
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 const SPECIAL_TIPS = {
-  'm-eraser' : '?占쏙옙 1占?吏?占쎄컻\n梨꾩썙占?1移몄쓣 吏?占쎌슂',
-  'm-eraser2': '?占쏙옙 2占?吏?占쎄컻\n?占쎌뼱占?2移몄쓣 ?占쎈쾲??吏?占쎌슂!',
-  'm-eraser3': '?占쏙옙 3占?吏?占쎄컻\n3移몄쓣 ?占쎈쾲??吏?占쎌슂!\nR???占쎈뒗 ?占쎈툝??占쏙옙占??占쎌쟾??,
-  'm-bomb'   : '?占쏙옙 ??占쏙옙 援ъ뒳\n梨꾩썙占?移몄뿉 ?占쎌쑝占?n?占쏀븯醫뚯슦 ??占쏙옙! (理쒙옙? 5占?',
+  'm-eraser' : '🩶 1칸 지우개\n채워진 1칸을 지워요',
+  'm-eraser2': '💜 2칸 지우개\n이어진 2칸을 한번에 지워요!',
+  'm-eraser3': '💙 3칸 지우개\n3칸을 한번에 지워요!\nR키 또는 더블탭으로 회전↺',
+  'm-bomb'   : '💣 폭탄 구슬\n채워진 칸에 놓으면\n상하좌우 폭발! (최대 5칸)',
 };
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // PIECE GENERATION
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function mkPiece(forceNormal) {
   if (!forceNormal) {
     const r = Math.random();
@@ -1733,20 +1729,21 @@ function mkPiece(forceNormal) {
   return {cells:shape.map(c=>[...c]),color,isEraser:false};
 }
 
-// eraser3 ?占쎌쟾
+// eraser3 회전
 function rotatePiece(idx) {
   const piece = tray[idx];
   if (!piece || !piece.isEraser3) return;
   piece.rotation = ((piece.rotation||0) + 1) % 2;
   piece.cells = piece.rotation === 1
-    ? [[0,0],[1,0],[2,0]]   // ?占쎈줈
-    : [[0,0],[0,1],[0,2]];  // 媛占?  renderTray();
+    ? [[0,0],[1,0],[2,0]]   // 세로
+    : [[0,0],[0,1],[0,2]];  // 가로
+  renderTray();
   sndClick();
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // UNDO
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function saveUndoState() {
   undoState={
     board: board.map(r=>[...r]),
@@ -1766,7 +1763,7 @@ function undoMove() {
   curLevel=undoState.curLevel;
   undoState=null; undoAvail=false;
   updateUndoBtn();
-  // nextPiece ?占쎌깮??(?占쎈룎由ш린 ??tray ?占쏀깭 湲곤옙?)
+  // nextPiece 재생성 (되돌리기 후 tray 상태 기준)
   const _fn=tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
   nextPiece=mkPiece(_fn);
   renderBoard(); renderTray(); renderNextPreview(); updateHUD();
@@ -1778,13 +1775,15 @@ function updateUndoBtn() {
   if (btn) btn.disabled=!undoAvail;
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // DRAG & DROP
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 
-// ?占쎌튂 ???占쏙옙????占쎈줈 ?占쎈씪占?嫄곕━ (px) ???占쏙옙??占쎌뿉 媛?占쏙옙?吏 ?占쎈룄占?const TOUCH_LIFT = 40;
+// 터치 시 손가락 위로 올라갈 거리 (px) — 손가락에 가려지지 않도록
+const TOUCH_LIFT = 40;
 
-// 醫뚰몴 異붿텧: pageX/Y?占쎌꽌 ?占쏀겕占??占쏀봽?占쎌쓣 占?viewport 湲곤옙? 醫뚰몴占?蹂??// (clientX/Y?占??占쎌씪?占쏙옙?占?window.scrollX/Y占?紐낆떆?占쎌쑝占?諛섏쁺)
+// 좌표 추출: pageX/Y에서 스크롤 오프셋을 빼 viewport 기준 좌표로 변환
+// (clientX/Y와 동일하지만 window.scrollX/Y를 명시적으로 반영)
 function evPos(e) {
   const isTouch = !!(e.touches && e.touches.length > 0);
   const t = isTouch ? e.touches[0] : e;
@@ -1803,7 +1802,9 @@ function beginDrag(idx, e) {
   if (!piece) return;
   const pos = evPos(e);
 
-  // ?占쎌튂 ?? ?占쎈젅???占쎈’ ???占쏙옙????占쎌튂(offset)占??占??  // ghost ?占쎈룞 ??offset留뚰겮 蹂댁젙?占쎌뿬 "?占쏙옙? ?占쎌튂 洹몌옙?占? ?占쎈씪?占쎄쾶 ??  let offsetX = 0, offsetY = 0;
+  // 터치 시: 트레이 슬롯 내 손가락 위치(offset)를 저장
+  // ghost 이동 시 offset만큼 보정하여 "잡은 위치 그대로" 따라오게 함
+  let offsetX = 0, offsetY = 0;
   if (pos.isTouch) {
     const slot = document.querySelector(`.tray-slot[data-idx="${idx}"]`);
     if (slot) {
@@ -1814,9 +1815,10 @@ function beginDrag(idx, e) {
   }
 
   drag = { idx, piece, x: pos.x, y: pos.y, offsetX, offsetY, isTouch: pos.isTouch };
-  // ?占쎌튂 ?占쎈옒占?占??占쎌씠吏 ?占쏀겕占?諛⑼옙?
+  // 터치 드래그 중 페이지 스크롤 방지
   if (pos.isTouch) document.body.style.overflow = 'hidden';
-  // ?占쎈옒占??占쎌옉 ???占쎈떒 ?占쏀똻 利됱떆 ?占쎄린占?  document.getElementById('special-tooltip').style.display = 'none';
+  // 드래그 시작 시 하단 툴팁 즉시 숨기기
+  document.getElementById('special-tooltip').style.display = 'none';
   const slotEl = document.querySelector(`.tray-slot[data-idx="${idx}"]`);
   if (slotEl) {
     slotEl.classList.add('selected');
@@ -1838,7 +1840,7 @@ function onMove(e) {
 function onUp(e) {
   if (!drag) return;
   e.preventDefault();
-  // ?占쎌튂 ?占쎈옒占?醫낅즺: overflow ?占쎈났
+  // 터치 드래그 종료: overflow 원복
   document.body.style.overflow = '';
   clearPreview();
   document.getElementById('drag-ghost').style.display = 'none';
@@ -1848,7 +1850,7 @@ function onUp(e) {
   if (gp && canPlace(drag.piece, gp.r, gp.c)) {
     commitPlace(drag.piece, gp.r, gp.c, drag.idx);
   } else if (gp) {
-    // 蹂대뱶 ?占쎌씠吏占?諛곗튂 遺덌옙? ??shake
+    // 보드 위이지만 배치 불가 → shake
     shakeBoard();
   }
   drag = null;
@@ -1865,19 +1867,19 @@ function shakeBoard() {
   }, 330);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // GHOST
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 
-// ?占쎌튂 drag offset + lift占?諛섏쁺??ghost???占쎈㈃ 醫뚰몴(top-left)占?諛섑솚
+// 터치 drag offset + lift를 반영한 ghost의 화면 좌표(top-left)를 반환
 function getDragAnchor(x, y) {
   if (drag && drag.isTouch) {
     return {
       left: x - drag.offsetX,
-      top:  y - drag.offsetY - TOUCH_LIFT   // ?占쏙옙????占쎌そ?占쎈줈 ?占쎈┝
+      top:  y - drag.offsetY - TOUCH_LIFT   // 손가락 위쪽으로 올림
     };
   }
-  // 留덉슦?? 湲곗〈 ?占쎌옉 ?占쏙옙?
+  // 마우스: 기존 동작 유지
   return { left: x, top: y };
 }
 
@@ -1902,52 +1904,53 @@ function showGhost(x, y) {
   });
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // BOARD COORD
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 
-// 寃뚯엫??湲곤옙? 寃⑹옄 ?占??占쎈뜳??諛섑솚
-// - touchend/mousemove ?占쎌젏??getBoundingClientRect() 占?留ㅻ쾲 ?占쎈줈 ?占쎌텧 (罹먯떛 湲덌옙?)
-// - CSS transform쨌scale쨌誘몃뵒?占쎌옘占???紐⑤뱺 ?占쎄린 蹂?占쏙옙? ?占쎈룞 諛섏쁺
+// 게임판 기준 격자 셀 인덱스 반환
+// - touchend/mousemove 시점에 getBoundingClientRect() 를 매번 새로 호출 (캐싱 금지)
+// - CSS transform·scale·미디어쿼리 등 모든 크기 변화를 자동 반영
 function boardCell(x, y) {
   const el   = document.getElementById('game-board');
-  const rect = el.getBoundingClientRect();   // ?占쎌떆占??占쎄퀎??
-  // CSS transform/zoom 蹂댁젙: rect(?占쎄컖??px) vs offsetWidth(CSS px) 鍮꾩쑉
+  const rect = el.getBoundingClientRect();   // 실시간 재계산
+
+  // CSS transform/zoom 보정: rect(시각적 px) vs offsetWidth(CSS px) 비율
   const scaleX = el.offsetWidth  > 0 ? rect.width  / el.offsetWidth  : 1;
   const scaleY = el.offsetHeight > 0 ? rect.height / el.offsetHeight : 1;
 
-  // 蹂대뱶 ?占쏙옙? CSS ?占쏙옙? 湲곤옙? ?占쏙옙?醫뚰몴 (scale ???????padding ?占쎄굅)
+  // 보드 내부 CSS 픽셀 기준 상대좌표 (scale 역변환 후 padding 제거)
   const lx = (x - rect.left) / scaleX - PADDING;
   const ly = (y - rect.top)  / scaleY - PADDING;
 
-  // ?占쎌젣 ?占쎈뜑占?占??占쎄린占?offsetWidth ?占썬굢 ?占쎌쟻 怨꾩궛
-  // (誘몃뵒?占쎌옘由щ줈 40px쨌42px쨌48px ?占쎌씠 諛붾뚯뼱???占쎈룞 諛섏쁺)
+  // 실제 렌더링 칸 크기를 offsetWidth から 동적 계산
+  // (미디어쿼리로 40px·42px·48px 등이 바뀌어도 자동 반영)
   const innerW   = el.offsetWidth  - 2 * PADDING;
   const innerH   = el.offsetHeight - 2 * PADDING;
-  const cellW    = innerW / GRID;   // ??(cellPx + gapPx) per column
+  const cellW    = innerW / GRID;   // ≈ (cellPx + gapPx) per column
   const cellH    = innerH / GRID;
 
-  // ?占쏀슚 踰붿쐞 諛뽰씠占?null (?占??占쎈퉬 60% ?占쎌쑀)
+  // 유효 범위 밖이면 null (셀 너비 60% 여유)
   if (lx < -cellW * 0.6 || ly < -cellH * 0.6 ||
       lx > innerW + cellW * 0.6 || ly > innerH + cellH * 0.6) return null;
 
-  // 占??占쎈뜳?? Math.floor 湲곕컲
-  //   col = Math.floor((clientX - rect.left) / (rect.width / 7))  [?占쎌슜???占쎌껌 怨듭떇 ?占쎌튂]
-  const c = Math.max(0, Math.min(GRID - 1, Math.floor(lx / cellW) - 1));
-  const r = Math.max(0, Math.min(GRID - 1, Math.floor(ly / cellH) - 1));
+  // 칸 인덱스: Math.floor 기반
+  //   col = Math.floor((clientX - rect.left) / (rect.width / 7))  [사용자 요청 공식 동치]
+  const c = Math.max(0, Math.min(GRID - 1, Math.floor(lx / cellW)));
+  const r = Math.max(0, Math.min(GRID - 1, Math.floor(ly / cellH)));
   return { r, c };
 }
 
-// ?占쎈옒占?占??占쎌젣 諛곗튂 ?占쎌젙?????占?醫뚰몴 諛섑솚
-// ?占쎌튂쨌留덉슦??紐⑤몢 ?占쏙옙???而ㅼ꽌 ?占쎌젣 ?占쎌튂占?吏곸젒 boardCell???占쎈떖
-// ??previewBoard(誘몃━蹂닿린)?占?onUp(諛곗튂) 紐⑤몢 ?占쎌씪 怨듭떇 ?占쎌슜 ???占쎌튂 ?占쎌튂
+// 드래그 중 실제 배치 판정에 쓸 셀 좌표 반환
+// 터치·마우스 모두 손가락/커서 실제 위치를 직접 boardCell에 전달
+// → previewBoard(미리보기)와 onUp(배치) 모두 동일 공식 사용 → 위치 일치
 function dragBoardCell(x, y) {
   return boardCell(x, y);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // PLACEMENT
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function canPlace(piece, r0, c0) {
   return piece.cells.every(([dr, dc]) => {
     const r = r0 + dr, c = c0 + dc;
@@ -1972,7 +1975,7 @@ function previewBoard(x, y) {
     const el = document.getElementById(`c${r}_${c}`);
     if (el) el.classList.add(ok ? 'ok' : 'bad');
   });
-  // ??占쏙옙 ?占쎈옒占?占? ??占쏙옙 ?占??占??占쏀븯醫뚯슦) 誘몃━ ?占쎌떆
+  // 폭탄 드래그 중: 폭발 대상 칸(상하좌우) 미리 표시
   if (drag.piece.isBomb && ok) {
     [[gp.r-1,gp.c],[gp.r+1,gp.c],[gp.r,gp.c-1],[gp.r,gp.c+1]].forEach(([r,c])=>{
       if (r<0||r>=GRID||c<0||c>=GRID) return;
@@ -1989,9 +1992,9 @@ function clearPreview() {
     .forEach(el => el.classList.remove('ok','bad','bomb-target'));
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // COMMIT PLACEMENT
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function commitPlace(piece,r0,c0,trayIdx) {
   saveUndoState();  // save BEFORE change
   let placed=0;
@@ -2010,27 +2013,26 @@ function commitPlace(piece,r0,c0,trayIdx) {
     spawnBombExplosion(r0,c0,exploded);
     if (exploded.length>0) spawnScorePop(r0,c0,exploded.length*30);
   } else {
-    const diffCfg = DIFF_CONFIG[difficulty] || DIFF_CONFIG.normal;
     piece.cells.forEach(([dr,dc])=>{
       const r=r0+dr, c=c0+dc;
       if (piece.isEraser||piece.isEraser2||piece.isEraser3) {
         eraserUsed=true; eraserCount++;
-        // ?占쎄릿 占??占쎌젣 ??lockedCells 紐⑸줉?占쎌꽌 ?占쎄굅
+        // 잠긴 칸 해제 시 lockedCells 목록에서 제거
         lockedCells=lockedCells.filter(([lr,lc])=>!(lr===r&&lc===c));
         board[r][c]=null; sndErase();
       } else {
-        board[r][c]=piece.color; score+=diffCfg.pts; placed++; placedTotal++;
+        board[r][c]=piece.color; score+=100; placed++; placedTotal++;
       }
     });
-    if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*diffCfg.pts); }
+    if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*100); }
   }
 
-  // nextPiece占??占쎌옱 ?占쎈’???占쎄퀬, ??nextPiece ?占쎌꽦
+  // nextPiece를 현재 슬롯에 넣고, 새 nextPiece 생성
   tray[trayIdx] = nextPiece;
   const _forceNormal = tray.some((p,i) => p && (p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
   nextPiece = mkPiece(_forceNormal);
   renderBoard(); renderTray(); renderNextPreview(); updateHUD();
-  // bounce + star: ?占쎈컲 援ъ뒳 諛곗튂 ?占쎌뿉占??占쏀뻾
+  // bounce + star: 일반 구슬 배치 후에만 실행
   if (placed>0) triggerBounceStar(r0,c0,piece.cells);
   updateEscapeBar();
 
@@ -2041,13 +2043,13 @@ function commitPlace(piece,r0,c0,trayIdx) {
 
   // Win check
   if (board.flat().filter(Boolean).length===49) { setTimeout(doWin,180); return; }
-  // 留됲엺 ?占쏀깭 媛먲옙? (???占쎈젅???占쎈뜑 ???占쎌씤)
+  // 막힌 상태 감지 (새 트레이 렌더 후 확인)
   setTimeout(checkStuck, 150);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // STUCK DETECTION
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function isStuck() {
   for (const piece of tray) {
     if (!piece) continue;
@@ -2060,13 +2062,14 @@ function isStuck() {
 
 function checkStuck() {
   if (!gameActive||isPaused) return;
-  if (board.flat().filter(Boolean).length===49) return; // win 泥섎━??  if (document.getElementById('stuck-popup').classList.contains('show')) return;
+  if (board.flat().filter(Boolean).length===49) return; // win 처리됨
+  if (document.getElementById('stuck-popup').classList.contains('show')) return;
   if (isStuck()) showStuckPopup();
 }
 
 function showStuckPopup() {
   document.getElementById('stuck-popup').classList.add('show');
-  if (timerID) clearInterval(timerID);  // ?占쎌뾽 占??占?占쎈㉧ ?占쏙옙?
+  if (timerID) clearInterval(timerID);  // 팝업 중 타이머 정지
 }
 
 function closeStuck() {
@@ -2076,16 +2079,16 @@ function closeStuck() {
 
 function giveEraser() {
   closeStuck();
-  // ?占쎈컲 援ъ뒳 ?占쎈’ ?占쎌꽑, ?占쎌쑝占?占?踰덉㎏ ?占쎈’ 援먯껜
+  // 일반 구슬 슬롯 우선, 없으면 첫 번째 슬롯 교체
   const idx = tray.findIndex(p=>p&&!p.isEraser&&!p.isEraser2&&!p.isEraser3&&!p.isBomb);
   tray[idx>=0?idx:0] = {cells:[[0,0]],color:'m-eraser',isEraser:true};
   renderTray();
-  showCharBubble('?占쏙옙 吏?占쎄컻占??占쎈졇?占쎌슂!');
+  showCharBubble('💝 지우개를 드렸어요!');
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // ESCAPE PROGRESS BAR
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function resetEscapeBar() {
   lastMilestone = -1;
   const fill   = document.getElementById('escape-fill');
@@ -2113,7 +2116,8 @@ function updateEscapeBar() {
   marble.style.left = pctVal + '%';
   pct.textContent   = pctVal + '%';
 
-  // emoji tier: 0%?占쏙옙? 25%?占쏙옙? 50%?占쏙옙? 75%?占쏙옙? 100%?占쏙옙?  const tier = ratio >= 1 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.5 ? 2 : ratio >= 0.25 ? 1 : 0;
+  // emoji tier: 0%→😭, 25%→😊, 50%→😄, 75%→🤩, 100%→🎉
+  const tier = ratio >= 1 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.5 ? 2 : ratio >= 0.25 ? 1 : 0;
   marble.textContent = MARBLE_EMOJIS[tier];
 
   // milestone dialogue
@@ -2141,25 +2145,26 @@ function showCharBubble(text) {
   }, 2800);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // PLACE BOUNCE + STAR PARTICLES
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function triggerBounceStar(r0,c0,cells) {
   const boardEl = document.getElementById('game-board');
   const rect    = boardEl.getBoundingClientRect();
-  // bounce-in ?占쎈옒??遺??(CSS ?占쎈땲硫붿씠??
+  // bounce-in 클래스 부여 (CSS 애니메이션)
   cells.forEach(([dr,dc])=>{
     const cell = document.getElementById(`c${r0+dr}_${c0+dc}`);
     if (!cell) return;
     const m = cell.querySelector('.marble');
     if (!m) return;
     m.classList.remove('bounce-in');
-    // reflow ???占쎌꽕?占쎌쑝占?媛숋옙? 占??占쎈같占??占쎌뿉???占쎈땲硫붿씠???占쎌떎??    void m.offsetWidth;
+    // reflow 후 재설정으로 같은 칸 재배치 시에도 애니메이션 재실행
+    void m.offsetWidth;
     m.classList.add('bounce-in');
     setTimeout(()=>m.classList.remove('bounce-in'), 420);
   });
-  // 諛곗튂???占?占?理쒙옙? 3媛쒖뿉??占??占쏀떚??1媛쒖뵫 諛쒖궗
-  const STAR_ICONS = ['占?,'??,'?占쏙옙'];
+  // 배치된 셀 중 최대 3개에서 별 파티클 1개씩 발사
+  const STAR_ICONS = ['⭐','✨','💫'];
   const picked = [...cells].sort(()=>Math.random()-.5).slice(0, Math.min(cells.length, 3));
   picked.forEach(([dr,dc])=>{
     const cx = rect.left + PADDING + (c0+dc)*STEP + CELL_SIZE/2;
@@ -2176,9 +2181,9 @@ function triggerBounceStar(r0,c0,cells) {
   });
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // SCORE POP
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function spawnScorePop(r,c,pts) {
   const el=document.getElementById('game-board');
   const rect=el.getBoundingClientRect();
@@ -2191,9 +2196,9 @@ function spawnScorePop(r,c,pts) {
   setTimeout(()=>div.remove(),950);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // CONNECTED GROUPS (same-color, size 2-5)
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function findConnectedGroups() {
   const visited=Array.from({length:GRID},()=>Array(GRID).fill(false));
   const groups=[];
@@ -2217,15 +2222,15 @@ function findConnectedGroups() {
   return groups;
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // SPARKLE GROUPS
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function sparkleGroups(groups, onDone) {
   if (!groups.length) { setTimeout(onDone,200); return; }
   const totalCells = groups.reduce((s,g)=>s+g.length, 0);
   let clearedCells = 0;
   groups.forEach((group, gi) => {
-    const groupDelay = gi * 100; // 洹몃９ 占?0.1占?媛꾧꺽
+    const groupDelay = gi * 100; // 그룹 간 0.1초 간격
     group.forEach(([r,c]) => {
       setTimeout(() => {
         const cell = document.getElementById(`c${r}_${c}`);
@@ -2252,7 +2257,7 @@ function sparkleGroups(groups, onDone) {
         }, 80);
       }, groupDelay);
     });
-    // 洹몃９ ?占쏀뙆???占쎌옉 ?占쎌젏??洹몃９ ?占쎌닔 ?占쎌뾽 ?占쎌떆
+    // 그룹 스파클 시작 시점에 그룹 점수 팝업 표시
     setTimeout(() => {
       const pts = group.length * 200;
       const avgR = Math.round(group.reduce((s,[r])=>s+r, 0) / group.length);
@@ -2280,21 +2285,21 @@ function spawnSparkleParticles(r,c) {
   }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // LEVEL-UP BANNER
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function showLvlBanner() {
   const b=document.createElement('div');
-  b.className='lvl-banner'; b.textContent='?占쏙옙 ?占쎈꺼 2 UP!! ?占쏙옙';
+  b.className='lvl-banner'; b.textContent='🎊 레벨 2 UP!! 🎊';
   document.body.appendChild(b);
   setTimeout(()=>b.remove(),2400);
   playTone(880,'triangle',.2,.15);
   setTimeout(()=>playTone(1047,'triangle',.2,.2),200);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // COUNT-UP ANIMATION
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function countupAnim(el, from, to, duration) {
   const start = performance.now();
   function step(now) {
@@ -2307,9 +2312,9 @@ function countupAnim(el, from, to, duration) {
   requestAnimationFrame(step);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // WIN
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function doWin() {
   gameActive=false;
   clearInterval(timerID);
@@ -2319,7 +2324,7 @@ function doWin() {
   sndFanfare();
 
   const winTime=timeLeft;
-  const bonus=winTime*(DIFF_CONFIG[difficulty]||DIFF_CONFIG.normal).bonusMult;
+  const bonus=winTime*10;
   const stars=winTime>=60?3:winTime>=30?2:1;
 
   // 1. Rainbow wave on all cells
@@ -2339,7 +2344,7 @@ function doWin() {
       spawnFlyingMarbles();
       score+=bonus;
 
-      // ?占쎌씪 誘몄뀡 泥댄겕
+      // 일일 미션 체크
       let dailyBonus=0;
       const mission=getTodayMission();
       if (!isDailyDone()) {
@@ -2352,31 +2357,31 @@ function doWin() {
       saveHS();
       addCumulativeScore(score);
 
-      let bonusTxt=bonus>0?'???占쎄컙 蹂대꼫??+'+bonus+'??:'';
-      if (dailyBonus>0) bonusTxt+=(bonusTxt?' 쨌 ':'')+'?占쏙옙 ?占쎌씪 誘몄뀡 +500??';
+      let bonusTxt=bonus>0?'⏱ 시간 보너스 +'+bonus+'점':'';
+      if (dailyBonus>0) bonusTxt+=(bonusTxt?' · ':'')+'📅 일일 미션 +500점!';
       document.getElementById('clear-bonus').textContent=bonusTxt;
       document.getElementById('clear-score').textContent='0';
 
       setTimeout(()=>{
         showScreen('clear');
         showStarRating(stars);
-        // ?占쎌닔 移댁슫?占쎌뾽 ?占쎈땲硫붿씠??(0 ??理쒖쥌 ?占쎌닔)
+        // 점수 카운트업 애니메이션 (0 → 최종 점수)
         setTimeout(()=>{
           const scoreEl=document.getElementById('clear-score');
           countupAnim(scoreEl, 0, score, 1200);
         }, 350);
         initDailyMission();
         checkAndShowAchievements(winTime);
-        // 紐낆삁???占쎈떦 ?占쎈쫫 ?占쎈젰 (?占쎌떆 ??
+        // 명예의 전당 이름 입력 (잠시 후)
         setTimeout(()=>showNameInputPopup(score,()=>{}), 1600);
       },700);
     });
   },680);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // STAR RATING
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function showStarRating(count) {
   const ns='http://www.w3.org/2000/svg';
   const container=document.getElementById('star-container');
@@ -2396,9 +2401,9 @@ function showStarRating(count) {
   }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // FLYING MARBLES
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function spawnFlyingMarbles() {
   const el=document.getElementById('game-board');
   const rect=el.getBoundingClientRect();
@@ -2417,9 +2422,9 @@ function spawnFlyingMarbles() {
   }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // GAME OVER
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function doGameOver() {
   gameActive=false;
   clearInterval(timerID);
@@ -2438,9 +2443,9 @@ function doGameOver() {
   },900);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // PAUSE
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function togglePause() {
   if (!gameActive&&!isPaused) return;
   resumeAC();
@@ -2449,15 +2454,15 @@ function togglePause() {
 }
 
 function quitGame() {
-  if (!confirm('寃뚯엫??醫낅즺?占쎌떆寃좎뒿?占쎄퉴?')) return;
+  if (!confirm('게임을 종료하시겠습니까?')) return;
   gameActive=false; isPaused=false;
   clearInterval(timerID); bgStop();
   showScreen('start');
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // MARBLE NAME TOOLTIP
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function showNameTip(name, x, y) {
   const el=document.getElementById('marble-name-tip');
   if (!el) return;
@@ -2471,9 +2476,9 @@ function hideNameTip() {
   if (el) el.style.display='none';
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // LOCKED CELLS
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function placeLocked(count) {
   let placed=0, attempts=0;
   while (placed<count && attempts<200) {
@@ -2489,9 +2494,9 @@ function placeLocked(count) {
   renderBoard();
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // TIMEATTACK AUTO-PLACE
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function autoPlaceMarble() {
   const empty=[];
   for (let r=0;r<GRID;r++) for (let c=0;c<GRID;c++) {
@@ -2502,19 +2507,19 @@ function autoPlaceMarble() {
   const color=activeColors[Math.floor(Math.random()*activeColors.length)];
   board[r][c]=color;
   renderBoard(); updateHUD(); updateEscapeBar();
-  // 鍮④컙 ?占쎈몢占?媛뺤“
+  // 빨간 테두리 강조
   const cell=document.getElementById(`c${r}_${c}`);
   if (cell) {
     cell.style.boxShadow='0 0 0 3px rgba(183,28,28,.9)';
     setTimeout(()=>{cell.style.boxShadow='';},600);
   }
-  showCharBubble('???占쎈룞 諛곗튂!');
+  showCharBubble('⚡ 자동 배치!');
   if (board.flat().filter(Boolean).length===49) setTimeout(doWin,180);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // ACHIEVEMENTS
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function getAchieved() { return JSON.parse(localStorage.getItem('marble_ach')||'[]'); }
 function saveAchievement(id) {
   const list=getAchieved();
@@ -2536,7 +2541,7 @@ function showAchBadge(list,idx) {
   pop.innerHTML='';
   const b=document.createElement('div');
   b.className='ach-badge';
-  b.innerHTML=`<span class="ach-icon">${a.icon}</span><div class="ach-name">?占쎌쟻 ?占쎌꽦: ${a.name}</div><div class="ach-desc">${a.desc}</div>`;
+  b.innerHTML=`<span class="ach-icon">${a.icon}</span><div class="ach-name">업적 달성: ${a.name}</div><div class="ach-desc">${a.desc}</div>`;
   pop.appendChild(b);
   pop.classList.add('show');
   setTimeout(()=>{
@@ -2546,9 +2551,9 @@ function showAchBadge(list,idx) {
   },2800);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // SKIN SHOP
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function getCumulScore()   { return parseInt(localStorage.getItem('marble_cumul')||'0'); }
 function addCumulativeScore(n) {
   localStorage.setItem('marble_cumul', getCumulScore()+n);
@@ -2647,7 +2652,7 @@ function renderShop() {
   const cumul=getCumulScore();
   const unlocked=getUnlockedSkins();
   const active=getActiveSkin();
-  document.getElementById('shop-cumul-score').textContent='?占쎌쟻 ?占쎌닔: '+cumul+'??;
+  document.getElementById('shop-cumul-score').textContent='누적 점수: '+cumul+'점';
   const grid=document.getElementById('skin-grid');
   grid.innerHTML='';
   SKINS.forEach(skin=>{
@@ -2662,7 +2667,7 @@ function renderShop() {
     item.appendChild(prev);
     const nd=document.createElement('div'); nd.className='skin-name'; nd.textContent=skin.name; item.appendChild(nd);
     const cd=document.createElement('div'); cd.className='skin-cost';
-    cd.textContent=isUnlocked?(isActive?'???占쎌슜 占?:'?占쏀깮?占쎄린'):(canBuy?'?占쎄툑 ('+skin.cost+'??':skin.cost+'???占쎌슂');
+    cd.textContent=isUnlocked?(isActive?'✓ 사용 중':'선택하기'):(canBuy?'해금 ('+skin.cost+'점)':skin.cost+'점 필요');
     item.appendChild(cd);
     if (isUnlocked) item.onclick=()=>{ setActiveSkin(skin.id); renderShop(); };
     else if (canBuy) item.onclick=()=>{ unlockSkin(skin.id); setActiveSkin(skin.id); renderShop(); };
@@ -2670,9 +2675,9 @@ function renderShop() {
   });
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // DAILY MISSION
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function getTodayMission() {
   const d=new Date();
   const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
@@ -2692,20 +2697,20 @@ function initDailyMission() {
   const el=document.getElementById('dm-text');
   if (!el) return;
   if (done) {
-    el.innerHTML=`<span class="dm-done">??${mission.text}</span>`;
+    el.innerHTML=`<span class="dm-done">✅ ${mission.text}</span>`;
   } else {
-    el.innerHTML=`${mission.text} <span style="color:#e91e63;font-weight:900">(+500??</span>`;
+    el.innerHTML=`${mission.text} <span style="color:#e91e63;font-weight:900">(+500점)</span>`;
   }
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // HALL OF FAME
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 function getHOF()        { return JSON.parse(localStorage.getItem('marble_hof')||'[]'); }
 function saveHOF(list)   { localStorage.setItem('marble_hof',JSON.stringify(list)); }
 function addToHOF(name,sc) {
   const list=getHOF();
-  list.push({name:name.slice(0,10)||'?占쎈챸', score:sc, date:new Date().toLocaleDateString('ko-KR'), diff:difficulty});
+  list.push({name:name.slice(0,10)||'익명', score:sc, date:new Date().toLocaleDateString('ko-KR')});
   list.sort((a,b)=>b.score-a.score);
   saveHOF(list.slice(0,5));
 }
@@ -2715,20 +2720,17 @@ function renderHOF() {
   const con=document.getElementById('hof-list');
   if (!con) return;
   con.innerHTML='';
-  const ICONS=['?占쏙옙','?占쏙옙','?占쏙옙','4截뤴깵','5截뤴깵'];
+  const ICONS=['🥇','🥈','🥉','4️⃣','5️⃣'];
   if (list.length===0) {
-    con.innerHTML='<div class="hof-empty">?占쎌쭅 湲곕줉???占쎌뼱??<br>?占쎈━?占쏀븯占??占쎈쫫???占쎈줉?????占쎌뼱???占쏙옙</div>';
+    con.innerHTML='<div class="hof-empty">아직 기록이 없어요!<br>클리어하면 이름을 등록할 수 있어요 🎯</div>';
     return;
   }
   list.forEach((e,i)=>{
     const row=document.createElement('div');
     row.className='hof-row';
-    const DIFF_LABELS={'easy':'?占쏙옙?','normal':'蹂댄넻','hard':'?占쎈젮?占?,'timeattack':'?占?占쎌뼱??};
-    const diffTag=e.diff?`<span class="hof-diff">${DIFF_LABELS[e.diff]||e.diff}</span>`:'';
     row.innerHTML=`<span class="hof-rank">${ICONS[i]}</span>`
       +`<span class="hof-name">${e.name}</span>`
-      +`<span class="hof-score">${e.score}??/span>`
-      +diffTag
+      +`<span class="hof-score">${e.score}점</span>`
       +`<span class="hof-date">${e.date||''}</span>`;
     con.appendChild(row);
   });
@@ -2736,11 +2738,11 @@ function renderHOF() {
 function showNameInputPopup(sc, cb) {
   const pop=document.getElementById('name-input-popup');
   const field=document.getElementById('name-input-field');
-  document.getElementById('ni-score-txt').textContent=sc+'??;
+  document.getElementById('ni-score-txt').textContent=sc+'점';
   field.value='';
   pop.classList.add('show');
   const reg=()=>{
-    addToHOF(field.value.trim()||'?占쎈챸', sc);
+    addToHOF(field.value.trim()||'익명', sc);
     pop.classList.remove('show');
     cb();
   };
@@ -2750,9 +2752,9 @@ function showNameInputPopup(sc, cb) {
   setTimeout(()=>field.focus(),200);
 }
 
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 // GLOBAL EVENTS
-// ?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧?占썩븧
+// ════════════════════════════════════════════
 document.addEventListener('mousemove',  onMove, {passive:false});
 document.addEventListener('mouseup',    onUp,   {passive:false});
 document.addEventListener('touchmove',  onMove, {passive:false});
