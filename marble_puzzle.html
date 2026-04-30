@@ -1321,6 +1321,7 @@ body {
 </div>
 <div id="game-btn-group">
   <button id="undo-btn"  class="game-btn" onclick="undoMove()" disabled title="되돌리기">↩</button>
+  <button id="shop-btn"  class="game-btn" onclick="showShop()"  title="구슬 상점">🛍️</button>
   <button id="help-btn"  class="game-btn" onclick="showGameHelp()" title="도움말">❓</button>
   <button id="pause-btn" class="game-btn" onclick="togglePause()" title="일시정지">⏸</button>
 </div>
@@ -1333,6 +1334,7 @@ body {
   <h2>⏸ 일시정지</h2>
   <div class="btn-row">
     <button class="btn btn-white" onclick="togglePause()">▶ 계속하기</button>
+    <button class="btn btn-white" onclick="showShop()">🛍️ 구슬 상점</button>
     <button class="btn btn-white" onclick="quitGame()">🚪 나가기</button>
   </div>
 </div>
@@ -3028,7 +3030,6 @@ function drawSkinPreview(skinId, container) {
   svg.setAttribute('viewBox','0 0 52 52');
   svg.setAttribute('width','52'); svg.setAttribute('height','52');
   if (skinId==='circle') {
-    ['#FFD93D','#6BCB77','#A78BFA','#4D96FF'].forEach((col,[x,y])=>{});
     [[13,13],[39,13],[13,39],[39,39]].forEach(([x,y],i)=>{
       const c=document.createElementNS(ns,'circle');
       c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','11');
