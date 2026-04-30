@@ -1411,6 +1411,7 @@ body {
     <button class="btn btn-white" onclick="playOpening()">🎬 오프닝</button>
     <button class="btn btn-white" onclick="showCalibration()">📱 터치 보정</button>
   </div>
+  <div id="cal-debug" style="font-size:.7em;color:#aaa;margin-top:4px;text-align:center;">(보정값 없음)</div>
 </div>
 
 <!-- ══ Game Screen ══ -->
@@ -1976,7 +1977,16 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(name+'-screen').classList.add('active');
   document.getElementById('game-btn-group').classList.toggle('show', name==='game');
-  if (name==='start') { document.getElementById('start-hs-val').textContent=getHS(); initDailyMission(); }
+  if (name==='start') {
+    document.getElementById('start-hs-val').textContent=getHS();
+    initDailyMission();
+    const _ox = localStorage.getItem('marble_touch_offset_x');
+    const _oy = localStorage.getItem('marble_touch_offset_y');
+    const _dbg = document.getElementById('cal-debug');
+    if (_dbg) _dbg.textContent = _ox
+      ? `저장된 보정값: X=${parseFloat(_ox).toFixed(2)}칸  Y=${parseFloat(_oy).toFixed(2)}칸`
+      : '(보정값 없음 — 터치 보정 버튼을 눌러 설정하세요)';
+  }
 }
 
 function showGameHelp() {
@@ -2563,7 +2573,10 @@ function onUp(e) {
   document.getElementById('drag-ghost').style.display = 'none';
   const slot = document.querySelector(`.tray-slot[data-idx="${drag.idx}"]`);
   if (slot) slot.classList.remove('ghost', 'selected');
-  const gp = dragBoardCell(drag.x, drag.y);
+  const isTouch = drag.isTouch;
+  const rawX = drag.x, rawY = drag.y;
+  const gp = dragBoardCell(rawX, rawY);
+  if (isTouch) showDropDebug(rawX, rawY, gp);
   if (gp && canPlace(drag.piece, gp.r, gp.c)) {
     commitPlace(drag.piece, gp.r, gp.c, drag.idx);
   } else if (gp) {
@@ -2571,6 +2584,28 @@ function onUp(e) {
     shakeBoard();
   }
   drag = null;
+}
+
+function showDropDebug(rawX, rawY, gp) {
+  const popup = document.getElementById('drop-debug');
+  if (!popup) return;
+  const boardEl = document.getElementById('game-board');
+  const rect = boardEl.getBoundingClientRect();
+  const rawGp = boardCell(rawX, rawY);
+  const ox = parseFloat(localStorage.getItem('marble_touch_offset_x') || '0');
+  const oy = parseFloat(localStorage.getItem('marble_touch_offset_y') || '0');
+  const pxOx = (ox * STEP).toFixed(1), pxOy = (oy * STEP - TOUCH_LIFT).toFixed(1);
+  popup.textContent = [
+    `touch: (${rawX.toFixed(0)}, ${rawY.toFixed(0)})`,
+    `board: L=${rect.left.toFixed(0)} T=${rect.top.toFixed(0)}`,
+    `raw cell: r=${rawGp?rawGp.r:'?'} c=${rawGp?rawGp.c:'?'}`,
+    `cal offset: X=${ox.toFixed(2)}칸 Y=${oy.toFixed(2)}칸`,
+    `px delta: (${pxOx}, ${pxOy})  lift=${TOUCH_LIFT}px`,
+    `final cell: r=${gp?gp.r:'?'} c=${gp?gp.c:'?'}`,
+  ].join('\n');
+  popup.style.display = 'block';
+  clearTimeout(popup._t);
+  popup._t = setTimeout(() => { popup.style.display = 'none'; }, 2000);
 }
 
 function shakeBoard() {
@@ -2659,12 +2694,12 @@ function boardCell(x, y) {
 }
 
 // 드래그 중 실제 배치 판정에 쓸 셀 좌표 반환
-// 터치·마우스 모두 손가락/커서 실제 위치를 직접 boardCell에 전달
+// 터치: TOUCH_LIFT(고스트 시각 들어올림) 보정 + 캘리브레이션 칸단위 offset × STEP
 function dragBoardCell(x, y) {
   if (drag && drag.isTouch) {
     const ox = parseFloat(localStorage.getItem('marble_touch_offset_x') || '0');
     const oy = parseFloat(localStorage.getItem('marble_touch_offset_y') || '0');
-    return boardCell(x + ox, y + oy);
+    return boardCell(x + ox * STEP, y + oy * STEP - TOUCH_LIFT);
   }
   return boardCell(x, y);
 }
@@ -3854,6 +3889,9 @@ function showCalibration() {
   _calMeasures = [];
   _calStep = 0;
   _calDrag = false;
+  // 이전 픽셀 단위 보정값 초기화 (v2: 칸 단위로 변경)
+  localStorage.removeItem('marble_touch_offset_x');
+  localStorage.removeItem('marble_touch_offset_y');
   buildCalBoard();
   showScreen('calibration');
   startCalStep(0);
@@ -3939,8 +3977,10 @@ function calPieceUp(e) {
   const targetCX = rect.left + rect.width  / 2;
   const targetCY = rect.top  + rect.height / 2;
 
-  // offset = how much to shift raw touch coords to land on target cell center
-  _calMeasures.push({ ox: targetCX - dropX, oy: targetCY - dropY });
+  // 칸 단위 오차: 픽셀 오차 ÷ (cal 셀크기 + gap)
+  // 게임 적용 시 칸단위 × STEP(게임 셀크기) 로 비율이 맞게 환산됨
+  const CAL_STEP = 44 + 3;
+  _calMeasures.push({ ox: (targetCX - dropX) / CAL_STEP, oy: (targetCY - dropY) / CAL_STEP });
 
   targetCell.classList.remove('cal-target');
   targetCell.classList.add('cal-hit');
@@ -3955,9 +3995,10 @@ function calPieceUp(e) {
 function showCalDone() {
   const avgX = _calMeasures.reduce((s,m)=>s+m.ox,0) / _calMeasures.length;
   const avgY = _calMeasures.reduce((s,m)=>s+m.oy,0) / _calMeasures.length;
-  localStorage.setItem('marble_touch_offset_x', avgX.toFixed(1));
-  localStorage.setItem('marble_touch_offset_y', avgY.toFixed(1));
-  document.getElementById('cal-inst').textContent = `보정값이 설정됐어요! (X=${avgX.toFixed(0)}px, Y=${avgY.toFixed(0)}px)`;
+  localStorage.setItem('marble_touch_offset_x', avgX.toFixed(3));
+  localStorage.setItem('marble_touch_offset_y', avgY.toFixed(3));
+  document.getElementById('cal-inst').textContent =
+    `보정값이 설정됐어요! (X=${avgX.toFixed(2)}칸, Y=${avgY.toFixed(2)}칸)`;
   const done = document.getElementById('cal-done');
   const actions = document.getElementById('cal-actions');
   if (done) done.style.display = '';
@@ -4049,5 +4090,12 @@ if (!localStorage.getItem('marble_touch_offset_x') && ('ontouchstart' in window)
   playOpening();
 }
 </script>
+
+<!-- 드롭 디버그 팝업 -->
+<div id="drop-debug" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.85);color:#0f0;font-family:monospace;font-size:.72em;
+  padding:8px 14px;border-radius:8px;z-index:10000;display:none;
+  white-space:pre;pointer-events:none;line-height:1.7;text-align:left"></div>
+
 </body>
 </html>
