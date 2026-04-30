@@ -940,26 +940,36 @@ body {
 .cal-sub { font-size:.85em; color:#666; margin-bottom:16px; line-height:1.5; }
 .cal-inst { font-size:.92em; color:#c2185b; font-weight:700; margin-bottom:14px; min-height:1.5em; }
 #cal-board {
-  display:grid; grid-template-columns:repeat(7,36px); grid-template-rows:repeat(7,36px);
-  gap:2px; margin:0 auto 16px; background:#ffe4ef; padding:4px;
+  display:grid; grid-template-columns:repeat(4,44px); grid-template-rows:repeat(4,44px);
+  gap:3px; margin:0 auto 10px; background:#ffe4ef; padding:5px;
   border-radius:10px; border:2px solid #f48fb1; touch-action:none;
   width:fit-content;
 }
-.cal-cell { width:36px; height:36px; border-radius:5px; background:rgba(244,143,177,.2);
-  position:relative; cursor:pointer; }
+.cal-cell { width:44px; height:44px; border-radius:5px; background:rgba(244,143,177,.2);
+  position:relative; }
 .cal-cell.cal-target {
   background:rgba(233,30,99,.15);
   box-shadow:0 0 0 3px #e91e63;
 }
 .cal-cell.cal-target::after {
-  content:'🎯'; position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%); font-size:1.2em;
+  content:'⭐'; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); font-size:1.3em;
   animation:calPulse .8s ease-in-out infinite alternate;
 }
 @keyframes calPulse { from{transform:translate(-50%,-50%)scale(1)} to{transform:translate(-50%,-50%)scale(1.2)} }
 .cal-cell.cal-hit { background:rgba(76,175,80,.35); }
 .cal-cell.cal-hit::after { content:'✓'; position:absolute; top:50%; left:50%;
   transform:translate(-50%,-50%); color:#2e7d32; font-size:1.1em; font-weight:900; }
+.cal-piece-area { margin:8px auto 0; display:flex; justify-content:center;
+  align-items:center; min-height:54px; }
+.cal-piece { width:44px; height:44px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#ff80ab,#e91e63);
+  cursor:grab; touch-action:none; user-select:none;
+  box-shadow:0 3px 8px rgba(233,30,99,.4); transition:opacity .15s; }
+#cal-ghost { position:fixed; width:44px; height:44px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#ff80ab,#e91e63);
+  opacity:.65; pointer-events:none; display:none; z-index:9999;
+  box-shadow:0 3px 10px rgba(233,30,99,.5); }
 .cal-done-box { text-align:center; margin-top:8px; }
 .cal-done-icon { font-size:2.5em; }
 .cal-done-txt  { font-size:1em; font-weight:700; color:#2e7d32; margin:6px 0 14px; }
@@ -1584,14 +1594,19 @@ body {
 
 <!-- ══ Calibration Screen ══ -->
 <div id="calibration-screen" class="screen">
+  <div id="cal-ghost"></div>
   <div class="cal-box">
     <div class="cal-title">📱 터치 보정</div>
-    <div class="cal-sub">아래 격자에서 🎯 표시된 칸을 정확히 탭해주세요.<br>3번 측정해서 평균 오차를 보정합니다.</div>
-    <div class="cal-inst" id="cal-inst">시작하려면 탭하세요</div>
+    <div class="cal-sub">아래 구슬을 드래그해서 ⭐ 칸에 놓아보세요!<br>3번 측정해서 드래그 오차를 보정합니다.</div>
+    <div class="cal-inst" id="cal-inst">구슬을 드래그해서 시작하세요</div>
     <div id="cal-board"></div>
+    <div class="cal-piece-area">
+      <div class="cal-piece" id="cal-piece"
+        ontouchstart="calPieceDown(event)" onmousedown="calPieceDown(event)"></div>
+    </div>
     <div class="cal-done-box" id="cal-done" style="display:none">
       <div class="cal-done-icon">✅</div>
-      <div class="cal-done-txt">보정 완료! 정확도가 향상됩니다.</div>
+      <div class="cal-done-txt">보정값이 설정됐어요!</div>
       <button class="btn btn-pink" onclick="finishCalibration()">시작하기</button>
     </div>
     <div id="cal-actions" style="display:flex;gap:8px;justify-content:center;margin-top:6px">
@@ -3829,14 +3844,16 @@ function showNameInputPopup(sc, cb) {
 // ════════════════════════════════════════════
 // TOUCH CALIBRATION
 // ════════════════════════════════════════════
-const CAL_GRID = 7; // calibration grid size
-const CAL_TARGETS = [[1,1],[3,5],[5,2]]; // [row, col] target positions
+const CAL_GRID = 4; // calibration grid size (4×4)
+const CAL_TARGETS = [[0,2],[2,0],[1,3]]; // [row, col] target positions on 4×4 grid
 let _calMeasures = [];
 let _calStep = 0;
+let _calDrag = false;
 
 function showCalibration() {
   _calMeasures = [];
   _calStep = 0;
+  _calDrag = false;
   buildCalBoard();
   showScreen('calibration');
   startCalStep(0);
@@ -3850,8 +3867,6 @@ function buildCalBoard() {
     const cell = document.createElement('div');
     cell.className = 'cal-cell';
     cell.dataset.r = r; cell.dataset.c = c;
-    cell.addEventListener('touchstart', calOnTouch, {passive:false});
-    cell.addEventListener('click', calOnClick);
     board.appendChild(cell);
   }
 }
@@ -3859,43 +3874,82 @@ function buildCalBoard() {
 function startCalStep(step) {
   if (step >= CAL_TARGETS.length) { showCalDone(); return; }
   const inst = document.getElementById('cal-inst');
-  if (inst) inst.textContent = `목표 원을 탭해주세요 (${step+1}/${CAL_TARGETS.length})`;
-  // Clear previous highlights
+  if (inst) inst.textContent = `구슬을 드래그해서 ⭐ 칸에 놓아보세요 (${step+1}/${CAL_TARGETS.length})`;
   document.querySelectorAll('.cal-cell').forEach(c=>{ c.classList.remove('cal-target','cal-hit'); });
-  // Highlight target
   const [tr, tc] = CAL_TARGETS[step];
   const idx = tr * CAL_GRID + tc;
   const cells = document.querySelectorAll('.cal-cell');
   if (cells[idx]) cells[idx].classList.add('cal-target');
+  const piece = document.getElementById('cal-piece');
+  if (piece) piece.style.opacity = '1';
 }
 
-function calOnTouch(e) {
+function calPieceDown(e) {
   e.preventDefault();
-  const touch = e.changedTouches[0];
-  recordCalHit(this, touch.clientX, touch.clientY);
-}
-function calOnClick(e) {
-  recordCalHit(this, e.clientX, e.clientY);
+  const coords = e.touches ? e.touches[0] : e;
+  _calDrag = true;
+  updateCalGhost(coords.clientX, coords.clientY);
+  const ghost = document.getElementById('cal-ghost');
+  if (ghost) ghost.style.display = 'block';
+  const piece = document.getElementById('cal-piece');
+  if (piece) piece.style.opacity = '0.3';
+  document.addEventListener('touchmove', calPieceMove, {passive:false});
+  document.addEventListener('touchend',  calPieceUp,   {passive:false});
+  document.addEventListener('mousemove', calPieceMove);
+  document.addEventListener('mouseup',   calPieceUp);
 }
 
-function recordCalHit(cell, touchX, touchY) {
+function calPieceMove(e) {
+  if (!_calDrag) return;
+  e.preventDefault();
+  const coords = e.touches ? e.touches[0] : e;
+  updateCalGhost(coords.clientX, coords.clientY);
+}
+
+function updateCalGhost(x, y) {
+  const ghost = document.getElementById('cal-ghost');
+  if (!ghost) return;
+  ghost.style.left = (x - 22) + 'px';
+  ghost.style.top  = (y - 22) + 'px';
+}
+
+function calPieceUp(e) {
+  if (!_calDrag) return;
+  document.removeEventListener('touchmove', calPieceMove);
+  document.removeEventListener('touchend',  calPieceUp);
+  document.removeEventListener('mousemove', calPieceMove);
+  document.removeEventListener('mouseup',   calPieceUp);
+
+  const coords = e.changedTouches ? e.changedTouches[0] : e;
+  const dropX = coords.clientX, dropY = coords.clientY;
+
+  const ghost = document.getElementById('cal-ghost');
+  if (ghost) ghost.style.display = 'none';
+  _calDrag = false;
+
   const step = _calStep;
+  if (step >= CAL_TARGETS.length) return;
   const [tr, tc] = CAL_TARGETS[step];
   const cells = document.querySelectorAll('.cal-cell');
   const idx = tr * CAL_GRID + tc;
-  if (!cells[idx] || !cells[idx].classList.contains('cal-target')) return;
+  const targetCell = cells[idx];
+  if (!targetCell) return;
 
-  // Get center of target cell
-  const rect = cells[idx].getBoundingClientRect();
-  const cx = rect.left + rect.width  / 2;
-  const cy = rect.top  + rect.height / 2;
+  const rect = targetCell.getBoundingClientRect();
+  const targetCX = rect.left + rect.width  / 2;
+  const targetCY = rect.top  + rect.height / 2;
 
-  _calMeasures.push({ ox: cx - touchX, oy: cy - touchY });
-  cells[idx].classList.remove('cal-target');
-  cells[idx].classList.add('cal-hit');
+  // offset = how much to shift raw touch coords to land on target cell center
+  _calMeasures.push({ ox: targetCX - dropX, oy: targetCY - dropY });
+
+  targetCell.classList.remove('cal-target');
+  targetCell.classList.add('cal-hit');
   _calStep++;
 
-  setTimeout(()=>startCalStep(_calStep), 200);
+  setTimeout(() => {
+    if (_calStep >= CAL_TARGETS.length) { showCalDone(); }
+    else { startCalStep(_calStep); }
+  }, 500);
 }
 
 function showCalDone() {
@@ -3903,7 +3957,7 @@ function showCalDone() {
   const avgY = _calMeasures.reduce((s,m)=>s+m.oy,0) / _calMeasures.length;
   localStorage.setItem('marble_touch_offset_x', avgX.toFixed(1));
   localStorage.setItem('marble_touch_offset_y', avgY.toFixed(1));
-  document.getElementById('cal-inst').textContent = `보정값: X=${avgX.toFixed(0)}px, Y=${avgY.toFixed(0)}px`;
+  document.getElementById('cal-inst').textContent = `보정값이 설정됐어요! (X=${avgX.toFixed(0)}px, Y=${avgY.toFixed(0)}px)`;
   const done = document.getElementById('cal-done');
   const actions = document.getElementById('cal-actions');
   if (done) done.style.display = '';
