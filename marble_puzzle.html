@@ -2556,7 +2556,6 @@ function beginDrag(idx, e) {
   if (pos.isTouch) document.body.style.overflow = 'hidden';
   // 드래그 시작 시 하단 툴팁 즉시 숨기기
   document.getElementById('special-tooltip').style.display = 'none';
-  const slotEl = document.querySelector(`.tray-slot[data-idx="${idx}"]`);
   if (slotEl) {
     slotEl.classList.add('selected');
     setTimeout(() => slotEl.classList.remove('selected'), 160);
