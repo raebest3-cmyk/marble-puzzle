@@ -170,12 +170,17 @@ body {
 }
 .hud-meta-row strong { font-size:1.25em; color:#e91e63; line-height:1; }
 
+/* ── CSS Variables for dynamic board ── */
+:root { --csz:48px; --g:7; }
+
 /* ── Game Board ── */
-#game-board { display:grid; grid-template-columns:repeat(7,48px); grid-template-rows:repeat(7,48px);
+#game-board { display:grid;
+  grid-template-columns:repeat(var(--g),var(--csz));
+  grid-template-rows:repeat(var(--g),var(--csz));
   gap:4px; background:#FFE4EF; padding:8px; border-radius:14px;
   box-shadow:0 6px 24px rgba(180,40,90,.22),inset 0 2px 8px rgba(255,255,255,.35);
   border:3px solid rgba(255,255,255,.55); position:relative; touch-action:none; }
-.cell { width:48px; height:48px; border-radius:9px; background:rgba(255,255,255,.32);
+.cell { width:var(--csz); height:var(--csz); border-radius:9px; background:rgba(255,255,255,.32);
   border:1.5px solid #F9A8C9;
   position:relative; transition:background .08s, box-shadow .08s; overflow:visible;
   box-shadow:inset 2px 2px 5px rgba(0,0,0,.1), inset -1px -1px 3px rgba(255,255,255,.6); }
@@ -829,6 +834,136 @@ body {
 .hof-date { font-size:.65em; color:rgba(255,255,255,.45); white-space:nowrap; margin-left:4px; }
 .hof-empty { color:rgba(255,255,255,.4); font-size:.85em; text-align:center; padding:10px 0; line-height:1.7; }
 
+/* ══════════════════════════════════════════
+   LEVEL SELECT SCREEN
+   ══════════════════════════════════════════ */
+#level-select-screen {
+  background:linear-gradient(160deg,#7c4dff,#e91e63);
+  overflow-y:auto; align-items:flex-start !important; padding:20px 10px 40px;
+}
+.ls-header { width:100%; max-width:420px; text-align:center; margin-bottom:16px; flex-shrink:0; }
+.ls-title  { color:#fff; font-size:1.6em; font-weight:900; text-shadow:0 2px 8px rgba(0,0,0,.3); margin-bottom:4px; }
+.ls-sub    { color:rgba(255,255,255,.8); font-size:.85em; }
+#level-grid {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+  width:100%; max-width:420px; padding:0 4px;
+}
+.lv-card {
+  background:rgba(255,255,255,.18); border-radius:16px; padding:14px 12px;
+  color:#fff; text-align:center; cursor:pointer;
+  border:2px solid rgba(255,255,255,.3);
+  transition:transform .15s, background .15s, opacity .15s;
+  position:relative; overflow:hidden;
+}
+.lv-card:hover { background:rgba(255,255,255,.3); transform:translateY(-3px); }
+.lv-card.lv-locked {
+  opacity:.45; cursor:default; filter:grayscale(.6);
+}
+.lv-card.lv-locked:hover { transform:none; background:rgba(255,255,255,.18); }
+.lv-card-num { font-size:1.4em; font-weight:900; line-height:1; }
+.lv-card-grid { font-size:.8em; opacity:.85; margin:3px 0; }
+.lv-card-time { font-size:.75em; opacity:.75; }
+.lv-card-stars { font-size:.9em; margin-top:5px; letter-spacing:1px; }
+.lv-card-lock { font-size:1.8em; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); opacity:.7; }
+.lv-card-clear { position:absolute; top:5px; right:7px; font-size:.7em; background:rgba(0,255,100,.3); border-radius:8px; padding:2px 6px; }
+
+/* ══════════════════════════════════════════
+   CUTSCENE SCREEN
+   ══════════════════════════════════════════ */
+#cutscene-screen { overflow:hidden; }
+.cs-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  gap:18px; padding:30px 20px; width:90vw; max-width:360px;
+}
+.cs-title { font-size:1.1em; font-weight:900; opacity:.8; letter-spacing:1px; }
+.cs-stage {
+  width:260px; height:160px; border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+.cs-dialog {
+  background:rgba(0,0,0,.5); border-radius:14px; padding:14px 18px;
+  color:#fff; font-size:1em; font-weight:700; text-align:center;
+  max-width:280px; line-height:1.65;
+  animation:csFadeIn .5s ease both;
+}
+#cs-skip { position:fixed; bottom:28px; right:22px; z-index:100;
+  background:rgba(255,255,255,.18); border:none; border-radius:20px;
+  color:#fff; font-family:inherit; font-size:.85em; font-weight:700;
+  padding:8px 18px; cursor:pointer; }
+/* Shared char animations */
+@keyframes csFloat { from{transform:translateY(0)} to{transform:translateY(-12px)} }
+@keyframes csJump  { 0%,100%{transform:translateY(0) rotate(-8deg)} 50%{transform:translateY(-22px) rotate(8deg)} }
+@keyframes csTiptoe{ from{transform:translateX(0) rotate(-5deg)} to{transform:translateX(10px) rotate(5deg)} }
+@keyframes csPush  { from{transform:translateX(0)} to{transform:translateX(10px)} }
+@keyframes csFadeIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+/* Scene-specific visuals */
+.cs-wall { width:80px; height:110px; background:#555; border-radius:6px; border:3px solid #777; position:relative; }
+.cs-crack { position:absolute; left:50%; top:0; width:3px; background:#ffd700;
+  animation:csCrack 2s ease forwards; height:0; transform:translateX(-50%); }
+@keyframes csCrack { to{height:65px} }
+.cs-crack::after { content:''; position:absolute; bottom:0; left:-3px; width:8px; height:20px;
+  background:#ffd700; transform:rotate(15deg); transform-origin:top; }
+.cs-window-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.cs-window { width:70px; height:60px; border:5px solid #999;
+  background:linear-gradient(135deg,#87CEEB,#fff); border-radius:4px 4px 0 0;
+  animation:csWinGlow 1.2s ease-in-out infinite alternate;
+  box-shadow:0 0 20px 10px rgba(33,150,243,.35); }
+@keyframes csWinGlow { from{box-shadow:0 0 15px 8px rgba(33,150,243,.25)} to{box-shadow:0 0 45px 22px rgba(33,150,243,.7)} }
+.cs-shovel { font-size:3em; transform-origin:bottom center; animation:csDig .55s ease-in-out infinite alternate; }
+@keyframes csDig { from{transform:rotate(-35deg)} to{transform:rotate(20deg)} }
+.cs-guard-wrap { position:relative; display:flex; gap:10px; align-items:flex-end; }
+.cs-guard { font-size:3em; }
+.cs-zzz { position:absolute; top:-10px; right:-16px; font-size:1.1em; color:#adf;
+  animation:csZzz 1.8s ease-in-out infinite; }
+@keyframes csZzz { 0%,100%{opacity:0;transform:translate(0,0)scale(.7)} 50%{opacity:1;transform:translate(6px,-8px)scale(1)} }
+.cs-door { font-size:4.5em; filter:drop-shadow(0 0 8px rgba(255,255,200,.5));
+  animation:csDoorGlow 1.4s ease-in-out infinite alternate; }
+@keyframes csDoorGlow { from{filter:drop-shadow(0 0 6px rgba(255,255,150,.3))} to{filter:drop-shadow(0 0 28px rgba(255,255,150,.9))} }
+.cs-door-open { font-size:4.5em; animation:csDoorSwing 2s ease forwards; }
+@keyframes csDoorSwing { 0%{transform:perspective(200px)rotateY(0)} 100%{transform:perspective(200px)rotateY(-35deg);filter:brightness(1.8)} }
+.cs-freedom { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.cs-rainbow-arc { width:180px; height:18px; border-radius:50px;
+  background:linear-gradient(90deg,red,orange,yellow,green,blue,violet);
+  opacity:.85; animation:csFadeIn .6s ease both; }
+.cs-stars { font-size:1.5em; animation:csStarSpin 1s linear infinite; }
+@keyframes csStarSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+/* ══════════════════════════════════════════
+   TOUCH CALIBRATION SCREEN
+   ══════════════════════════════════════════ */
+#calibration-screen { background:#FFB6C1; }
+.cal-box { background:rgba(255,255,255,.88); border-radius:24px; padding:24px 20px;
+  max-width:340px; width:90vw; text-align:center; }
+.cal-title { font-size:1.35em; font-weight:900; color:#e91e63; margin-bottom:6px; }
+.cal-sub { font-size:.85em; color:#666; margin-bottom:16px; line-height:1.5; }
+.cal-inst { font-size:.92em; color:#c2185b; font-weight:700; margin-bottom:14px; min-height:1.5em; }
+#cal-board {
+  display:grid; grid-template-columns:repeat(7,36px); grid-template-rows:repeat(7,36px);
+  gap:2px; margin:0 auto 16px; background:#ffe4ef; padding:4px;
+  border-radius:10px; border:2px solid #f48fb1; touch-action:none;
+  width:fit-content;
+}
+.cal-cell { width:36px; height:36px; border-radius:5px; background:rgba(244,143,177,.2);
+  position:relative; cursor:pointer; }
+.cal-cell.cal-target {
+  background:rgba(233,30,99,.15);
+  box-shadow:0 0 0 3px #e91e63;
+}
+.cal-cell.cal-target::after {
+  content:'🎯'; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); font-size:1.2em;
+  animation:calPulse .8s ease-in-out infinite alternate;
+}
+@keyframes calPulse { from{transform:translate(-50%,-50%)scale(1)} to{transform:translate(-50%,-50%)scale(1.2)} }
+.cal-cell.cal-hit { background:rgba(76,175,80,.35); }
+.cal-cell.cal-hit::after { content:'✓'; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); color:#2e7d32; font-size:1.1em; font-weight:900; }
+.cal-done-box { text-align:center; margin-top:8px; }
+.cal-done-icon { font-size:2.5em; }
+.cal-done-txt  { font-size:1em; font-weight:700; color:#2e7d32; margin:6px 0 14px; }
+
 /* ── Ending Screen ── */
 #ending-screen { background:linear-gradient(135deg,#1a237e,#6a1b9a,#ad1457,#e65100); }
 .ending-box { background:rgba(255,255,255,.12); border-radius:28px; padding:36px 28px;
@@ -881,12 +1016,9 @@ body {
 
 /* ── Responsive ── */
 @media (max-width:420px) {
-  #game-board { grid-template-columns:repeat(7,40px); grid-template-rows:repeat(7,40px); }
-  .cell { width:40px; height:40px; }
+  /* 셀 크기는 JS(computeCellSize)가 동적으로 결정함 */
 }
 @media (max-height:700px) {
-  #game-board { grid-template-columns:repeat(7,42px); grid-template-rows:repeat(7,42px); }
-  .cell { width:42px; height:42px; }
   #piece-tray { min-height:74px; padding:9px 14px; }
   #hud { padding:5px 8px; margin-bottom:6px; }
   .hud-block { padding:2px 10px; }
@@ -903,8 +1035,6 @@ body {
 @media (orientation:landscape) and (max-height:520px) {
   #game-screen { flex-direction:row !important; align-items:center; justify-content:center; gap:14px; padding:6px 10px; }
   #game-main { flex-direction:column; align-items:center; gap:0; }
-  #game-board { grid-template-columns:repeat(7,38px); grid-template-rows:repeat(7,38px); }
-  .cell { width:38px; height:38px; }
   #game-controls { max-width:230px; gap:5px; }
   #hud { padding:4px 8px; margin-bottom:0; }
   .hud-block { padding:2px 8px; }
@@ -1244,34 +1374,32 @@ body {
     </svg>
     <div class="speech">살려줘요~!! 😭</div>
   </div>
-  <div class="diff-label">난이도 선택</div>
-  <div class="diff-row">
+  <button class="btn btn-pink" style="font-size:1.15em;padding:15px 50px;margin-bottom:10px"
+    onclick="showLevelSelect()">🎮 스토리 모드</button>
+  <div class="diff-label" style="font-size:.78em;opacity:.65;margin-bottom:6px">빠른 플레이</div>
+  <div class="diff-row" style="margin-bottom:8px">
     <button class="diff-btn d-easy"   onclick="setDiff('easy')">
       <span class="diff-icon">😊</span>
       <span class="diff-name">쉬움</span>
-      <span class="diff-desc">3분 · 3가지 색</span>
-    </button>
-    <button class="diff-btn d-normal" onclick="setDiff('normal')">
-      <span class="diff-icon">🎯</span>
-      <span class="diff-name">보통</span>
-      <span class="diff-desc">2분 · 4가지 색</span>
+      <span class="diff-desc">3분 · 3색</span>
     </button>
     <button class="diff-btn d-hard"   onclick="setDiff('hard')">
       <span class="diff-icon">💀</span>
       <span class="diff-name">어려움</span>
-      <span class="diff-desc">1분 · 장애물 3개</span>
+      <span class="diff-desc">1분 · 장애물</span>
     </button>
     <button class="diff-btn d-timeattack" onclick="setDiff('timeattack')">
       <span class="diff-icon">⚡</span>
       <span class="diff-name">타임어택</span>
-      <span class="diff-desc">30초마다 자동배치</span>
+      <span class="diff-desc">자동배치</span>
     </button>
   </div>
   <div class="btn-row">
     <button class="btn btn-white" onclick="showScreen('help')">❓ 도움말</button>
-    <button class="btn btn-white" onclick="showShop()">🛍️ 구슬 상점</button>
+    <button class="btn btn-white" onclick="showShop()">🛍️ 상점</button>
     <button class="btn btn-white" onclick="showHOF()">🏆 명예의 전당</button>
-    <button class="btn btn-white" onclick="playOpening()">🎬 오프닝 다시보기</button>
+    <button class="btn btn-white" onclick="playOpening()">🎬 오프닝</button>
+    <button class="btn btn-white" onclick="showCalibration()">📱 터치 보정</button>
   </div>
 </div>
 
@@ -1366,7 +1494,7 @@ body {
   <div class="clear-score-txt">최종 점수: <span id="clear-score">0</span>점</div>
   <div class="clear-bonus-txt" id="clear-bonus"></div>
   <div class="btn-row">
-    <button class="btn btn-pink"  onclick="startGame(window._lastDiff||'normal')">🔄 다시 하기</button>
+    <button class="btn btn-pink"  onclick="retryGame()">🔄 다시 하기</button>
     <button class="btn btn-white" onclick="showScreen('start')">🏠 처음으로</button>
   </div>
 </div>
@@ -1377,7 +1505,7 @@ body {
   <div class="go-info">획득 점수: <span id="go-score">0</span>점</div>
   <div class="go-hs">🏆 최고 점수: <span id="go-hs-val">0</span>점</div>
   <div class="btn-row">
-    <button class="btn btn-pink btn-restart" onclick="startGame(window._lastDiff||'normal')">🔄 재도전</button>
+    <button class="btn btn-pink btn-restart" onclick="retryGame()">🔄 재도전</button>
     <button class="btn btn-exit"             onclick="showScreen('start')">🏠 나가기</button>
   </div>
 </div>
@@ -1438,6 +1566,40 @@ body {
   <button class="btn btn-white" style="margin-top:14px" onclick="showScreen('start')">← 돌아가기</button>
 </div>
 
+<!-- ══ Level Select Screen ══ -->
+<div id="level-select-screen" class="screen">
+  <div class="ls-header">
+    <div class="ls-title">🔮 레벨 선택</div>
+    <div class="ls-sub">이전 레벨을 클리어하면 다음 레벨이 열려요!</div>
+  </div>
+  <div id="level-grid"></div>
+  <button class="btn btn-white" style="margin-top:14px;flex-shrink:0" onclick="showScreen('start')">← 돌아가기</button>
+</div>
+
+<!-- ══ Cutscene Screen ══ -->
+<div id="cutscene-screen" class="screen">
+  <div class="cs-wrap" id="cs-inner"></div>
+  <button id="cs-skip" onclick="skipCutscene()">건너뛰기 ⏭</button>
+</div>
+
+<!-- ══ Calibration Screen ══ -->
+<div id="calibration-screen" class="screen">
+  <div class="cal-box">
+    <div class="cal-title">📱 터치 보정</div>
+    <div class="cal-sub">아래 격자에서 🎯 표시된 칸을 정확히 탭해주세요.<br>3번 측정해서 평균 오차를 보정합니다.</div>
+    <div class="cal-inst" id="cal-inst">시작하려면 탭하세요</div>
+    <div id="cal-board"></div>
+    <div class="cal-done-box" id="cal-done" style="display:none">
+      <div class="cal-done-icon">✅</div>
+      <div class="cal-done-txt">보정 완료! 정확도가 향상됩니다.</div>
+      <button class="btn btn-pink" onclick="finishCalibration()">시작하기</button>
+    </div>
+    <div id="cal-actions" style="display:flex;gap:8px;justify-content:center;margin-top:6px">
+      <button class="btn btn-white" onclick="showScreen('start')">건너뛰기</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ Ending Screen ══ -->
 <div id="ending-screen" class="screen">
   <div class="ending-box">
@@ -1478,11 +1640,24 @@ body {
 // ════════════════════════════════════════════
 // CONSTANTS
 // ════════════════════════════════════════════
-const GRID      = 7;
-const CELL_SIZE = 48;
+let   GRID      = 7;   // 동적 변경됨
+let   CELL_SIZE = 48;  // 동적 변경됨
 const GAP       = 4;
 const PADDING   = 8;
-const STEP      = CELL_SIZE + GAP; // 52
+let   STEP      = CELL_SIZE + GAP; // 동적 변경됨
+
+// ── 레벨 설정 (8단계) ──
+// 홀수 셀 그리드(3²=9, 5²=25, 9²=81)는 locked/obstacle로 짝수 채움 보정
+const LEVELS = [
+  { n:1, grid:3,  colors:2, minSz:2, maxSz:2, time:300, obstacles:0, locked:1 },
+  { n:2, grid:4,  colors:2, minSz:2, maxSz:3, time:240, obstacles:0, locked:0 },
+  { n:3, grid:5,  colors:3, minSz:2, maxSz:3, time:240, obstacles:0, locked:1 },
+  { n:4, grid:6,  colors:3, minSz:3, maxSz:4, time:180, obstacles:0, locked:0 },
+  { n:5, grid:7,  colors:4, minSz:3, maxSz:5, time:180, obstacles:0, locked:0 },
+  { n:6, grid:8,  colors:4, minSz:4, maxSz:5, time:120, obstacles:0, locked:0 },
+  { n:7, grid:9,  colors:4, minSz:5, maxSz:5, time:120, obstacles:1, locked:0 },
+  { n:8, grid:10, colors:4, minSz:5, maxSz:5, time:90,  obstacles:3, locked:2 },
+];
 
 const ALL_COLORS   = ['m-yellow','m-green','m-ivory','m-blue'];
 const EASY_COLORS  = ['m-yellow','m-green','m-blue'];
@@ -1542,6 +1717,91 @@ const DAILY_MISSIONS = [
 ];
 
 const TA_INTERVAL = 30; // 타임어택: 30초마다 자동배치
+
+// ════════════════════════════════════════════
+// DYNAMIC BOARD HELPERS
+// ════════════════════════════════════════════
+function computeCellSize(grid) {
+  const bPad = 22;  // 8*2 padding + 3*2 border
+  const gapTot = (grid - 1) * 4;
+  const avail = Math.min(
+    window.innerWidth  - 20,
+    window.innerHeight - 240,
+    480
+  );
+  const sz = Math.floor((avail - bPad - gapTot) / grid);
+  return Math.max(22, Math.min(58, sz));
+}
+function updateBoardCSS() {
+  const root = document.documentElement;
+  root.style.setProperty('--csz', CELL_SIZE + 'px');
+  root.style.setProperty('--g', GRID);
+}
+
+// ── 레벨 진행 상황 ──
+function getLevelProgress()    { return parseInt(localStorage.getItem('marble_lv_progress')||'1'); }
+function saveLevelProgress(n)  { if(n>getLevelProgress()) localStorage.setItem('marble_lv_progress',n); }
+function isLevelUnlocked(idx)  { return idx < getLevelProgress(); }
+function getLevelStars(idx)    { return parseInt(localStorage.getItem(`marble_lv_stars_${idx}`)||'0'); }
+function saveLevelStars(idx,s) { if(s>getLevelStars(idx)) localStorage.setItem(`marble_lv_stars_${idx}`,s); }
+
+// ── 스토리 모드 진입 ──
+function startLevelGame(idx) {
+  currentLevelIdx = idx;
+  const lv = LEVELS[idx];
+  GRID = lv.grid;
+  CELL_SIZE = computeCellSize(GRID);
+  STEP = CELL_SIZE + GAP;
+  updateBoardCSS();
+  difficulty = 'level';
+  window._lastDiff = 'level';
+  startGame('level');
+}
+
+// ── 레벨 선택 화면 렌더링 ──
+function showLevelSelect() {
+  renderLevelCards();
+  showScreen('level-select');
+}
+function renderLevelCards() {
+  const grid = document.getElementById('level-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const prog = getLevelProgress();
+  LEVELS.forEach((lv, idx) => {
+    const unlocked = isLevelUnlocked(idx);
+    const stars = getLevelStars(idx);
+    const card = document.createElement('div');
+    card.className = 'lv-card' + (unlocked ? '' : ' lv-locked');
+    const timeStr = lv.time >= 60 ? `${Math.floor(lv.time/60)}분` + (lv.time%60 ? `${lv.time%60}초` : '') : `${lv.time}초`;
+    const colorNames = ['','','2색','3색','4색'];
+    card.innerHTML = `
+      <div class="lv-card-num">Lv.${lv.n}</div>
+      <div class="lv-card-grid">${lv.grid}×${lv.grid} (${lv.grid*lv.grid}칸)</div>
+      <div class="lv-card-time">⏱ ${timeStr} · ${colorNames[lv.colors]||lv.colors+'색'}</div>
+      <div class="lv-card-stars">${stars>0?'★'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆'}</div>
+      ${unlocked && stars>0 ? '<div class="lv-card-clear">CLEAR</div>' : ''}
+      ${!unlocked ? '<div class="lv-card-lock">🔒</div>' : ''}
+    `;
+    if (unlocked) card.addEventListener('click', ()=>setLevelDiff(idx));
+    grid.appendChild(card);
+  });
+}
+function setLevelDiff(idx) {
+  if (!localStorage.getItem('marble_tut_done')) {
+    _tutCallback = ()=>startLevelGame(idx);
+    document.getElementById('tutorial-overlay').classList.add('show');
+    tutGoto(1);
+  } else {
+    startLevelGame(idx);
+  }
+}
+
+// ── 재도전 ──
+function retryGame() {
+  if (difficulty === 'level') startLevelGame(currentLevelIdx);
+  else startGame(window._lastDiff || 'easy');
+}
 
 // ════════════════════════════════════════════
 // AUDIO
@@ -1651,6 +1911,7 @@ let score        = 0;
 let difficulty   = 'normal';
 let activeColors = [...ALL_COLORS];
 let curLevel     = 1;
+let currentLevelIdx = 0; // 레벨 모드: LEVELS[] 인덱스 (0-based)
 let timeLeft     = 120;
 let gameActive   = false;
 let isPaused     = false;
@@ -1755,12 +2016,20 @@ function startGame(diff) {
   // 만료된 스킨 자동 해제
   if (getActiveSkin()!=='circle' && !isSkinOwned(getActiveSkin())) setActiveSkin('circle');
 
-  const timeMap = { easy:180, normal:120, hard:60, timeattack:120 };
-  timeLeft     = timeMap[difficulty];
-  // 🌸 꽃 구슬: 제한시간 1분 추가
-  if (getActiveSkin()==='flower') timeLeft+=60;
-  activeColors = difficulty==='easy' ? EASY_COLORS : [...ALL_COLORS];
-  curLevel     = 1;
+  if (difficulty === 'level') {
+    // ── 레벨 모드: LEVELS 설정 사용 ──
+    const lv = LEVELS[currentLevelIdx];
+    timeLeft     = lv.time;
+    if (getActiveSkin()==='flower') timeLeft += 60;
+    activeColors = ALL_COLORS.slice(0, lv.colors);
+    curLevel     = lv.n;
+  } else {
+    const timeMap = { easy:180, normal:120, hard:60, timeattack:120 };
+    timeLeft     = timeMap[difficulty];
+    if (getActiveSkin()==='flower') timeLeft+=60;
+    activeColors = difficulty==='easy' ? EASY_COLORS : [...ALL_COLORS];
+    curLevel     = 1;
+  }
   board        = Array.from({length:GRID},()=>Array(GRID).fill(null));
   score        = 0;
   gameActive   = true;
@@ -1787,11 +2056,16 @@ function startGame(diff) {
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
 
-  // Level indicator visible only in normal (covers all 5 levels)
+  // Level indicator: 보통(기존) + 레벨 모드
   document.getElementById('hud-lv-item').style.display =
-    difficulty==='normal' ? '' : 'none';
+    (difficulty==='normal' || difficulty==='level') ? '' : 'none';
 
   if (difficulty==='hard') placeObstacles(3);
+  if (difficulty==='level') {
+    const lv = LEVELS[currentLevelIdx];
+    if (lv.obstacles > 0) placeObstacles(lv.obstacles);
+    if (lv.locked    > 0) placeLocked(lv.locked);
+  }
 
   buildBoard();
   tray=[];
@@ -2139,12 +2413,16 @@ function mkPiece(forceNormal) {
   if      (difficulty==='easy')       { minSz=2; maxSz=4; }
   else if (difficulty==='hard')       { minSz=3; maxSz=5; }
   else if (difficulty==='timeattack') { minSz=2; maxSz=5; }
-  else { // normal: 레벨별 조각 크기
+  else if (difficulty==='level') {
+    const lv = LEVELS[currentLevelIdx];
+    minSz = lv.minSz; maxSz = lv.maxSz;
+  }
+  else { // normal: 레벨별 조각 크기 (기존 5단계)
     if      (curLevel<=1) { minSz=2; maxSz=4; }
     else if (curLevel===2){ minSz=3; maxSz=5; }
     else if (curLevel===3){ minSz=3; maxSz=5; }
     else if (curLevel===4){ minSz=4; maxSz=5; }
-    else                  { minSz=5; maxSz=5; } // Lv5
+    else                  { minSz=5; maxSz=5; }
   }
   const sz=minSz+Math.floor(Math.random()*(maxSz-minSz+1));
   const shapes=SHAPES[Math.min(sz,5)];
@@ -2367,20 +2645,13 @@ function boardCell(x, y) {
 
 // 드래그 중 실제 배치 판정에 쓸 셀 좌표 반환
 // 터치·마우스 모두 손가락/커서 실제 위치를 직접 boardCell에 전달
-// → previewBoard(미리보기)와 onUp(배치) 모두 동일 공식 사용 → 위치 일치
-// [DEBUG] 터치 col 보정: x를 반 칸 왼쪽으로 이동 후 재계산 / row 보정: -1 유지
 function dragBoardCell(x, y) {
-  const cell = boardCell(x, y);
-  if (!cell) return cell;
   if (drag && drag.isTouch) {
-    const boardEl = document.getElementById('game-board');
-    const halfCell = boardEl.getBoundingClientRect().width / GRID / 2;
-    const shifted  = boardCell(x - halfCell, y);
-    const c = Math.max(0, Math.min(GRID - 1, shifted ? shifted.c : cell.c));
-    const r = Math.max(0, Math.min(GRID - 1, cell.r - 1));
-    return { r, c };
+    const ox = parseFloat(localStorage.getItem('marble_touch_offset_x') || '0');
+    const oy = parseFloat(localStorage.getItem('marble_touch_offset_y') || '0');
+    return boardCell(x + ox, y + oy);
   }
-  return cell;
+  return boardCell(x, y);
 }
 
 // ════════════════════════════════════════════
@@ -2486,7 +2757,7 @@ function commitPlace(piece,r0,c0,trayIdx) {
   updateEscapeBar();
 
   // Win check
-  if (board.flat().filter(Boolean).length===49) { setTimeout(doWin,180); return; }
+  if (board.flat().filter(Boolean).length===GRID*GRID) { setTimeout(doWin,180); return; }
   // 막힌 상태 감지 (새 트레이 렌더 후 확인)
   setTimeout(checkStuck, 150);
 }
@@ -2506,7 +2777,7 @@ function isStuck() {
 
 function checkStuck() {
   if (!gameActive||isPaused) return;
-  if (board.flat().filter(Boolean).length===49) return; // win 처리됨
+  if (board.flat().filter(Boolean).length===GRID*GRID) return; // win 처리됨
   if (document.getElementById('stuck-popup').classList.contains('show')) return;
   if (isStuck()) showStuckPopup();
 }
@@ -2775,7 +3046,9 @@ function countupAnim(el, from, to, duration) {
 // WIN
 // ════════════════════════════════════════════
 function doWin() {
-  // 보통 난이도: 레벨 클리어 → 다음 레벨 진행
+  // 레벨 모드: 컷씬 → 다음 레벨 진행
+  if (difficulty==='level') { handleLevelWin(); return; }
+  // 보통 난이도(구 5레벨 시스템): 레벨 클리어 → 다음 레벨 진행
   if (difficulty==='normal' && curLevel<5) { advanceLevel(); return; }
   if (difficulty==='normal' && curLevel===5) { doEnding(); return; }
 
@@ -2846,6 +3119,125 @@ function doWin() {
       },700);
     });
   },680);
+}
+
+// ════════════════════════════════════════════
+// LEVEL MODE WIN HANDLER + CUTSCENE SYSTEM
+// ════════════════════════════════════════════
+
+// ── 컷씬 정의 ──
+const CS_DATA = [
+  { bg:'#1c1c2e', title:'Lv.1 클리어!', text:'벽에 금이 갔어! 희망이 보여!',
+    html:'<div class="cs-wall"><div class="cs-crack"></div></div>',
+    char:'<div style="font-size:2.5em;animation:csFloat 1.2s ease-in-out infinite alternate">🔮</div>' },
+  { bg:'#1c2a3a', title:'Lv.2 클리어!', text:'창문이다! 저기로 나갈 수 있을지도!',
+    html:'<div class="cs-window-wrap"><div class="cs-window"></div><div style="font-size:.9em;color:#87CEEB">빛이 들어온다!</div></div>',
+    char:'<div style="font-size:2.5em;animation:csFloat 1.2s ease-in-out infinite alternate">🔮</div>' },
+  { bg:'#2a1a0a', title:'Lv.3 클리어!', text:'열심히 파면 탈출할 수 있어!',
+    html:'<div class="cs-shovel">⛏️</div>',
+    char:'<div style="font-size:2.5em;animation:csFloat 1.2s ease-in-out infinite alternate">🔮</div>' },
+  { bg:'#0a1a0a', title:'Lv.4 클리어!', text:'쉿! 조용히... 들키면 안 돼!',
+    html:'<div class="cs-guard-wrap"><div class="cs-guard">💂</div><div class="cs-zzz">💤</div></div>',
+    char:'<div style="font-size:2.5em;animation:csTiptoe 0.8s ease-in-out infinite alternate">🔮</div>' },
+  { bg:'#1a0a2a', title:'Lv.5 클리어!', text:'감옥 문이 보여! 거의 다 왔어!',
+    html:'<div class="cs-door">🚪</div>',
+    char:'<div style="font-size:2.5em;animation:csFloat 1.2s ease-in-out infinite alternate">🔮</div>' },
+  { bg:'#1a0808', title:'Lv.6 클리어!', text:'으랏차차! 조금만 더!',
+    html:'<div style="display:flex;gap:10px;align-items:center"><div style="font-size:2.5em;animation:csPush .4s ease-in-out infinite alternate">🔮</div><div style="font-size:3em;animation:csPush .4s ease-in-out infinite alternate" >🚪</div></div>',
+    char:'' },
+  { bg:'#0a0a20', title:'Lv.7 클리어!', text:'문이 열린다! 이제 진짜야!',
+    html:'<div class="cs-door-open">🚪</div>',
+    char:'<div style="font-size:2.5em;animation:csJump .5s ease-in-out infinite alternate">🔮</div>' },
+  { bg:'linear-gradient(160deg,#1a6b9e,#2196F3,#87CEEB)', title:'🎉 탈출 성공!', text:'자유다!! 도와줘서 고마워! 🎉',
+    html:'<div class="cs-freedom"><div class="cs-rainbow-arc"></div><div class="cs-stars">⭐✨🌟</div></div>',
+    char:'<div style="font-size:3em;animation:csJump .45s ease-in-out infinite alternate">🔮</div>',
+    isEnding:true },
+];
+
+let _csTimer = null;
+let _csCallback = null;
+
+function handleLevelWin() {
+  gameActive = false;
+  clearInterval(timerID);
+  bgStop();
+  sndFanfare();
+
+  const winTime = timeLeft;
+  const stars = winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.5) ? 3
+               : winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.25) ? 2 : 1;
+
+  // 별점 / 포인트 저장
+  saveLevelStars(currentLevelIdx, stars);
+  saveHS();
+  addCumulativeScore(score);
+  const starPts = [50,100,200][stars-1];
+  addPoints(Math.floor(score/10) + starPts);
+
+  // 다음 레벨 해제
+  saveLevelProgress(currentLevelIdx + 2); // +1(next level idx) +1(1-based)
+
+  // Rainbow wave
+  for (let r=0;r<GRID;r++) for (let c=0;c<GRID;c++) {
+    if (!board[r][c]||board[r][c]==='m-obstacle'||board[r][c]==='m-locked') continue;
+    const cell=document.getElementById(`c${r}_${c}`);
+    if (cell) setTimeout(()=>{
+      cell.classList.add('rainbow-wave');
+      setTimeout(()=>cell.classList.remove('rainbow-wave'),560);
+    },(r+c)*38);
+  }
+
+  const isLast = currentLevelIdx >= LEVELS.length - 1;
+
+  setTimeout(()=>{
+    if (isLast) {
+      // 마지막 레벨: 엔딩 컷씬 → 엔딩 화면
+      checkAndShowAchievements(winTime, true);
+      showCutscene(currentLevelIdx, ()=>{
+        document.getElementById('ending-score').textContent='0';
+        showScreen('ending');
+        setTimeout(()=>countupAnim(document.getElementById('ending-score'),0,score,1400),350);
+        setTimeout(()=>showNameInputPopup(score,()=>{}),1800);
+      });
+    } else {
+      // 다음 레벨 컷씬 → 레벨 선택 화면
+      checkAndShowAchievements(winTime, false);
+      showCutscene(currentLevelIdx, ()=>{
+        showLevelSelect();
+      });
+    }
+  }, 700);
+}
+
+function showCutscene(levelIdx, callback) {
+  _csCallback = callback;
+  const cs = CS_DATA[levelIdx];
+  if (!cs) { if (callback) callback(); return; }
+
+  const inner = document.getElementById('cs-inner');
+  inner.style.cssText = '';
+  document.getElementById('cutscene-screen').style.background = cs.bg;
+
+  inner.innerHTML = `
+    <div class="cs-title" style="color:rgba(255,255,255,.7)">${cs.title}</div>
+    <div class="cs-stage" style="background:rgba(0,0,0,.35)">
+      ${cs.html}
+      ${cs.char}
+    </div>
+    <div class="cs-dialog">${cs.text}</div>
+  `;
+  showScreen('cutscene');
+
+  // 3초 후 자동 진행
+  if (_csTimer) clearTimeout(_csTimer);
+  _csTimer = setTimeout(skipCutscene, 3000);
+}
+
+function skipCutscene() {
+  if (_csTimer) { clearTimeout(_csTimer); _csTimer = null; }
+  const cb = _csCallback; _csCallback = null;
+  showScreen('start'); // 임시로 화면 전환 후 콜백
+  if (cb) cb();
 }
 
 // ════════════════════════════════════════════
@@ -3067,7 +3459,7 @@ function autoPlaceMarble() {
     setTimeout(()=>{cell.style.boxShadow='';},600);
   }
   showCharBubble('⚡ 자동 배치!');
-  if (board.flat().filter(Boolean).length===49) setTimeout(doWin,180);
+  if (board.flat().filter(Boolean).length===GRID*GRID) setTimeout(doWin,180);
 }
 
 // ════════════════════════════════════════════
@@ -3435,6 +3827,94 @@ function showNameInputPopup(sc, cb) {
 }
 
 // ════════════════════════════════════════════
+// TOUCH CALIBRATION
+// ════════════════════════════════════════════
+const CAL_GRID = 7; // calibration grid size
+const CAL_TARGETS = [[1,1],[3,5],[5,2]]; // [row, col] target positions
+let _calMeasures = [];
+let _calStep = 0;
+
+function showCalibration() {
+  _calMeasures = [];
+  _calStep = 0;
+  buildCalBoard();
+  showScreen('calibration');
+  startCalStep(0);
+}
+
+function buildCalBoard() {
+  const board = document.getElementById('cal-board');
+  if (!board) return;
+  board.innerHTML = '';
+  for (let r=0;r<CAL_GRID;r++) for (let c=0;c<CAL_GRID;c++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    cell.dataset.r = r; cell.dataset.c = c;
+    cell.addEventListener('touchstart', calOnTouch, {passive:false});
+    cell.addEventListener('click', calOnClick);
+    board.appendChild(cell);
+  }
+}
+
+function startCalStep(step) {
+  if (step >= CAL_TARGETS.length) { showCalDone(); return; }
+  const inst = document.getElementById('cal-inst');
+  if (inst) inst.textContent = `목표 원을 탭해주세요 (${step+1}/${CAL_TARGETS.length})`;
+  // Clear previous highlights
+  document.querySelectorAll('.cal-cell').forEach(c=>{ c.classList.remove('cal-target','cal-hit'); });
+  // Highlight target
+  const [tr, tc] = CAL_TARGETS[step];
+  const idx = tr * CAL_GRID + tc;
+  const cells = document.querySelectorAll('.cal-cell');
+  if (cells[idx]) cells[idx].classList.add('cal-target');
+}
+
+function calOnTouch(e) {
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  recordCalHit(this, touch.clientX, touch.clientY);
+}
+function calOnClick(e) {
+  recordCalHit(this, e.clientX, e.clientY);
+}
+
+function recordCalHit(cell, touchX, touchY) {
+  const step = _calStep;
+  const [tr, tc] = CAL_TARGETS[step];
+  const cells = document.querySelectorAll('.cal-cell');
+  const idx = tr * CAL_GRID + tc;
+  if (!cells[idx] || !cells[idx].classList.contains('cal-target')) return;
+
+  // Get center of target cell
+  const rect = cells[idx].getBoundingClientRect();
+  const cx = rect.left + rect.width  / 2;
+  const cy = rect.top  + rect.height / 2;
+
+  _calMeasures.push({ ox: cx - touchX, oy: cy - touchY });
+  cells[idx].classList.remove('cal-target');
+  cells[idx].classList.add('cal-hit');
+  _calStep++;
+
+  setTimeout(()=>startCalStep(_calStep), 200);
+}
+
+function showCalDone() {
+  const avgX = _calMeasures.reduce((s,m)=>s+m.ox,0) / _calMeasures.length;
+  const avgY = _calMeasures.reduce((s,m)=>s+m.oy,0) / _calMeasures.length;
+  localStorage.setItem('marble_touch_offset_x', avgX.toFixed(1));
+  localStorage.setItem('marble_touch_offset_y', avgY.toFixed(1));
+  document.getElementById('cal-inst').textContent = `보정값: X=${avgX.toFixed(0)}px, Y=${avgY.toFixed(0)}px`;
+  const done = document.getElementById('cal-done');
+  const actions = document.getElementById('cal-actions');
+  if (done) done.style.display = '';
+  if (actions) actions.style.display = 'none';
+}
+
+function finishCalibration() {
+  showScreen('start');
+}
+
+// ════════════════════════════════════════════
 // OPENING STORY
 // ════════════════════════════════════════════
 
@@ -3507,7 +3987,13 @@ document.addEventListener('keydown', e=>{
 if (!localStorage.getItem('marble_points')) localStorage.setItem('marble_points','500');
 document.getElementById('start-hs-val').textContent=getHS();
 initDailyMission();
-if (localStorage.getItem('marble_opening_seen')) { showScreen('start'); } else { playOpening(); }
+if (!localStorage.getItem('marble_touch_offset_x') && ('ontouchstart' in window)) {
+  showCalibration();
+} else if (localStorage.getItem('marble_opening_seen')) {
+  showScreen('start');
+} else {
+  playOpening();
+}
 </script>
 </body>
 </html>
