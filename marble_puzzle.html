@@ -829,6 +829,25 @@ body {
 .hof-date { font-size:.65em; color:rgba(255,255,255,.45); white-space:nowrap; margin-left:4px; }
 .hof-empty { color:rgba(255,255,255,.4); font-size:.85em; text-align:center; padding:10px 0; line-height:1.7; }
 
+/* ── Ending Screen ── */
+#ending-screen { background:linear-gradient(135deg,#1a237e,#6a1b9a,#ad1457,#e65100); }
+.ending-box { background:rgba(255,255,255,.12); border-radius:28px; padding:36px 28px;
+  max-width:360px; width:90vw; text-align:center;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 12px 48px rgba(0,0,0,.4); animation:screenSlideUp .5s cubic-bezier(.34,1.3,.64,1) both; }
+.ending-crown { font-size:4em; display:block; margin-bottom:10px;
+  animation:endingBounce 1s ease-in-out infinite alternate; }
+.ending-title { color:#FFD700; font-size:1.7em; font-weight:900; margin-bottom:8px;
+  text-shadow:0 2px 8px rgba(0,0,0,.5); }
+.ending-sub { color:rgba(255,255,255,.9); font-size:.95em; margin-bottom:18px; }
+.ending-score-wrap { color:#FFD700; font-size:1.25em; font-weight:700;
+  background:rgba(0,0,0,.3); border-radius:12px; padding:10px 18px; margin-bottom:22px; }
+.ending-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+@keyframes endingBounce {
+  from { transform:translateY(0)   scale(1);    }
+  to   { transform:translateY(-14px) scale(1.1); }
+}
+
 /* ── Name Input Popup ── */
 #name-input-popup { display:none; position:fixed; inset:0; z-index:9700;
   align-items:center; justify-content:center;
@@ -1378,8 +1397,10 @@ body {
     <p>미리 놓인 어두운 칸으로, 배치하거나 지울 수 없습니다.</p>
     <h3>↩ 되돌리기</h3>
     <p>오른쪽 상단 ↩ 버튼으로 마지막 이동을 취소할 수 있습니다. 턴당 1회만 사용 가능합니다.</p>
-    <h3>📊 레벨업 (보통)</h3>
-    <p>25개 배치 시 레벨 2로 상승 (더 복잡한 조각 등장)</p>
+    <h3>📊 레벨 시스템 (보통)</h3>
+    <p>보드 완성 시 자동으로 다음 레벨 진행 (총 5레벨)<br>
+    Lv1→2: 3~5칸 조각·잠긴칸 3개 / Lv3: 같음 / Lv4: 4~5칸·잠긴칸5·장애물2 / Lv5: 5칸만·잠긴칸5·장애물4<br>
+    레벨 5 완주 시 엔딩 화면 표시!</p>
     <h3>⭐ 점수</h3>
     <p>구슬 1개 배치 = 100점 / 클리어 시 남은 시간 × 10점 보너스<br>별 3개: 60초↑ / 별 2개: 30초↑ / 별 1개: 30초 미만</p>
   </div>
@@ -1415,6 +1436,20 @@ body {
     <div id="hof-list"></div>
   </div>
   <button class="btn btn-white" style="margin-top:14px" onclick="showScreen('start')">← 돌아가기</button>
+</div>
+
+<!-- ══ Ending Screen ══ -->
+<div id="ending-screen" class="screen">
+  <div class="ending-box">
+    <span class="ending-crown">👑</span>
+    <div class="ending-title">모든 레벨 클리어!</div>
+    <div class="ending-sub">당신은 진정한 구슬 마스터! 🎉<br>레벨 5까지 완주했습니다!</div>
+    <div class="ending-score-wrap">최종 점수: <strong id="ending-score">0</strong>점</div>
+    <div class="ending-btns">
+      <button class="btn btn-pink"  onclick="startGame('normal')">🔄 다시 도전</button>
+      <button class="btn btn-white" onclick="showScreen('start')">🏠 처음으로</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ Achievement Popup ══ -->
@@ -1476,9 +1511,16 @@ const MARBLE_NAMES = {
 
 // ── 업적 ──
 const ACHIEVEMENTS = [
-  { id:'first_clear', icon:'🏆', name:'첫 탈출!',    desc:'처음으로 클리어했어요' },
-  { id:'speed_clear', icon:'⚡', name:'번개 탈출!',   desc:'1분 이상 남기고 클리어' },
-  { id:'no_eraser',   icon:'💎', name:'순수한 탈출!', desc:'지우개·폭탄 없이 클리어' },
+  { id:'first_clear', icon:'🏆', name:'첫 탈출!',      desc:'처음으로 클리어했어요' },
+  { id:'speed_clear', icon:'⚡', name:'번개 탈출!',     desc:'1분 이상 남기고 클리어' },
+  { id:'no_eraser',   icon:'💎', name:'순수한 탈출!',   desc:'지우개·폭탄 없이 클리어' },
+  { id:'combo_3',     icon:'🔥', name:'연속 달인!',     desc:'한 게임에서 3번 연속 배치 성공' },
+  { id:'no_special',  icon:'✨', name:'완벽한 탈출!',   desc:'특수 구슬 도움·막힘 없이 클리어' },
+  { id:'speed_3min',  icon:'⏱', name:'3분 탈출!',      desc:'쉬움 난이도 클리어' },
+  { id:'hard_clear',  icon:'💀', name:'강철 탈출!',     desc:'어려움 난이도 클리어' },
+  { id:'lv5_clear',   icon:'👑', name:'전설의 탈출!',   desc:'레벨 5 클리어' },
+  { id:'shop_first',  icon:'🛍️', name:'쇼핑 마니아!',  desc:'첫 스킨 구매' },
+  { id:'point_1000',  icon:'💰', name:'부자 탈출!',     desc:'포인트 1000p 달성' },
 ];
 
 // ── 스킨 ──
@@ -1630,6 +1672,9 @@ let lockedCells  = [];
 let taCountdown  = TA_INTERVAL;
 let nextPiece    = null;
 let hintBonus    = 0;   // 🍀 클로버 스킨 보너스 힌트 횟수
+let diamondBonus = 0;   // 💎 다이아몬드 스킨 보너스 지우개 횟수
+let consecutivePlacements = 0; // 연속 배치 카운터 (combo_3 업적)
+let stuckPopupTriggered = false; // 막힘 팝업 발생 여부 (no_special 업적)
 let _expWarnShown = false; // 스킨 만료 1시간 전 경고 표시 여부
 
 const ESCAPE_LINES = [
@@ -1735,10 +1780,14 @@ function startGame(diff) {
   _expWarnShown= false;
   // 🍀 클로버 구슬: 힌트 +1
   hintBonus = (getActiveSkin()==='clover') ? 1 : 0;
+  // 💎 다이아몬드 구슬: 지우개 힌트 +2
+  diamondBonus = (getActiveSkin()==='diamond') ? 2 : 0;
+  consecutivePlacements = 0;
+  stuckPopupTriggered = false;
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
 
-  // Level indicator visible only in normal
+  // Level indicator visible only in normal (covers all 5 levels)
   document.getElementById('hud-lv-item').style.display =
     difficulty==='normal' ? '' : 'none';
 
@@ -2087,9 +2136,16 @@ function mkPiece(forceNormal) {
     if (r < bombThresh) return {cells:[[0,0]],color:'m-bomb',isBomb:true};
   }
   let minSz,maxSz;
-  if      (difficulty==='easy') { minSz=2; maxSz=4; }
-  else if (difficulty==='hard') { minSz=3; maxSz=5; }
-  else { minSz=curLevel>=2?3:2; maxSz=5; }
+  if      (difficulty==='easy')       { minSz=2; maxSz=4; }
+  else if (difficulty==='hard')       { minSz=3; maxSz=5; }
+  else if (difficulty==='timeattack') { minSz=2; maxSz=5; }
+  else { // normal: 레벨별 조각 크기
+    if      (curLevel<=1) { minSz=2; maxSz=4; }
+    else if (curLevel===2){ minSz=3; maxSz=5; }
+    else if (curLevel===3){ minSz=3; maxSz=5; }
+    else if (curLevel===4){ minSz=4; maxSz=5; }
+    else                  { minSz=5; maxSz=5; } // Lv5
+  }
   const sz=minSz+Math.floor(Math.random()*(maxSz-minSz+1));
   const shapes=SHAPES[Math.min(sz,5)];
   const shape=shapes[Math.floor(Math.random()*shapes.length)];
@@ -2409,6 +2465,17 @@ function commitPlace(piece,r0,c0,trayIdx) {
     if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*100); }
   }
 
+  // 연속 배치 추적 (combo_3 업적)
+  if (placed>0) {
+    consecutivePlacements++;
+    if (consecutivePlacements>=3 && !getAchieved().includes('combo_3')) {
+      saveAchievement('combo_3');
+      showAchBadge([ACHIEVEMENTS.find(a=>a.id==='combo_3')],0);
+    }
+  } else {
+    consecutivePlacements=0;
+  }
+
   // nextPiece를 현재 슬롯에 넣고, 새 nextPiece 생성
   tray[trayIdx] = nextPiece;
   const _forceNormal = tray.some((p,i) => p && (p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
@@ -2417,11 +2484,6 @@ function commitPlace(piece,r0,c0,trayIdx) {
   // bounce + star: 일반 구슬 배치 후에만 실행
   if (placed>0) triggerBounceStar(r0,c0,piece.cells);
   updateEscapeBar();
-
-  // Level up (normal only)
-  if (difficulty==='normal' && curLevel===1 && placedTotal>=25) {
-    curLevel=2; showLvlBanner(); placeLocked(3);
-  }
 
   // Win check
   if (board.flat().filter(Boolean).length===49) { setTimeout(doWin,180); return; }
@@ -2450,6 +2512,7 @@ function checkStuck() {
 }
 
 function showStuckPopup() {
+  stuckPopupTriggered = true;
   document.getElementById('stuck-popup').classList.add('show');
   if (timerID) clearInterval(timerID);  // 팝업 중 타이머 정지
 }
@@ -2469,6 +2532,13 @@ function giveEraser() {
     const idx2=tray.findIndex(p=>p&&!p.isEraser&&!p.isEraser2&&!p.isEraser3&&!p.isBomb);
     if (idx2>=0) tray[idx2]={cells:[[0,0]],color:'m-eraser',isEraser:true};
     showCharBubble('🍀 클로버 보너스! 지우개 +1!');
+  } else if (diamondBonus>0) {
+    // 💎 다이아몬드 구슬: 지우개 힌트 +2회 (막힘 감지 시 추가 지우개)
+    diamondBonus--;
+    const idx2=tray.findIndex(p=>p&&!p.isEraser&&!p.isEraser2&&!p.isEraser3&&!p.isBomb);
+    if (idx2>=0) tray[idx2]={cells:[[0,0]],color:'m-eraser',isEraser:true};
+    const rem=diamondBonus>0?` (남은 보너스: ${diamondBonus}회)`:'';
+    showCharBubble('💎 다이아몬드 보너스! 지우개 +1!' + rem);
   } else {
     showCharBubble('💝 지우개를 드렸어요!');
   }
@@ -2679,7 +2749,7 @@ function spawnSparkleParticles(r,c) {
 // ════════════════════════════════════════════
 function showLvlBanner() {
   const b=document.createElement('div');
-  b.className='lvl-banner'; b.textContent='🎊 레벨 2 UP!! 🎊';
+  b.className='lvl-banner'; b.textContent=`🎊 레벨 ${curLevel} UP!! 🎊`;
   document.body.appendChild(b);
   setTimeout(()=>b.remove(),2400);
   playTone(880,'triangle',.2,.15);
@@ -2705,6 +2775,10 @@ function countupAnim(el, from, to, duration) {
 // WIN
 // ════════════════════════════════════════════
 function doWin() {
+  // 보통 난이도: 레벨 클리어 → 다음 레벨 진행
+  if (difficulty==='normal' && curLevel<5) { advanceLevel(); return; }
+  if (difficulty==='normal' && curLevel===5) { doEnding(); return; }
+
   gameActive=false;
   clearInterval(timerID);
   const taWarn=document.getElementById('ta-warn');
@@ -2772,6 +2846,89 @@ function doWin() {
       },700);
     });
   },680);
+}
+
+// ════════════════════════════════════════════
+// LEVEL ADVANCE (normal mode: board fill → next level)
+// ════════════════════════════════════════════
+const _LV_TIMER  = {2:120, 3:120, 4:90, 5:60};
+const _LV_LOCKED = {2:3,   3:3,   4:5,  5:5};
+const _LV_OBST   = {2:0,   3:0,   4:2,  5:4};
+
+function advanceLevel() {
+  curLevel++;
+
+  // Reset board state for new level
+  board = Array.from({length:GRID},()=>Array(GRID).fill(null));
+  obstacles = [];
+  lockedCells = [];
+  placedTotal = 0;
+  undoState = null;
+  undoAvail = false;
+  consecutivePlacements = 0;
+  lastMilestone = -1;
+  _eraser3HintShown = false;
+
+  timeLeft = _LV_TIMER[curLevel] || 120;
+  if (getActiveSkin()==='flower') timeLeft += 60;
+
+  const obstCount = _LV_OBST[curLevel] || 0;
+  const lockCount = _LV_LOCKED[curLevel] || 0;
+  if (obstCount>0) placeObstacles(obstCount);
+  if (lockCount>0) placeLocked(lockCount);
+
+  tray=[];
+  for (let i=0;i<4;i++) {
+    const hs=tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
+    tray.push(mkPiece(hs));
+  }
+  nextPiece=mkPiece(tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb)));
+
+  renderBoard(); renderTray(); renderNextPreview(); updateHUD(); updateUndoBtn(); resetEscapeBar();
+  showLvlBanner();
+  sndFanfare();
+  gameActive=true;
+  clearInterval(timerID);
+  timerID=setInterval(tick,1000);
+  bgStop(); bgStart();
+}
+
+// ════════════════════════════════════════════
+// ENDING (normal mode level 5 clear)
+// ════════════════════════════════════════════
+function doEnding() {
+  gameActive=false;
+  clearInterval(timerID);
+  bgStop();
+  sndFanfare();
+
+  saveHS();
+  addCumulativeScore(score);
+  addPoints(Math.floor(score/10)+200); // 레벨5 클리어 = ★★★ 보너스
+
+  saveAchievement('lv5_clear');
+
+  const taWarn=document.getElementById('ta-warn');
+  if (taWarn) taWarn.style.display='none';
+
+  // Rainbow wave
+  for (let r=0;r<GRID;r++) for (let c=0;c<GRID;c++) {
+    const cell=document.getElementById(`c${r}_${c}`);
+    if (cell) setTimeout(()=>{
+      cell.classList.add('rainbow-wave');
+      setTimeout(()=>cell.classList.remove('rainbow-wave'),560);
+    },(r+c)*38);
+  }
+
+  setTimeout(()=>{
+    checkAndShowAchievements(timeLeft, true);
+    showScreen('ending');
+    document.getElementById('ending-score').textContent='0';
+    setTimeout(()=>{
+      countupAnim(document.getElementById('ending-score'),0,score,1400);
+    },350);
+    setTimeout(()=>showNameInputPopup(score,()=>{}),1800);
+  },900);
 }
 
 // ════════════════════════════════════════════
@@ -2921,14 +3078,23 @@ function saveAchievement(id) {
   const list=getAchieved();
   if (!list.includes(id)){ list.push(id); localStorage.setItem('marble_ach',JSON.stringify(list)); }
 }
-function checkAndShowAchievements(winTime) {
+function checkAndShowAchievements(winTime, isEnding=false) {
   const achieved=getAchieved();
   const toShow=[];
-  if (!achieved.includes('first_clear')) toShow.push(ACHIEVEMENTS[0]);
-  if (winTime>=60) toShow.push(ACHIEVEMENTS[1]);
-  if (!eraserUsed && !bombUsed) toShow.push(ACHIEVEMENTS[2]);
-  toShow.forEach(a=>saveAchievement(a.id));
-  if (toShow.length>0) showAchBadge(toShow,0);
+  const fa=id=>ACHIEVEMENTS.find(a=>a.id===id);
+
+  if (!achieved.includes('first_clear'))                               toShow.push(fa('first_clear'));
+  if (winTime>=60 && !achieved.includes('speed_clear'))                toShow.push(fa('speed_clear'));
+  if (!eraserUsed && !bombUsed && !achieved.includes('no_eraser'))     toShow.push(fa('no_eraser'));
+  if (!eraserUsed && !bombUsed && !stuckPopupTriggered
+      && !achieved.includes('no_special'))                             toShow.push(fa('no_special'));
+  if (difficulty==='easy' && !achieved.includes('speed_3min'))         toShow.push(fa('speed_3min'));
+  if (difficulty==='hard' && !achieved.includes('hard_clear'))         toShow.push(fa('hard_clear'));
+  if (isEnding && !achieved.includes('lv5_clear'))                     toShow.push(fa('lv5_clear'));
+
+  const valid=toShow.filter(Boolean);
+  valid.forEach(a=>saveAchievement(a.id));
+  if (valid.length>0) showAchBadge(valid,0);
 }
 function showAchBadge(list,idx) {
   if (idx>=list.length) return;
@@ -2957,7 +3123,14 @@ function addCumulativeScore(n){ localStorage.setItem('marble_cumul',getCumulScor
 
 // ── 포인트 ──
 function getPoints()   { return parseInt(localStorage.getItem('marble_points')||'500'); }
-function addPoints(n)  { localStorage.setItem('marble_points',getPoints()+Math.max(0,n)); }
+function addPoints(n)  {
+  localStorage.setItem('marble_points',getPoints()+Math.max(0,n));
+  // 💰 포인트 1000p 달성 업적
+  if (getPoints()>=1000 && !getAchieved().includes('point_1000')) {
+    saveAchievement('point_1000');
+    setTimeout(()=>showAchBadge([ACHIEVEMENTS.find(a=>a.id==='point_1000')],0),800);
+  }
+}
 function spendPoints(n){ localStorage.setItem('marble_points',Math.max(0,getPoints()-n)); }
 
 // ── 활성 스킨 ──
@@ -3177,6 +3350,11 @@ function doBuy(skin) {
   document.body.appendChild(cel); setTimeout(()=>cel.remove(),1400);
   renderShop(); renderBoard(); renderTray();
   const pe=document.getElementById('hud-pts'); if (pe) pe.textContent=getPoints();
+  // 🛍️ 첫 스킨 구매 업적
+  if (!getAchieved().includes('shop_first')) {
+    saveAchievement('shop_first');
+    setTimeout(()=>showAchBadge([ACHIEVEMENTS.find(a=>a.id==='shop_first')],0),500);
+  }
 }
 
 // ════════════════════════════════════════════
