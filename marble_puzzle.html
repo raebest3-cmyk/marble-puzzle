@@ -735,21 +735,78 @@ body {
 
 /* ── Shop Screen ── */
 #shop-screen { background:linear-gradient(160deg,#ffe0ec 0%,#FFB6C1 40%,#ff85a1 100%); overflow-y:auto; }
-.shop-box { background:rgba(255,255,255,.88); border-radius:20px; padding:20px 16px;
-  max-width:360px; width:92vw; max-height:62vh; overflow-y:auto; }
-.shop-title { color:#e91e63; font-size:1.15em; font-weight:900; margin-bottom:10px; text-align:center; }
-.shop-cumul { background:#fce4ec; border-radius:12px; padding:6px 14px;
-  color:#c2185b; font-size:.84em; font-weight:700; text-align:center; margin-bottom:12px; }
-.skin-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.skin-item { background:#fff; border:2.5px solid #f48fb1; border-radius:14px;
-  padding:14px 8px; text-align:center; cursor:pointer; transition:transform .12s, border-color .12s; }
-.skin-item:hover { transform:translateY(-2px); border-color:#e91e63; }
-.skin-item.skin-active { border-color:#FFD700; background:#fffde7; }
-.skin-item.skin-locked { opacity:.52; cursor:not-allowed; }
-.skin-item.skin-locked:hover { transform:none; border-color:#f48fb1; }
-.skin-preview { width:52px; height:52px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; }
-.skin-name { font-size:.82em; font-weight:700; color:#c2185b; }
-.skin-cost { font-size:.68em; color:#888; margin-top:3px; }
+/* ── Shop ── */
+.shop-box { background:rgba(255,255,255,.92); border-radius:20px; padding:16px 12px;
+  max-width:400px; width:96vw; max-height:82vh; overflow-y:auto; }
+.shop-title { color:#e91e63; font-size:1.15em; font-weight:900; margin-bottom:8px; text-align:center; }
+.shop-pts-bar { background:linear-gradient(135deg,#e91e63,#f06292); border-radius:12px;
+  padding:8px 16px; color:#fff; font-size:.88em; font-weight:700;
+  text-align:center; margin-bottom:12px; }
+.shop-pts-bar strong { font-size:1.28em; letter-spacing:.5px; }
+.skin-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.skin-card { background:#fff; border:2.5px solid #f48fb1; border-radius:16px;
+  padding:10px 7px 9px; text-align:center; cursor:pointer;
+  transition:transform .12s, border-color .12s, box-shadow .12s; position:relative; }
+.skin-card:hover { transform:translateY(-2px); border-color:#e91e63;
+  box-shadow:0 4px 14px rgba(233,30,99,.2); }
+.skin-card.sk-active { border-color:#FFD700; background:#fffde7; }
+.skin-card.sk-owned  { border-color:#81c784; background:#f1f8e9; }
+.skin-card.sk-locked { opacity:.58; cursor:default; }
+.skin-card.sk-locked:hover { transform:none; border-color:#f48fb1; box-shadow:none; }
+.skin-preview { width:52px; height:52px; margin:0 auto 5px;
+  display:flex; align-items:center; justify-content:center; }
+.skin-name { font-size:.8em; font-weight:700; color:#c2185b; }
+.skin-desc { font-size:.6em; color:#888; margin:2px 0 3px; line-height:1.4; min-height:2.8em; }
+.skin-timer { font-size:.6em; color:#2e7d32; font-weight:700; margin-bottom:3px; }
+.skin-timer.expiring { color:#c62828; animation:blink .8s infinite; }
+.skin-price { font-size:.7em; color:#7b1fa2; font-weight:700; margin:3px 0; }
+.skin-need  { font-size:.58em; color:#c62828; margin-top:2px; min-height:1em; }
+.skin-btn { margin-top:5px; padding:5px 10px; border:none; border-radius:18px; cursor:pointer;
+  font-family:inherit; font-size:.7em; font-weight:700; transition:transform .1s; display:block; width:100%; }
+.skin-btn:active { transform:scale(.93); }
+.skin-btn.btn-select { background:#FFD700; color:#5d4037; }
+.skin-btn.btn-buy    { background:linear-gradient(135deg,#e91e63,#f06292); color:#fff; }
+.skin-btn.btn-using  { background:#a5d6a7; color:#1b5e20; cursor:default; }
+.skin-btn.btn-poor   { background:#eee; color:#aaa; cursor:not-allowed; }
+/* Confirm popup */
+#shop-confirm { position:fixed; inset:0; z-index:3000; display:none;
+  align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
+#shop-confirm.show { display:flex; }
+.confirm-box { background:#fff; border-radius:22px; padding:28px 22px 20px;
+  max-width:300px; width:88vw; text-align:center;
+  animation:confirmPop .28s cubic-bezier(.34,1.56,.64,1); }
+@keyframes confirmPop { 0%{transform:scale(.7);opacity:0} 100%{transform:scale(1);opacity:1} }
+.confirm-icon { font-size:2.6em; margin-bottom:6px; }
+.confirm-msg  { font-family:'Jua',sans-serif; font-size:.94em; color:#333;
+  line-height:1.65; margin-bottom:18px; }
+.confirm-btns { display:flex; gap:10px; }
+.confirm-btns button { flex:1; padding:11px; border:none; border-radius:14px;
+  font-family:inherit; font-size:.9em; font-weight:700; cursor:pointer; }
+.confirm-btns .cbtn-ok { background:linear-gradient(135deg,#e91e63,#f06292); color:#fff; }
+.confirm-btns .cbtn-no { background:#f5f5f5; color:#888; }
+/* Buy celebration */
+.buy-cel { position:fixed; top:38%; left:50%; transform:translate(-50%,-50%);
+  font-family:'Jua',sans-serif; font-size:1.55em; font-weight:900; color:#e91e63;
+  z-index:4000; pointer-events:none;
+  animation:buyPop .5s cubic-bezier(.34,1.56,.64,1) forwards, floatUp .85s .25s ease forwards; }
+@keyframes buyPop { 0%{transform:translate(-50%,-50%) scale(.5) rotate(-18deg);opacity:0}
+  70%{transform:translate(-50%,-50%) scale(1.2) rotate(4deg);opacity:1}
+  100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1} }
+/* Skin-specific marble effects */
+.marble.skin-rainbow { animation:rainbowAnim 1.6s linear infinite !important; }
+.marble.skin-fire { animation:firePulse 1s ease-in-out infinite !important; }
+.marble.skin-clover { animation:cloverGlow 1.4s ease-in-out infinite alternate !important; }
+@keyframes firePulse {
+  0%,100%{ box-shadow:0 0 7px 2px #ff6600,inset -2px -2px 5px rgba(0,0,0,.18); }
+  50%    { box-shadow:0 0 18px 6px #ff2200,0 0 30px #ff9900,inset -2px -2px 5px rgba(0,0,0,.18); }
+}
+@keyframes cloverGlow {
+  0%  { box-shadow:0 0 5px 2px #43a047; }
+  100%{ box-shadow:0 0 14px 5px #1b5e20,0 0 22px #a5d6a7; }
+}
+/* HUD points */
+#hud-pts { font-size:1.5em; color:#7b1fa2; line-height:1;
+  text-shadow:0 1px 0 rgba(255,255,255,.7); }
 
 /* ── Daily Mission ── */
 .daily-mission { background:rgba(255,255,255,.78); border-radius:16px; padding:8px 16px;
@@ -1220,6 +1277,12 @@ body {
       <div class="hud-meta-row" id="hud-lv-item">📊 Lv.<strong id="hud-level">1</strong></div>
       <div class="hud-meta-row">🔮 <strong id="hud-remain">49</strong>칸</div>
     </div>
+    <div class="hud-divider"></div>
+    <!-- ④ 포인트 -->
+    <div class="hud-block" id="hud-pts-block">
+      <span class="hud-label">💎 포인트</span>
+      <strong id="hud-pts">0</strong>
+    </div>
   </div>
   <div id="game-board"></div>
   </div><!-- #game-main -->
@@ -1325,10 +1388,22 @@ body {
 <div id="shop-screen" class="screen">
   <div class="shop-box">
     <div class="shop-title">🛍️ 구슬 상점</div>
-    <div class="shop-cumul" id="shop-cumul-score">누적 점수: 0점</div>
+    <div class="shop-pts-bar" id="shop-pts-bar">💎 보유 포인트: <strong id="shop-pts-val">0</strong>p</div>
     <div class="skin-grid" id="skin-grid"></div>
   </div>
   <button class="btn btn-pink" style="margin-top:14px" onclick="goBackFromShop()">← 돌아가기</button>
+</div>
+
+<!-- ══ Shop Confirm Popup ══ -->
+<div id="shop-confirm">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⭐</div>
+    <div class="confirm-msg"  id="confirm-msg">구매하시겠습니까?</div>
+    <div class="confirm-btns">
+      <button class="cbtn-ok" id="confirm-ok">구매하기 💎</button>
+      <button class="cbtn-no" onclick="closeConfirm()">취소</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ Hall of Fame Screen ══ -->
@@ -1406,10 +1481,13 @@ const ACHIEVEMENTS = [
 
 // ── 스킨 ──
 const SKINS = [
-  { id:'circle', name:'기본 구슬', cost:0 },
-  { id:'star',   name:'별 구슬',   cost:1000 },
-  { id:'heart',  name:'하트 구슬', cost:2000 },
-  { id:'flower', name:'꽃 구슬',   cost:3000 },
+  { id:'circle',  icon:'⚪', name:'기본 동그라미',    cost:0,    perm:true,  desc:'특수 기능 없음' },
+  { id:'star',    icon:'⭐', name:'별 구슬',          cost:300,  perm:false, desc:'점수 10% 추가 획득' },
+  { id:'flower',  icon:'🌸', name:'꽃 구슬',          cost:500,  perm:false, desc:'제한시간 1분 추가' },
+  { id:'diamond', icon:'💎', name:'다이아몬드 구슬',  cost:800,  perm:false, desc:'지우개 힌트 +2회' },
+  { id:'rainbow', icon:'🌈', name:'무지개 구슬',      cost:1500, perm:false, desc:'클리어 보너스 2배' },
+  { id:'fire',    icon:'🔥', name:'불꽃 구슬',        cost:1000, perm:false, desc:'폭탄 등장 확률 2배' },
+  { id:'clover',  icon:'🍀', name:'네잎클로버 구슬',  cost:700,  perm:false, desc:'자동 힌트 1회 추가' },
 ];
 
 // ── 일일 미션 ──
@@ -1549,6 +1627,8 @@ let bombUsed     = false;
 let lockedCells  = [];
 let taCountdown  = TA_INTERVAL;
 let nextPiece    = null;
+let hintBonus    = 0;   // 🍀 클로버 스킨 보너스 힌트 횟수
+let _expWarnShown = false; // 스킨 만료 1시간 전 경고 표시 여부
 
 const ESCAPE_LINES = [
   { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
@@ -1625,8 +1705,13 @@ function startGame(diff) {
   difficulty   = diff || 'normal';
   window._lastDiff = difficulty;
 
+  // 만료된 스킨 자동 해제
+  if (getActiveSkin()!=='circle' && !isSkinOwned(getActiveSkin())) setActiveSkin('circle');
+
   const timeMap = { easy:180, normal:120, hard:60, timeattack:120 };
   timeLeft     = timeMap[difficulty];
+  // 🌸 꽃 구슬: 제한시간 1분 추가
+  if (getActiveSkin()==='flower') timeLeft+=60;
   activeColors = difficulty==='easy' ? EASY_COLORS : [...ALL_COLORS];
   curLevel     = 1;
   board        = Array.from({length:GRID},()=>Array(GRID).fill(null));
@@ -1645,6 +1730,9 @@ function startGame(diff) {
   eraserCount  = 0;
   bombUsed     = false;
   taCountdown  = TA_INTERVAL;
+  _expWarnShown= false;
+  // 🍀 클로버 구슬: 힌트 +1
+  hintBonus = (getActiveSkin()==='clover') ? 1 : 0;
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
 
@@ -1706,6 +1794,17 @@ function tick() {
     if (taCountdown<=0) { autoPlaceMarble(); taCountdown=TA_INTERVAL; }
   }
   updateHUD();
+  if (!_expWarnShown) {
+    const as=getActiveSkin();
+    if (as!=='circle') {
+      const rem=getSkinRemainingMs(as);
+      if (rem>0 && rem<3600000) {
+        _expWarnShown=true;
+        const sk=SKINS.find(s=>s.id===as);
+        showCharBubble(`⚠️ ${sk?sk.icon:''}${sk?sk.name:as} 만료 1시간 전!`);
+      }
+    }
+  }
   if (timeLeft<=0) doGameOver();
 }
 
@@ -1718,6 +1817,8 @@ function updateHUD() {
   document.getElementById('hud-level').textContent=curLevel;
   const empty=board.flat().filter(v=>!v).length;
   document.getElementById('hud-remain').textContent=empty;
+  const pe=document.getElementById('hud-pts');
+  if (pe) pe.textContent=getPoints();
 }
 
 // ════════════════════════════════════════════
@@ -1844,6 +1945,9 @@ function mkMarbleEl(color, size, mood) {
   } else if (mood && mood!=='none') {
     m.appendChild(mkFaceSVG(mood));
     applySkinOverlay(m, color, size);
+    // 스킨별 시각 효과 클래스 (특수 구슬 제외)
+    const sk=getActiveSkin();
+    if (sk==='rainbow'||sk==='fire'||sk==='clover') m.classList.add('skin-'+sk);
   }
   return m;
 }
@@ -1973,10 +2077,12 @@ const SPECIAL_TIPS = {
 function mkPiece(forceNormal) {
   if (!forceNormal) {
     const r = Math.random();
-    if (r < 0.08)                  return {cells:[[0,0]],color:'m-eraser',isEraser:true};
-    if (r < 0.08+0.15)             return {cells:[[0,0],[0,1]],color:'m-eraser2',isEraser2:true};
-    if (r < 0.08+0.15+0.08)        return {cells:[[0,0],[0,1],[0,2]],color:'m-eraser3',isEraser3:true,rotation:0};
-    if (r < 0.08+0.15+0.08+0.10)   return {cells:[[0,0]],color:'m-bomb',isBomb:true};
+    if (r < 0.08)      return {cells:[[0,0]],color:'m-eraser',isEraser:true};
+    if (r < 0.23)      return {cells:[[0,0],[0,1]],color:'m-eraser2',isEraser2:true};
+    if (r < 0.31)      return {cells:[[0,0],[0,1],[0,2]],color:'m-eraser3',isEraser3:true,rotation:0};
+    // 🔥 불꽃 구슬: 폭탄 확률 2배 (10% → 20%)
+    const bombThresh = 0.31 + (getActiveSkin()==='fire' ? 0.20 : 0.10);
+    if (r < bombThresh) return {cells:[[0,0]],color:'m-bomb',isBomb:true};
   }
   let minSz,maxSz;
   if      (difficulty==='easy') { minSz=2; maxSz=4; }
@@ -2292,7 +2398,10 @@ function commitPlace(piece,r0,c0,trayIdx) {
         lockedCells=lockedCells.filter(([lr,lc])=>!(lr===r&&lc===c));
         board[r][c]=null; sndErase();
       } else {
-        board[r][c]=piece.color; score+=100; placed++; placedTotal++;
+        board[r][c]=piece.color;
+        // ⭐ 별 구슬: 점수 10% 추가
+        score += getActiveSkin()==='star' ? 110 : 100;
+        placed++; placedTotal++;
       }
     });
     if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*100); }
@@ -2350,11 +2459,18 @@ function closeStuck() {
 
 function giveEraser() {
   closeStuck();
-  // 일반 구슬 슬롯 우선, 없으면 첫 번째 슬롯 교체
   const idx = tray.findIndex(p=>p&&!p.isEraser&&!p.isEraser2&&!p.isEraser3&&!p.isBomb);
   tray[idx>=0?idx:0] = {cells:[[0,0]],color:'m-eraser',isEraser:true};
+  // 🍀 클로버 구슬: 지우개 힌트 +1
+  if (hintBonus>0) {
+    hintBonus--;
+    const idx2=tray.findIndex(p=>p&&!p.isEraser&&!p.isEraser2&&!p.isEraser3&&!p.isBomb);
+    if (idx2>=0) tray[idx2]={cells:[[0,0]],color:'m-eraser',isEraser:true};
+    showCharBubble('🍀 클로버 보너스! 지우개 +1!');
+  } else {
+    showCharBubble('💝 지우개를 드렸어요!');
+  }
   renderTray();
-  showCharBubble('💝 지우개를 드렸어요!');
 }
 
 // ════════════════════════════════════════════
@@ -2595,7 +2711,9 @@ function doWin() {
   sndFanfare();
 
   const winTime=timeLeft;
-  const bonus=winTime*10;
+  // 🌈 무지개 구슬: 클리어 보너스 2배
+  let bonus=winTime*10;
+  if (getActiveSkin()==='rainbow') bonus*=2;
   const stars=winTime>=60?3:winTime>=30?2:1;
 
   // 1. Rainbow wave on all cells
@@ -2627,8 +2745,12 @@ function doWin() {
 
       saveHS();
       addCumulativeScore(score);
+      // 포인트 적립: 점수 10% + 별 보너스
+      const starPts=[50,100,200][stars-1];
+      addPoints(Math.floor(score/10)+starPts);
 
       let bonusTxt=bonus>0?'⏱ 시간 보너스 +'+bonus+'점':'';
+      if (getActiveSkin()==='rainbow') bonusTxt+=(bonusTxt?' · ':'')+'🌈 무지개 2배 보너스!';
       if (dailyBonus>0) bonusTxt+=(bonusTxt?' · ':'')+'📅 일일 미션 +500점!';
       document.getElementById('clear-bonus').textContent=bonusTxt;
       document.getElementById('clear-score').textContent='0';
@@ -2703,6 +2825,7 @@ function doGameOver() {
   if (taWarn) taWarn.style.display='none';
   bgStop();
   saveHS();
+  addPoints(Math.floor(score/10));
   const gs=document.getElementById('game-screen');
   gs.style.transition='filter .7s';
   gs.style.filter='grayscale(1) brightness(.6)';
@@ -2823,23 +2946,49 @@ function showAchBadge(list,idx) {
 }
 
 // ════════════════════════════════════════════
-// SKIN SHOP
+// SKIN SHOP — POINT SYSTEM
 // ════════════════════════════════════════════
+
+// ── 레거시 (HOF·점수 호환 유지) ──
 function getCumulScore()   { return parseInt(localStorage.getItem('marble_cumul')||'0'); }
-function addCumulativeScore(n) {
-  localStorage.setItem('marble_cumul', getCumulScore()+n);
-}
+function addCumulativeScore(n){ localStorage.setItem('marble_cumul',getCumulScore()+n); }
+
+// ── 포인트 ──
+function getPoints()   { return parseInt(localStorage.getItem('marble_points')||'500'); }
+function addPoints(n)  { localStorage.setItem('marble_points',getPoints()+Math.max(0,n)); }
+function spendPoints(n){ localStorage.setItem('marble_points',Math.max(0,getPoints()-n)); }
+
+// ── 활성 스킨 ──
 function getActiveSkin()   { return localStorage.getItem('marble_skin')||'circle'; }
 function setActiveSkin(id) { localStorage.setItem('marble_skin',id); }
-function getUnlockedSkins(){ return JSON.parse(localStorage.getItem('marble_skins_unlocked')||'["circle"]'); }
-function unlockSkin(id) {
-  const u=getUnlockedSkins();
-  if (!u.includes(id)){ u.push(id); localStorage.setItem('marble_skins_unlocked',JSON.stringify(u)); }
+
+// ── 구매 기록 (24시간 만료) ──
+function getPurchases()  { return JSON.parse(localStorage.getItem('marble_purchases')||'{}'); }
+function isSkinOwned(id) {
+  if (id==='circle') return true;
+  const p=getPurchases(); return !!(p[id] && Date.now()-p[id]<86400000);
+}
+function getSkinRemainingMs(id) {
+  const p=getPurchases(); if (!p[id]) return 0;
+  return Math.max(0,86400000-(Date.now()-p[id]));
+}
+function formatRem(ms) {
+  const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);
+  return h>0?`${h}시간 ${m}분 남음`:`${m}분 남음`;
+}
+function buySkin(id, cost) {
+  if (getPoints()<cost) return false;
+  spendPoints(cost);
+  const p=getPurchases(); p[id]=Date.now();
+  localStorage.setItem('marble_purchases',JSON.stringify(p));
+  return true;
 }
 
+// ── 오버레이 SVG (star·flower·diamond) ──
 function applySkinOverlay(marbleEl, color, size) {
   const skin=getActiveSkin();
-  if (skin==='circle') return;
+  // rainbow/fire/clover 는 CSS 애니메이션으로 처리
+  if (['circle','rainbow','fire','clover'].includes(skin)) return;
   const isSpecial=SPECIAL_COLORS.has(color)||color==='m-obstacle';
   if (isSpecial) return;
   const ns='http://www.w3.org/2000/svg';
@@ -2851,66 +3000,102 @@ function applySkinOverlay(marbleEl, color, size) {
     shape=document.createElementNS(ns,'polygon');
     shape.setAttribute('points','25,4 30,18 44,18 33,27 37,42 25,33 13,42 17,27 6,18 20,18');
     shape.setAttribute('fill','white');
-  } else if (skin==='heart') {
-    shape=document.createElementNS(ns,'path');
-    shape.setAttribute('d','M25,40 C25,40 6,27 6,16 C6,10 11,6 17,6 C21,6 24,9 25,11 C26,9 29,6 33,6 C39,6 44,10 44,16 C44,27 25,40 25,40 Z');
-    shape.setAttribute('fill','white');
   } else if (skin==='flower') {
-    for (let i=0;i<5;i++) {
-      const ang=(i/5)*Math.PI*2;
-      const c2=document.createElementNS(ns,'circle');
+    for (let i=0;i<5;i++){
+      const ang=(i/5)*Math.PI*2, c2=document.createElementNS(ns,'circle');
       c2.setAttribute('cx',(25+Math.cos(ang)*13).toFixed(1));
       c2.setAttribute('cy',(25+Math.sin(ang)*13).toFixed(1));
-      c2.setAttribute('r','7');
-      c2.setAttribute('fill','white');
-      svg.appendChild(c2);
+      c2.setAttribute('r','7'); c2.setAttribute('fill','white'); svg.appendChild(c2);
     }
     const ctr=document.createElementNS(ns,'circle');
-    ctr.setAttribute('cx','25'); ctr.setAttribute('cy','25'); ctr.setAttribute('r','6');
-    ctr.setAttribute('fill','white'); svg.appendChild(ctr);
+    ctr.setAttribute('cx','25'); ctr.setAttribute('cy','25');
+    ctr.setAttribute('r','6'); ctr.setAttribute('fill','white'); svg.appendChild(ctr);
     marbleEl.appendChild(svg); return;
+  } else if (skin==='diamond') {
+    shape=document.createElementNS(ns,'polygon');
+    shape.setAttribute('points','25,4 44,22 25,46 6,22');
+    shape.setAttribute('fill','white');
   }
   if (shape) svg.appendChild(shape);
   marbleEl.appendChild(svg);
 }
 
+// ── 상점 미리보기 SVG ──
 function drawSkinPreview(skinId, container) {
   container.innerHTML='';
   const ns='http://www.w3.org/2000/svg';
   const svg=document.createElementNS(ns,'svg');
   svg.setAttribute('viewBox','0 0 52 52');
   svg.setAttribute('width','52'); svg.setAttribute('height','52');
-  const colors=['#FFD93D','#6BCB77','#FFF9E6','#4D96FF'];
   if (skinId==='circle') {
+    ['#FFD93D','#6BCB77','#A78BFA','#4D96FF'].forEach((col,[x,y])=>{});
     [[13,13],[39,13],[13,39],[39,39]].forEach(([x,y],i)=>{
       const c=document.createElementNS(ns,'circle');
       c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','11');
-      c.setAttribute('fill',colors[i]); svg.appendChild(c);
+      c.setAttribute('fill',['#FFD93D','#6BCB77','#A78BFA','#4D96FF'][i]); svg.appendChild(c);
     });
   } else if (skinId==='star') {
     const p=document.createElementNS(ns,'polygon');
     p.setAttribute('points','26,4 31,19 46,19 34,28 38,44 26,35 14,44 18,28 6,19 21,19');
     p.setAttribute('fill','#FFD93D'); svg.appendChild(p);
-  } else if (skinId==='heart') {
-    const p=document.createElementNS(ns,'path');
-    p.setAttribute('d','M26,42 C26,42 6,28 6,17 C6,11 11,7 17,7 C21,7 24,10 26,12 C28,10 31,7 35,7 C41,7 46,11 46,17 C46,28 26,42 26,42 Z');
-    p.setAttribute('fill','#f06292'); svg.appendChild(p);
   } else if (skinId==='flower') {
-    const pc=['#f48fb1','#ce93d8','#81d4fa','#a5d6a7','#fff176'];
-    for (let i=0;i<5;i++) {
-      const ang=(i/5)*Math.PI*2;
-      const c=document.createElementNS(ns,'circle');
+    ['#f48fb1','#ce93d8','#81d4fa','#a5d6a7','#fff176'].forEach((col,i)=>{
+      const ang=(i/5)*Math.PI*2, c=document.createElementNS(ns,'circle');
       c.setAttribute('cx',(26+Math.cos(ang)*15).toFixed(1));
       c.setAttribute('cy',(26+Math.sin(ang)*15).toFixed(1));
-      c.setAttribute('r','10'); c.setAttribute('fill',pc[i]); svg.appendChild(c);
-    }
+      c.setAttribute('r','10'); c.setAttribute('fill',col); svg.appendChild(c);
+    });
     const ctr=document.createElementNS(ns,'circle');
-    ctr.setAttribute('cx','26'); ctr.setAttribute('cy','26'); ctr.setAttribute('r','9');
-    ctr.setAttribute('fill','#FFD93D'); svg.appendChild(ctr);
+    ctr.setAttribute('cx','26'); ctr.setAttribute('cy','26');
+    ctr.setAttribute('r','9'); ctr.setAttribute('fill','#FFD93D'); svg.appendChild(ctr);
+  } else if (skinId==='diamond') {
+    const p=document.createElementNS(ns,'polygon');
+    p.setAttribute('points','26,4 46,22 26,48 6,22');
+    p.setAttribute('fill','#4dd0e1'); p.setAttribute('stroke','#00acc1'); p.setAttribute('stroke-width','2');
+    svg.appendChild(p);
+    const s=document.createElementNS(ns,'polygon');
+    s.setAttribute('points','26,12 38,22 26,38 14,22');
+    s.setAttribute('fill','rgba(255,255,255,.42)'); svg.appendChild(s);
+  } else if (skinId==='rainbow') {
+    const defs=document.createElementNS(ns,'defs');
+    const lg=document.createElementNS(ns,'linearGradient');
+    lg.setAttribute('id','rg'+Math.random().toFixed(4));
+    lg.setAttribute('x1','0%'); lg.setAttribute('y1','0%');
+    lg.setAttribute('x2','100%'); lg.setAttribute('y2','100%');
+    [['0%','#ff1744'],['20%','#ff6d00'],['40%','#ffd600'],
+     ['60%','#00e676'],['80%','#2979ff'],['100%','#d500f9']].forEach(([off,col])=>{
+      const s=document.createElementNS(ns,'stop');
+      s.setAttribute('offset',off); s.setAttribute('stop-color',col); lg.appendChild(s);
+    });
+    const lgId=lg.getAttribute('id'); defs.appendChild(lg); svg.appendChild(defs);
+    const c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx','26'); c.setAttribute('cy','26'); c.setAttribute('r','22');
+    c.setAttribute('fill','url(#'+lgId+')'); svg.appendChild(c);
+  } else if (skinId==='fire') {
+    const c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx','26'); c.setAttribute('cy','28'); c.setAttribute('r','16');
+    c.setAttribute('fill','#ff6600'); svg.appendChild(c);
+    const p=document.createElementNS(ns,'path');
+    p.setAttribute('d','M26,8 C20,14 14,22 16,30 C18,36 22,40 26,42 C30,40 34,36 36,30 C38,22 32,14 26,8Z');
+    p.setAttribute('fill','#ff9900'); svg.appendChild(p);
+    const p2=document.createElementNS(ns,'path');
+    p2.setAttribute('d','M26,16 C23,21 20,26 22,32 C24,36 26,38 26,38 C26,38 28,36 30,32 C32,26 29,21 26,16Z');
+    p2.setAttribute('fill','#ffd600'); svg.appendChild(p2);
+  } else if (skinId==='clover') {
+    [[16,16],[36,16],[16,36],[36,36]].forEach(([x,y],i)=>{
+      const c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','11');
+      c.setAttribute('fill',['#43a047','#66bb6a','#a5d6a7','#2e7d32'][i]); svg.appendChild(c);
+    });
+    const stem=document.createElementNS(ns,'line');
+    stem.setAttribute('x1','26'); stem.setAttribute('y1','26');
+    stem.setAttribute('x2','26'); stem.setAttribute('y2','47');
+    stem.setAttribute('stroke','#2e7d32'); stem.setAttribute('stroke-width','3'); svg.appendChild(stem);
   }
   container.appendChild(svg);
 }
 
+// ── 상점 ──
 function showShop() {
   if (gameActive && !isPaused) togglePause();
   renderShop();
@@ -2919,31 +3104,78 @@ function showShop() {
 function goBackFromShop() {
   if (isPaused) showScreen('game'); else showScreen('start');
 }
+
 function renderShop() {
-  const cumul=getCumulScore();
-  const unlocked=getUnlockedSkins();
-  const active=getActiveSkin();
-  document.getElementById('shop-cumul-score').textContent='누적 점수: '+cumul+'점';
-  const grid=document.getElementById('skin-grid');
-  grid.innerHTML='';
+  const pts=getPoints(), active=getActiveSkin();
+  const pv=document.getElementById('shop-pts-val'); if (pv) pv.textContent=pts;
+  const grid=document.getElementById('skin-grid'); grid.innerHTML='';
+
   SKINS.forEach(skin=>{
-    const isUnlocked=unlocked.includes(skin.id);
-    const isActive=active===skin.id;
-    const canBuy=!isUnlocked && cumul>=skin.cost;
-    const item=document.createElement('div');
-    item.className='skin-item'+(isActive?' skin-active':'')+((!isUnlocked&&!canBuy)?' skin-locked':'');
-    const prev=document.createElement('div');
-    prev.className='skin-preview';
-    drawSkinPreview(skin.id, prev);
-    item.appendChild(prev);
-    const nd=document.createElement('div'); nd.className='skin-name'; nd.textContent=skin.name; item.appendChild(nd);
-    const cd=document.createElement('div'); cd.className='skin-cost';
-    cd.textContent=isUnlocked?(isActive?'✓ 사용 중':'선택하기'):(canBuy?'해금 ('+skin.cost+'점)':skin.cost+'점 필요');
-    item.appendChild(cd);
-    if (isUnlocked) item.onclick=()=>{ setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
-    else if (canBuy) item.onclick=()=>{ unlockSkin(skin.id); setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
-    grid.appendChild(item);
+    const owned=isSkinOwned(skin.id), isActive=active===skin.id;
+    const rem=owned&&!skin.perm?getSkinRemainingMs(skin.id):0;
+    const canAfford=pts>=skin.cost;
+
+    const card=document.createElement('div');
+    card.className='skin-card'
+      +(isActive?' sk-active':owned&&!skin.perm?' sk-owned':!owned&&!canAfford?' sk-locked':'');
+
+    const prev=document.createElement('div'); prev.className='skin-preview';
+    drawSkinPreview(skin.id,prev); card.appendChild(prev);
+
+    const nm=document.createElement('div'); nm.className='skin-name';
+    nm.textContent=skin.icon+' '+skin.name; card.appendChild(nm);
+
+    const dsc=document.createElement('div'); dsc.className='skin-desc';
+    dsc.textContent=skin.desc; card.appendChild(dsc);
+
+    if (owned&&!skin.perm) {
+      const t=document.createElement('div');
+      t.className='skin-timer'+(rem<3600000?' expiring':'');
+      t.textContent='⏰ '+formatRem(rem); card.appendChild(t);
+    }
+    if (!skin.perm) {
+      const pr=document.createElement('div'); pr.className='skin-price';
+      pr.textContent='💎 '+skin.cost+'p / 24시간'; card.appendChild(pr);
+    }
+    const nd=document.createElement('div'); nd.className='skin-need';
+    if (!skin.perm&&!owned&&!canAfford) nd.textContent='💎 '+(skin.cost-pts)+'p 더 필요해요';
+    card.appendChild(nd);
+
+    const btn=document.createElement('button'); btn.className='skin-btn';
+    if (isActive) {
+      btn.textContent='✓ 사용 중'; btn.className+=' btn-using';
+    } else if (owned) {
+      btn.textContent='선택하기'; btn.className+=' btn-select';
+      btn.onclick=()=>{ setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
+    } else if (canAfford) {
+      btn.textContent='구매 '+skin.cost+'p'; btn.className+=' btn-buy';
+      btn.onclick=()=>openConfirm(skin);
+    } else {
+      btn.textContent='포인트 부족'; btn.className+=' btn-poor';
+    }
+    card.appendChild(btn);
+    grid.appendChild(card);
   });
+}
+
+// ── 구매 확인 팝업 ──
+function openConfirm(skin) {
+  document.getElementById('confirm-icon').textContent=skin.icon;
+  document.getElementById('confirm-msg').innerHTML=
+    `<strong>${skin.name}</strong>을(를)<br><strong>${skin.cost}p</strong>에 구매할까요?<br><small>24시간 동안 사용 가능합니다!</small>`;
+  document.getElementById('confirm-ok').onclick=()=>doBuy(skin);
+  document.getElementById('shop-confirm').classList.add('show');
+}
+function closeConfirm() { document.getElementById('shop-confirm').classList.remove('show'); }
+function doBuy(skin) {
+  closeConfirm();
+  if (!buySkin(skin.id,skin.cost)) return;
+  setActiveSkin(skin.id);
+  const cel=document.createElement('div'); cel.className='buy-cel';
+  cel.textContent=skin.icon+' '+skin.name+' 구매 완료! 🎉';
+  document.body.appendChild(cel); setTimeout(()=>cel.remove(),1400);
+  renderShop(); renderBoard(); renderTray();
+  const pe=document.getElementById('hud-pts'); if (pe) pe.textContent=getPoints();
 }
 
 // ════════════════════════════════════════════
@@ -3092,7 +3324,8 @@ document.addEventListener('keydown', e=>{
   }
 });
 
-// Init
+// Init — 신규 플레이어 포인트 500p 지급
+if (!localStorage.getItem('marble_points')) localStorage.setItem('marble_points','500');
 document.getElementById('start-hs-val').textContent=getHS();
 initDailyMission();
 if (localStorage.getItem('marble_opening_seen')) { showScreen('start'); } else { playOpening(); }
