@@ -842,6 +842,210 @@ body {
   #tray-area { margin-top:0; flex-wrap:wrap; justify-content:center; gap:6px; }
   #piece-tray { padding:7px 10px; min-height:64px; gap:6px; }
 }
+
+/* ══════════════════════════════════════════
+   OPENING STORY
+══════════════════════════════════════════ */
+#opening-screen { overflow:hidden; padding:0; }
+
+.op-scene {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0; transition:opacity .5s ease;
+  pointer-events:none;
+}
+.op-scene.op-vis { opacity:1; pointer-events:auto; }
+
+/* 공통 구슬 */
+.op-ball {
+  position:absolute;
+  width:70px; height:70px;
+  background:radial-gradient(circle at 35% 35%,#ffb3c6,#e91e63);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2em; line-height:1;
+  box-shadow:0 4px 18px rgba(233,30,99,.35);
+  flex-shrink:0;
+}
+
+/* 공통 자막 */
+.op-txt {
+  position:absolute; bottom:16%;
+  font-family:'Jua',sans-serif;
+  font-size:clamp(1.05em,4vw,1.45em);
+  color:#fff; text-align:center; line-height:1.6;
+  background:rgba(0,0,0,.3);
+  padding:10px 26px; border-radius:32px;
+  text-shadow:0 1px 4px rgba(0,0,0,.45);
+  pointer-events:none; z-index:10;
+}
+
+/* ── 장면 1: 하늘 ── */
+#op-s1 {
+  background:linear-gradient(180deg,#87ceeb 0%,#b6e8ff 60%,#7dc850 60%,#5a9930 100%);
+}
+.op-cloud {
+  position:absolute;
+  background:rgba(255,255,255,.88);
+  border-radius:40px; height:28px;
+  animation:opCloudDrift 9s ease-in-out infinite alternate;
+}
+.op-cloud::before,.op-cloud::after {
+  content:''; position:absolute;
+  background:inherit; border-radius:50%;
+}
+.op-cloud::before { width:38px; height:38px; top:-14px; left:10px; }
+.op-cloud::after  { width:28px; height:28px; top:-10px; right:12px; }
+.op-sun {
+  position:absolute; top:8%; right:12%;
+  width:55px; height:55px;
+  background:radial-gradient(circle,#ffe082,#ffb300);
+  border-radius:50%;
+  box-shadow:0 0 0 12px rgba(255,224,130,.35),0 0 0 22px rgba(255,224,130,.15);
+  animation:opSunPulse 2s ease-in-out infinite alternate;
+}
+.op-ball-run {
+  top:55%; left:12%;
+  animation:opBallRun 2.4s ease-in-out infinite,
+            opBallBounce .48s ease-in-out infinite;
+}
+
+/* ── 장면 2: 악당 등장 ── */
+#op-s2 {
+  background:linear-gradient(180deg,#87ceeb 0%,#b6e8ff 60%,#7dc850 60%,#5a9930 100%);
+}
+.op-s2-dark {
+  position:absolute; inset:0; z-index:1;
+  animation:opDarken 2s ease forwards;
+}
+.op-ball-scared {
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+}
+.op-claw {
+  position:absolute; top:-18%; left:50%;
+  transform:translateX(-50%);
+  width:100px; z-index:3;
+  animation:opClawDrop 1.9s cubic-bezier(.2,.8,.3,1) forwards;
+}
+.op-claw-fingers {
+  display:flex; justify-content:center; gap:5px;
+}
+.op-cf {
+  width:22px; height:56px;
+  background:linear-gradient(180deg,#0d0508,#230a14);
+  border-radius:5px 5px 0 0; position:relative;
+}
+.op-cf::after {
+  content:''; position:absolute;
+  top:-14px; left:50%; transform:translateX(-50%);
+  border:11px solid transparent;
+  border-bottom-color:#0d0508;
+}
+.op-cpalm {
+  width:86px; height:50px; margin:0 auto;
+  background:linear-gradient(160deg,#180510,#2d0a20);
+  border-radius:10px 10px 3px 3px;
+  box-shadow:0 8px 22px rgba(0,0,0,.7);
+}
+
+/* ── 장면 3: 감옥 ── */
+#op-s3 {
+  background:linear-gradient(160deg,#1c0a2a 0%,#3a0d28 100%);
+}
+.op-jail-wrap {
+  position:relative; width:124px; height:144px;
+}
+.op-ball-shake {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  animation:opJailShake .55s ease-in-out infinite;
+  z-index:0;
+}
+.op-jail-svg {
+  position:absolute; top:0; left:0;
+  width:124px; height:144px; z-index:2;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));
+}
+
+/* ── 장면 4: 희망 ── */
+#op-s4 {
+  background:linear-gradient(160deg,#fff0f5 0%,#ffe0ec 40%,#ffb6c1 100%);
+}
+.op-ball-hope {
+  top:36%; left:50%;
+  transform:translate(-50%,-50%);
+  animation:opGlow .9s ease-in-out infinite alternate;
+}
+.op-save-hand {
+  position:absolute; bottom:-5%; left:50%;
+  transform:translateX(-50%);
+  font-size:3.8em;
+  animation:opHandRise 1.7s cubic-bezier(.25,.8,.3,1) forwards;
+  z-index:1;
+}
+
+/* 건너뛰기 버튼 */
+.op-skip-btn {
+  position:absolute; bottom:4%; right:4%; z-index:200;
+  background:rgba(255,255,255,.22); border:2px solid rgba(255,255,255,.55);
+  color:#fff; font-family:'Jua',sans-serif; font-size:.82em;
+  padding:7px 18px; border-radius:26px; cursor:pointer;
+  backdrop-filter:blur(6px);
+  transition:background .2s, transform .1s;
+}
+.op-skip-btn:active { transform:scale(.94); }
+
+/* ── 키프레임 ── */
+@keyframes opCloudDrift {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(22px); }
+}
+@keyframes opSunPulse {
+  0%   { box-shadow:0 0 0 10px rgba(255,224,130,.3),0 0 0 20px rgba(255,224,130,.12); }
+  100% { box-shadow:0 0 0 16px rgba(255,224,130,.4),0 0 0 30px rgba(255,224,130,.18); }
+}
+@keyframes opBallRun {
+  0%        { left:12%; }
+  44%       { left:74%; transform:scaleX(1); }
+  46%,54%   { left:74%; transform:scaleX(-1); }
+  96%,100%  { left:12%; transform:scaleX(1); }
+}
+@keyframes opBallBounce {
+  0%,100% { top:55%; }
+  50%     { top:46%; }
+}
+@keyframes opDarken {
+  0%   { background:rgba(0,0,0,0); }
+  100% { background:rgba(0,0,0,.72); }
+}
+@keyframes opClawDrop {
+  0%  { top:-18%; opacity:0; }
+  18% { opacity:1; }
+  68% { top:28%; }
+  82% { top:23%; }
+  100%{ top:25%; }
+}
+@keyframes opJailShake {
+  0%,100% { transform:translate(-50%,-50%) rotate(0deg); }
+  20%     { transform:translate(calc(-50% - 9px),-50%) rotate(-6deg); }
+  40%     { transform:translate(calc(-50% + 9px),-50%) rotate(6deg); }
+  60%     { transform:translate(calc(-50% - 6px),-50%) rotate(-4deg); }
+  80%     { transform:translate(calc(-50% + 6px),-50%) rotate(4deg); }
+}
+@keyframes opHandRise {
+  0%   { bottom:-5%; opacity:0; }
+  40%  { opacity:1; }
+  72%  { bottom:22%; }
+  86%  { bottom:17%; }
+  100% { bottom:19%; }
+}
+@keyframes opGlow {
+  0%   { box-shadow:0 0 10px rgba(233,30,99,.3); }
+  100% { box-shadow:0 0 40px rgba(233,30,99,.9),0 0 65px rgba(233,30,99,.4); }
+}
 </style>
 </head>
 <body>
@@ -884,8 +1088,62 @@ body {
   </div>
 </div>
 
+<!-- ══ Opening Story Screen ══ -->
+<div id="opening-screen" class="screen active">
+
+  <!-- 장면 1: 행복한 구슬 -->
+  <div class="op-scene" id="op-s1">
+    <div class="op-sun"></div>
+    <div class="op-cloud" style="width:88px;top:11%;left:7%"></div>
+    <div class="op-cloud" style="width:62px;top:21%;right:11%;animation-delay:-4s"></div>
+    <div class="op-ball op-ball-run">😄</div>
+    <p class="op-txt">행복하게 살던 구슬이...</p>
+  </div>
+
+  <!-- 장면 2: 악당 손 등장 -->
+  <div class="op-scene" id="op-s2">
+    <div class="op-s2-dark"></div>
+    <div class="op-ball op-ball-scared">😱</div>
+    <div class="op-claw">
+      <div class="op-claw-fingers">
+        <div class="op-cf"></div>
+        <div class="op-cf"></div>
+        <div class="op-cf"></div>
+      </div>
+      <div class="op-cpalm"></div>
+    </div>
+    <p class="op-txt" style="bottom:14%">어느 날 갑자기!</p>
+  </div>
+
+  <!-- 장면 3: 감옥에 갇힌 구슬 -->
+  <div class="op-scene" id="op-s3">
+    <div class="op-jail-wrap">
+      <div class="op-ball op-ball-shake">😢</div>
+      <svg class="op-jail-svg" viewBox="0 0 124 144" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6"  y="0" width="9" height="144" rx="4.5" fill="#3a3a4e"/>
+        <rect x="29" y="0" width="9" height="144" rx="4.5" fill="#3a3a4e"/>
+        <rect x="52" y="0" width="9" height="144" rx="4.5" fill="#3a3a4e"/>
+        <rect x="75" y="0" width="9" height="144" rx="4.5" fill="#3a3a4e"/>
+        <rect x="98" y="0" width="9" height="144" rx="4.5" fill="#3a3a4e"/>
+        <rect x="0"  y="25"  width="124" height="11" rx="5.5" fill="#2a2a3a"/>
+        <rect x="0"  y="108" width="124" height="11" rx="5.5" fill="#2a2a3a"/>
+      </svg>
+    </div>
+    <p class="op-txt">감옥에 갇혀버렸어요! 😢</p>
+  </div>
+
+  <!-- 장면 4: 구슬을 구해줘 -->
+  <div class="op-scene" id="op-s4">
+    <div class="op-ball op-ball-hope">🔮</div>
+    <div class="op-save-hand">👆</div>
+    <p class="op-txt" style="bottom:20%">구슬을 구해줘!<br>퍼즐을 풀어봐!</p>
+  </div>
+
+  <button class="op-skip-btn" onclick="skipOpening()">건너뛰기 ⏭</button>
+</div>
+
 <!-- ══ Start Screen ══ -->
-<div id="start-screen" class="screen active">
+<div id="start-screen" class="screen">
   <div class="start-title">🔮 구슬퍼즐 대탈출 🔮</div>
   <div class="start-sub">49칸을 구슬로 가득 채워 탈출시켜라!</div>
   <div class="hs-badge">🏆 최고 점수: <span id="start-hs-val">0</span>점</div>
@@ -937,6 +1195,7 @@ body {
     <button class="btn btn-white" onclick="showScreen('help')">❓ 도움말</button>
     <button class="btn btn-white" onclick="showShop()">🛍️ 구슬 상점</button>
     <button class="btn btn-white" onclick="showHOF()">🏆 명예의 전당</button>
+    <button class="btn btn-white" onclick="playOpening()">🎬 오프닝 다시보기</button>
   </div>
 </div>
 
@@ -2764,6 +3023,59 @@ function showNameInputPopup(sc, cb) {
 }
 
 // ════════════════════════════════════════════
+// OPENING STORY
+// ════════════════════════════════════════════
+
+let _opTimers = [];
+
+function _opSnd(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const map = {
+      tense:   [[880,.06],[660,.18],[440,.32],[300,.46]],
+      sad:     [[330,.0],[262,.38]],
+      hopeful: [[262,.0],[330,.14],[392,.28],[523,.44]]
+    };
+    (map[type]||[]).forEach(([freq,t])=>{
+      const osc=ctx.createOscillator(), g=ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = type==='tense' ? 'sawtooth' : 'sine';
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(type==='tense'?.1:.17, ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+.42);
+      osc.start(ctx.currentTime+t);
+      osc.stop(ctx.currentTime+t+.48);
+    });
+  } catch(e) {}
+}
+
+function _opGo(n) {
+  document.querySelectorAll('.op-scene').forEach(s=>s.classList.remove('op-vis'));
+  const el = document.getElementById('op-s'+n);
+  if (el) el.classList.add('op-vis');
+}
+
+function playOpening() {
+  _opTimers.forEach(clearTimeout); _opTimers=[];
+  showScreen('opening');
+  _opGo(1);
+  // 2s: 장면 2 (긴장음)
+  _opTimers.push(setTimeout(()=>{ _opGo(2); _opSnd('tense'); }, 2000));
+  // 4s: 장면 3 (슬픈음)
+  _opTimers.push(setTimeout(()=>{ _opGo(3); _opSnd('sad');   }, 4000));
+  // 6.5s: 장면 4 (희망음)
+  _opTimers.push(setTimeout(()=>{ _opGo(4); _opSnd('hopeful'); }, 6500));
+  // 8.5s: 시작 화면으로 자동 전환
+  _opTimers.push(setTimeout(skipOpening, 8500));
+}
+
+function skipOpening() {
+  _opTimers.forEach(clearTimeout); _opTimers=[];
+  localStorage.setItem('marble_opening_seen','1');
+  showScreen('start');
+}
+
+// ════════════════════════════════════════════
 // GLOBAL EVENTS
 // ════════════════════════════════════════════
 document.addEventListener('mousemove',  onMove, {passive:false});
@@ -2782,6 +3094,7 @@ document.addEventListener('keydown', e=>{
 // Init
 document.getElementById('start-hs-val').textContent=getHS();
 initDailyMission();
+if (localStorage.getItem('marble_opening_seen')) { showScreen('start'); } else { playOpening(); }
 </script>
 </body>
 </html>
