@@ -120,6 +120,85 @@ body {
 .btn-white:hover { transform:translateY(-2px); background:#fff; }
 .btn-row { display:flex; flex-direction:column; align-items:center; gap:9px; }
 
+/* ── Start Menu New Layout ── */
+.start-menu-wrap { display:flex; flex-direction:column; align-items:center; gap:9px; width:100%; max-width:290px; }
+.smenu-btn {
+  width:100%; padding:13px 20px; border:none; border-radius:24px;
+  font-family:'Jua',sans-serif; font-size:1.02em; font-weight:700; letter-spacing:.5px;
+  cursor:pointer; transition:transform .12s, box-shadow .12s;
+  background:rgba(255,255,255,.85); color:#e91e63;
+  box-shadow:0 4px 14px rgba(0,0,0,.1);
+}
+.smenu-btn:hover  { transform:translateY(-2px); background:#fff; }
+.smenu-btn:active { transform:scale(.95) !important; }
+.smenu-primary {
+  background:linear-gradient(135deg,#f06292,#e91e63); color:#fff;
+  box-shadow:0 5px 18px rgba(233,30,99,.35); font-size:1.1em; padding:15px 20px;
+}
+.smenu-primary:hover { box-shadow:0 8px 24px rgba(233,30,99,.4); }
+.smenu-back { background:rgba(255,255,255,.6); color:#888; font-size:.9em; padding:11px 20px; }
+.smenu-sub-title { color:#fff; font-weight:900; font-size:.88em; letter-spacing:1px; opacity:.88; }
+
+/* ── Settings Popup ── */
+#settings-popup {
+  display:none; position:fixed; inset:0; z-index:9500;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.48); backdrop-filter:blur(4px);
+}
+#settings-popup.show { display:flex; }
+.settings-box {
+  background:#fff; border-radius:24px; padding:26px 22px;
+  max-width:300px; width:84vw; text-align:center;
+  box-shadow:0 14px 44px rgba(0,0,0,.28);
+  animation:screenFadeIn .25s ease-out both;
+  display:flex; flex-direction:column; gap:10px;
+}
+.settings-title { font-family:'Jua',sans-serif; font-size:1.2em; color:#e91e63; font-weight:900; }
+.settings-row-btn {
+  padding:12px 16px; border:none; border-radius:18px; font-family:'Jua',sans-serif;
+  font-size:.95em; font-weight:700; cursor:pointer; transition:transform .12s, background .12s;
+  background:#fce4ec; color:#c2185b;
+}
+.settings-row-btn:hover  { background:#f8bbd0; transform:translateY(-1px); }
+.settings-row-btn:active { transform:scale(.95); }
+.settings-danger { background:#ffebee; color:#c62828; }
+.settings-danger:hover { background:#ffcdd2; }
+.settings-close-btn {
+  padding:10px 16px; border:none; border-radius:18px; font-family:'Jua',sans-serif;
+  font-size:.88em; font-weight:700; cursor:pointer; background:#f5f5f5; color:#888;
+}
+.settings-close-btn:active { transform:scale(.95); }
+
+/* ── Extend Time Popup ── */
+#extend-popup {
+  display:none; position:fixed; inset:0; z-index:9500;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.52); backdrop-filter:blur(4px);
+}
+#extend-popup.show { display:flex; }
+.extend-box {
+  background:#fff; border-radius:24px; padding:28px 24px;
+  max-width:310px; width:86vw; text-align:center;
+  box-shadow:0 14px 44px rgba(0,0,0,.28);
+  animation:screenFadeIn .25s ease-out both;
+}
+.extend-icon { font-size:2.8em; margin-bottom:8px; animation:tutBounce 1s ease-in-out infinite; }
+.extend-box p { font-family:'Jua',sans-serif; font-size:1.08em; color:#c2185b; line-height:1.6; margin-bottom:10px; }
+.extend-cost { font-family:'Jua',sans-serif; font-size:.95em; color:#7b1fa2; font-weight:700;
+  background:#f3e5f5; border-radius:12px; padding:6px 16px; display:inline-block; margin-bottom:14px; }
+#extend-msg { font-family:'Jua',sans-serif; font-size:.85em; color:#c62828; margin-bottom:8px; }
+.extend-btns { display:flex; gap:10px; justify-content:center; }
+.extend-btns button {
+  padding:11px 22px; border:none; border-radius:20px; font-family:'Jua',sans-serif;
+  font-size:.92em; font-weight:700; cursor:pointer; transition:transform .12s;
+}
+.extend-btns button:first-child {
+  background:linear-gradient(135deg,#42a5f5,#1565c0); color:#fff;
+  box-shadow:0 4px 12px rgba(21,101,192,.3);
+}
+.extend-btns button:last-child { background:#f5f5f5; color:#888; }
+.extend-btns button:active { transform:scale(.94); }
+
 /* ── HUD ── */
 #hud {
   display:flex; align-items:center; justify-content:center;
@@ -1365,13 +1444,8 @@ body {
 <!-- ══ Start Screen ══ -->
 <div id="start-screen" class="screen">
   <div class="start-title">🔮 구슬퍼즐 대탈출 🔮</div>
-  <div class="start-sub">49칸을 구슬로 가득 채워 탈출시켜라!</div>
   <div class="hs-badge">🏆 최고 점수: <span id="start-hs-val">0</span>점</div>
-  <div class="daily-mission" id="daily-mission-wrap">
-    <div class="dm-label">📅 오늘의 미션</div>
-    <div id="dm-text">로딩 중...</div>
-  </div>
-  <div class="jail-wrap">
+  <div class="jail-wrap" style="transform:scale(.75);transform-origin:top center;margin-bottom:-28px">
     <div class="jail-bg"></div>
     <div class="marble-char">
       <div class="char-eyes"><div class="char-eye"></div><div class="char-eye"></div></div>
@@ -1388,34 +1462,42 @@ body {
     </svg>
     <div class="speech">살려줘요~!! 😭</div>
   </div>
-  <button class="btn btn-pink" style="font-size:1.15em;padding:15px 50px;margin-bottom:10px"
-    onclick="showLevelSelect()">🎮 스토리 모드</button>
-  <div class="diff-label" style="font-size:.78em;opacity:.65;margin-bottom:6px">빠른 플레이</div>
-  <div class="diff-row" style="margin-bottom:8px">
-    <button class="diff-btn d-easy"   onclick="setDiff('easy')">
-      <span class="diff-icon">😊</span>
-      <span class="diff-name">쉬움</span>
-      <span class="diff-desc">3분 · 3색</span>
-    </button>
-    <button class="diff-btn d-hard"   onclick="setDiff('hard')">
-      <span class="diff-icon">💀</span>
-      <span class="diff-name">어려움</span>
-      <span class="diff-desc">1분 · 장애물</span>
-    </button>
-    <button class="diff-btn d-timeattack" onclick="setDiff('timeattack')">
-      <span class="diff-icon">⚡</span>
-      <span class="diff-name">타임어택</span>
-      <span class="diff-desc">자동배치</span>
-    </button>
+  <!-- 메인 메뉴 -->
+  <div id="start-main-menu" class="start-menu-wrap">
+    <button class="smenu-btn smenu-primary" onclick="showLevelSelect()">🎮 게임 시작</button>
+    <button class="smenu-btn" onclick="showSpecialModeMenu()">⚡ 특별 모드</button>
+    <button class="smenu-btn" onclick="showHOF()">🏆 명예의 전당</button>
+    <button class="smenu-btn" onclick="showShop()">🛍️ 구슬 상점</button>
+    <button class="smenu-btn" onclick="showStartSettings()">⚙️ 설정</button>
   </div>
-  <div class="btn-row">
-    <button class="btn btn-white" onclick="showScreen('help')">❓ 도움말</button>
-    <button class="btn btn-white" onclick="showShop()">🛍️ 상점</button>
-    <button class="btn btn-white" onclick="showHOF()">🏆 명예의 전당</button>
-    <button class="btn btn-white" onclick="playOpening()">🎬 오프닝</button>
-    <button class="btn btn-white" onclick="showCalibration()">📱 터치 보정</button>
+  <!-- 특별 모드 서브메뉴 -->
+  <div id="start-special-menu" class="start-menu-wrap" style="display:none">
+    <div class="smenu-sub-title">⚡ 특별 모드를 선택하세요</div>
+    <div class="diff-row" style="margin-bottom:2px">
+      <button class="diff-btn d-easy" onclick="setDiff('easy')">
+        <span class="diff-icon">🌱</span>
+        <span class="diff-name">쉬움 모드</span>
+        <span class="diff-desc">3분 · 2색 · 작은 조각</span>
+      </button>
+      <button class="diff-btn d-hard" onclick="setDiff('hard')">
+        <span class="diff-icon">💀</span>
+        <span class="diff-name">어려움 모드</span>
+        <span class="diff-desc">1분 · 4색 · 장애물</span>
+      </button>
+      <button class="diff-btn d-timeattack" onclick="setDiff('timeattack')">
+        <span class="diff-icon">⏱️</span>
+        <span class="diff-name">타임어택</span>
+        <span class="diff-desc">30초마다 자동배치</span>
+      </button>
+    </div>
+    <button class="smenu-btn smenu-back" onclick="hideSpecialModeMenu()">← 뒤로가기</button>
   </div>
-  <div id="cal-debug" style="font-size:.7em;color:#aaa;margin-top:4px;text-align:center;">(보정값 없음)</div>
+  <div id="cal-debug" style="font-size:.7em;color:#aaa;margin-top:6px;text-align:center;"></div>
+  <!-- 일일미션 (숨김, JS에서 필요시 사용) -->
+  <div class="daily-mission" id="daily-mission-wrap" style="display:none">
+    <div class="dm-label">📅 오늘의 미션</div>
+    <div id="dm-text">로딩 중...</div>
+  </div>
 </div>
 
 <!-- ══ Game Screen ══ -->
@@ -1486,6 +1568,32 @@ body {
   <button id="shop-btn"  class="game-btn" onclick="showShop()"  title="구슬 상점">🛍️</button>
   <button id="help-btn"  class="game-btn" onclick="showGameHelp()" title="도움말">❓</button>
   <button id="pause-btn" class="game-btn" onclick="togglePause()" title="일시정지">⏸</button>
+</div>
+
+<!-- ══ Settings Popup ══ -->
+<div id="settings-popup">
+  <div class="settings-box">
+    <div class="settings-title">⚙️ 설정</div>
+    <button class="settings-row-btn" id="mute-btn" onclick="toggleMute()">🔊 배경음악: 켜짐</button>
+    <button class="settings-row-btn" onclick="closeStartSettings();showCalibration()">📱 터치 보정</button>
+    <button class="settings-row-btn" onclick="closeStartSettings();playOpening()">🎬 오프닝 보기</button>
+    <button class="settings-row-btn settings-danger" onclick="confirmResetData()">🗑️ 데이터 초기화</button>
+    <button class="settings-close-btn" onclick="closeStartSettings()">✕ 닫기</button>
+  </div>
+</div>
+
+<!-- ══ Extend Time Popup ══ -->
+<div id="extend-popup">
+  <div class="extend-box">
+    <div class="extend-icon">⏰</div>
+    <p>20초 남았어요!<br>1분을 연장할까요?</p>
+    <div class="extend-cost">💎 200p 소비</div>
+    <div id="extend-msg" style="display:none">포인트가 부족해요 😢</div>
+    <div class="extend-btns">
+      <button onclick="doExtend()">연장하기</button>
+      <button onclick="closeExtendPopup()">포기</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ Drag Ghost ══ -->
@@ -1827,6 +1935,7 @@ function retryGame() {
 // AUDIO
 // ════════════════════════════════════════════
 let _ac = null;
+let _isMuted = localStorage.getItem('marble_muted') === '1';
 function ac() {
   if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
   return _ac;
@@ -1834,6 +1943,7 @@ function ac() {
 function resumeAC() { try { if (_ac && _ac.state==='suspended') _ac.resume(); } catch(e){} }
 
 function playTone(freq, type, vol, dur, freqEnd) {
+  if (_isMuted) return;
   try {
     const ctx=ac(), o=ctx.createOscillator(), g=ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
@@ -1848,6 +1958,7 @@ function playTone(freq, type, vol, dur, freqEnd) {
 function sndClick() { playTone(500+Math.random()*400,'sine',.18,.1); }
 function sndPlace() { playTone(380,'triangle',.22,.06,780); setTimeout(()=>playTone(780,'triangle',.14,.1),60); }
 function sndErase() {
+  if (_isMuted) return;
   try {
     const ctx=ac(), buf=ctx.createBuffer(1,ctx.sampleRate*.18,ctx.sampleRate);
     const d=buf.getChannelData(0);
@@ -1858,11 +1969,10 @@ function sndErase() {
 }
 function sndUndo() { playTone(400,'sine',.15,.08,300); }
 function sndBomb() {
+  if (_isMuted) return;
   try {
     const ctx=ac();
-    // 낮은 주파수 굉음
     playTone(55,'sawtooth',.45,.5,28);
-    // 노이즈 버스트
     const buf=ctx.createBuffer(1,ctx.sampleRate*.45,ctx.sampleRate);
     const d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*.12));
@@ -1909,7 +2019,7 @@ function sndSparkle() { playTone(1200,'sine',.15,.05,2000); }
 
 let _bgOn=false; const _bgT=[];
 function bgStart() {
-  if (_bgOn) return; _bgOn=true;
+  if (_bgOn || _isMuted) return; _bgOn=true;
   const mel=[523,587,659,698,784,698,659,587,523,0,523,0];
   let i=0;
   function next() {
@@ -1956,7 +2066,9 @@ let hintBonus    = 0;   // 🍀 클로버 스킨 보너스 힌트 횟수
 let diamondBonus = 0;   // 💎 다이아몬드 스킨 보너스 지우개 횟수
 let consecutivePlacements = 0; // 연속 배치 카운터 (combo_3 업적)
 let stuckPopupTriggered = false; // 막힘 팝업 발생 여부 (no_special 업적)
-let _expWarnShown = false; // 스킨 만료 1시간 전 경고 표시 여부
+let _expWarnShown   = false;
+let _extendCount    = 0;
+let _extendShown    = false;
 
 const ESCAPE_LINES = [
   { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
@@ -2019,6 +2131,71 @@ function setDiff(diff) {
   }
 }
 
+// ════════════════════════════════════════════
+// START SCREEN MENU
+// ════════════════════════════════════════════
+function showSpecialModeMenu() {
+  document.getElementById('start-main-menu').style.display = 'none';
+  document.getElementById('start-special-menu').style.display = 'flex';
+}
+function hideSpecialModeMenu() {
+  document.getElementById('start-special-menu').style.display = 'none';
+  document.getElementById('start-main-menu').style.display = 'flex';
+}
+function showStartSettings() {
+  const btn = document.getElementById('mute-btn');
+  if (btn) btn.textContent = _isMuted ? '🔇 배경음악: 꺼짐' : '🔊 배경음악: 켜짐';
+  document.getElementById('settings-popup').classList.add('show');
+}
+function closeStartSettings() {
+  document.getElementById('settings-popup').classList.remove('show');
+}
+function toggleMute() {
+  _isMuted = !_isMuted;
+  localStorage.setItem('marble_muted', _isMuted ? '1' : '0');
+  const btn = document.getElementById('mute-btn');
+  if (btn) btn.textContent = _isMuted ? '🔇 배경음악: 꺼짐' : '🔊 배경음악: 켜짐';
+  if (_isMuted) bgStop();
+}
+function confirmResetData() {
+  if (!confirm('정말 초기화하시겠어요?\n점수·포인트·업적이 모두 삭제됩니다.')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('marble_')).forEach(k => localStorage.removeItem(k));
+  localStorage.setItem('marble_points', '500');
+  closeStartSettings();
+  document.getElementById('start-hs-val').textContent = '0';
+  showCharBubble('🗑️ 데이터가 초기화됐어요!');
+}
+
+// ════════════════════════════════════════════
+// EXTEND TIME
+// ════════════════════════════════════════════
+function showExtendPopup() {
+  document.getElementById('extend-msg').style.display = 'none';
+  document.getElementById('extend-popup').classList.add('show');
+  if (timerID) clearInterval(timerID);
+}
+function closeExtendPopup() {
+  document.getElementById('extend-popup').classList.remove('show');
+  if (gameActive) { clearInterval(timerID); timerID = setInterval(tick, 1000); }
+}
+function doExtend() {
+  if (getPoints() < 200) {
+    document.getElementById('extend-msg').style.display = 'block';
+    return;
+  }
+  spendPoints(200);
+  timeLeft += 60;
+  _extendCount++;
+  _extendShown = false;
+  closeExtendPopup();
+  const tv = document.getElementById('timer-val');
+  tv.style.color = '#1565c0';
+  tv.classList.remove('danger');
+  setTimeout(() => { if (timeLeft > 30) tv.style.color = ''; }, 3000);
+  showCharBubble('⏰ +1분 연장!');
+  updateHUD();
+}
+
 function tutGoto(step) {
   document.querySelectorAll('.tut-step').forEach(s=>s.classList.remove('show'));
   document.getElementById('tut-step-'+step).classList.add('show');
@@ -2076,6 +2253,8 @@ function startGame(diff) {
   bombUsed     = false;
   taCountdown  = TA_INTERVAL;
   _expWarnShown= false;
+  _extendCount = 0;
+  _extendShown = false;
   // 🍀 클로버 구슬: 힌트 +1
   hintBonus = (getActiveSkin()==='clover') ? 1 : 0;
   // 💎 다이아몬드 구슬: 지우개 힌트 +2
@@ -2158,6 +2337,10 @@ function tick() {
         showCharBubble(`⚠️ ${sk?sk.icon:''}${sk?sk.name:as} 만료 1시간 전!`);
       }
     }
+  }
+  if (timeLeft === 20 && !_extendShown && _extendCount < 2 && difficulty !== 'timeattack') {
+    _extendShown = true;
+    showExtendPopup();
   }
   if (timeLeft<=0) doGameOver();
 }
