@@ -588,7 +588,112 @@ body {
 .score-pop { position:fixed; font-size:1.1em; font-weight:800; color:#e91e63;
   pointer-events:none; animation:floatUp .9s ease-out forwards; z-index:8000;
   text-shadow:0 1px 4px rgba(255,255,255,.8); }
+.score-pop.combo-gold { color:#FFD700; font-size:1.3em;
+  text-shadow:0 0 8px rgba(255,200,0,.7),0 1px 4px rgba(0,0,0,.3); }
 @keyframes floatUp { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-55px);opacity:0} }
+
+/* ── Combo UI ── */
+#combo-wrap {
+  display:none; flex-direction:column; align-items:center;
+  gap:3px; padding:4px 0 2px; width:100%;
+}
+#combo-wrap.visible { display:flex; }
+#combo-label {
+  font-size:.82em; font-weight:900; color:#e91e63; letter-spacing:.5px;
+  animation:none;
+}
+#combo-label.combo-bounce {
+  animation:comboBounce .32s cubic-bezier(.34,1.6,.64,1) both;
+}
+@keyframes comboBounce {
+  0%   { transform:scale(1); }
+  45%  { transform:scale(1.45); }
+  75%  { transform:scale(.9); }
+  100% { transform:scale(1); }
+}
+#combo-bar-track {
+  width:90%; max-width:320px; height:6px;
+  background:rgba(0,0,0,.1); border-radius:3px; overflow:hidden;
+}
+#combo-bar-fill {
+  height:100%; width:100%; border-radius:3px;
+  background:#4caf50;
+  transition:width .12s linear, background-color .3s;
+}
+#combo-bar-fill.orange { background:#ff9800; }
+#combo-bar-fill.red    { background:#f44336; animation:comboBarBlink .4s ease-in-out infinite; }
+@keyframes comboBarBlink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* ── Combo Flash Effects ── */
+@keyframes comboRingFlash {
+  0%   { box-shadow:inset 0 0 0 0px rgba(255,165,0,0); }
+  30%  { box-shadow:inset 0 0 0 7px rgba(255,165,0,.7); }
+  100% { box-shadow:inset 0 0 0 0px rgba(255,165,0,0); }
+}
+#game-screen.combo-ring { animation:comboRingFlash .5s ease-out both; }
+
+@keyframes rainbowRipple {
+  0%   { background:linear-gradient(135deg,#f06292,#FFB6C1); opacity:1; }
+  50%  { background:linear-gradient(135deg,#ff0,#f00,#0f0,#00f,#f0f); opacity:.7; }
+  100% { background:linear-gradient(135deg,#f06292,#FFB6C1); opacity:0; }
+}
+#combo-rainbow-overlay {
+  display:none; position:fixed; inset:0; z-index:7500;
+  pointer-events:none;
+}
+#combo-rainbow-overlay.show {
+  display:block;
+  animation:rainbowRipple .9s ease-out forwards;
+}
+
+/* ── MAX COMBO text ── */
+#max-combo-text {
+  display:none; position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  font-size:clamp(2em,8vw,3.5em); font-weight:900;
+  background:linear-gradient(135deg,#FFD700,#FF6B00,#FF0000);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-shadow:none; z-index:8500; pointer-events:none;
+  filter:drop-shadow(0 2px 8px rgba(255,150,0,.5));
+  white-space:nowrap;
+}
+#max-combo-text.show {
+  display:block;
+  animation:maxComboAnim .8s cubic-bezier(.34,1.4,.64,1) forwards;
+}
+@keyframes maxComboAnim {
+  0%   { transform:translate(-50%,-50%) scale(.3) rotate(-12deg); opacity:0; }
+  60%  { transform:translate(-50%,-50%) scale(1.15) rotate(2deg);  opacity:1; }
+  100% { transform:translate(-50%,-50%) scale(1) rotate(0);         opacity:1; }
+}
+
+/* ── Combo End Popup ── */
+#combo-end-pop {
+  display:none; position:fixed; top:42%; left:50%;
+  transform:translate(-50%,-50%);
+  font-size:.88em; font-weight:700; color:#888;
+  background:rgba(255,255,255,.88); border-radius:20px;
+  padding:5px 16px; z-index:8000; pointer-events:none;
+}
+#combo-end-pop.show { display:block; animation:floatUp .5s ease-out forwards; }
+
+/* ── Combo Yellow Border on Cell ── */
+@keyframes comboYellowFlash {
+  0%,100% { box-shadow:none; }
+  50%     { box-shadow:0 0 0 3px rgba(255,220,0,.9), 0 0 8px rgba(255,200,0,.5); }
+}
+.combo-yellow { animation:comboYellowFlash .5s ease-in-out 2; }
+
+/* ── Marble shake on combo break ── */
+@keyframes marbleShake {
+  0%,100%{ transform:translateX(0); }
+  20%    { transform:translateX(-3px); }
+  40%    { transform:translateX(3px); }
+  60%    { transform:translateX(-2px); }
+  80%    { transform:translateX(2px); }
+}
+.marble-shake { animation:marbleShake .28s ease-in-out; }
 
 /* ── Marble Bounce-In ── */
 @keyframes marbleBounceIn {
@@ -1722,6 +1827,11 @@ body {
       <strong id="hud-pts">0</strong>
     </div>
   </div>
+  <!-- 콤보 타이머 바 + 콤보 숫자 -->
+  <div id="combo-wrap">
+    <div id="combo-label">🔥 <span id="combo-count">0</span> COMBO</div>
+    <div id="combo-bar-track"><div id="combo-bar-fill"></div></div>
+  </div>
   <div id="game-board"></div>
   </div><!-- #game-main -->
   <div id="game-controls">
@@ -1757,6 +1867,11 @@ body {
     </div>
   </div>
 </div>
+<!-- ══ Combo Overlays ══ -->
+<div id="combo-rainbow-overlay"></div>
+<div id="max-combo-text">MAX COMBO! 🔥</div>
+<div id="combo-end-pop">콤보 종료</div>
+
 <div id="game-btn-group">
   <button id="undo-btn"  class="game-btn" onclick="undoMove()" disabled title="되돌리기">↩<span class="game-btn-badge" id="undo-badge">2</span></button>
   <button id="hint-btn"  class="game-btn" onclick="doHint()"   title="힌트">💡<span class="game-btn-badge" id="hint-badge">1</span></button>
@@ -1844,6 +1959,7 @@ body {
   <div class="rainbow-ball"></div>
   <div class="clear-score-txt">최종 점수: <span id="clear-score">0</span>점</div>
   <div class="clear-bonus-txt" id="clear-bonus"></div>
+  <div class="clear-bonus-txt" id="clear-combo-stat" style="display:none;color:#FF6B00;font-weight:900;"></div>
   <div class="btn-row">
     <button class="btn btn-pink"  onclick="retryGame()">🔄 다시 하기</button>
     <button class="btn btn-white" onclick="showScreen('start')">🏠 처음으로</button>
@@ -2068,7 +2184,9 @@ const ACHIEVEMENTS = [
   { id:'first_clear', icon:'🏆', name:'첫 탈출!',      desc:'처음으로 클리어했어요' },
   { id:'speed_clear', icon:'⚡', name:'번개 탈출!',     desc:'1분 이상 남기고 클리어' },
   { id:'no_eraser',   icon:'💎', name:'순수한 탈출!',   desc:'지우개·폭탄 없이 클리어' },
-  { id:'combo_3',     icon:'🔥', name:'연속 달인!',     desc:'한 게임에서 3번 연속 배치 성공' },
+  { id:'combo_3',     icon:'🔥', name:'연속 달인!',     desc:'3콤보 달성' },
+  { id:'combo_5',     icon:'🔥', name:'콤보 고수!',     desc:'5콤보 달성' },
+  { id:'combo_max',   icon:'💥', name:'MAX 콤보!',      desc:'10콤보 달성 (MAX COMBO)' },
   { id:'no_special',  icon:'✨', name:'완벽한 탈출!',   desc:'특수 구슬 도움·막힘 없이 클리어' },
   { id:'speed_3min',  icon:'⏱', name:'3분 탈출!',      desc:'쉬움 난이도 클리어' },
   { id:'hard_clear',  icon:'💀', name:'강철 탈출!',     desc:'어려움 난이도 클리어' },
@@ -2288,8 +2406,10 @@ function bgStart() {
   let i=0;
   function next() {
     if (!_bgOn) return;
-    // BPM 100(600ms) 기본, 잔여시간 30초 이하이면 BPM 140(429ms)으로 전환
-    const interval = (gameActive && timeLeft <= 30) ? 429 : 600;
+    // BPM 100(600ms) 기본, 콤보5+(BPM120=500ms), 잔여시간 30초 이하면 BPM 140(429ms)
+    let interval = 600;
+    if (gameActive && timeLeft <= 30)  interval = 429;
+    else if (_comboBgFast)              interval = 500;
     if (mel[i%mel.length]) playTone(mel[i%mel.length],'sine',.12,.28);
     i++; _bgT.push(setTimeout(next, interval));
   }
@@ -2359,6 +2479,14 @@ let _guidePlaceCount = 0;
 // ── 적응형 난이도 ──
 let _adaptiveEasy  = false;
 let _adaptiveMaxSzOverride = null;
+// ── 콤보 시스템 ──
+let comboCount       = 0;   // 현재 콤보
+let comboMaxThisGame = 0;   // 이번 게임 최고 콤보
+let _comboDeadline   = 0;   // 콤보 마감 시각 (ms, Date.now() 기준)
+let _comboTimerRAF   = null; // requestAnimationFrame 핸들
+let _comboActive     = false;
+let _lastPlaceColor  = null; // 직전 배치 색상 (같은 색 +1초 처리)
+let _comboBgFast     = false; // BGM BPM 120 상태 여부
 
 const ESCAPE_LINES = [
   { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
@@ -2571,6 +2699,11 @@ function startGame(diff) {
   // 적응형 난이도 초기화 (새 게임 시 이전 게임 이지 상태 유지하지 않음)
   _adaptiveEasy = false;
   _adaptiveMaxSzOverride = null;
+  // 콤보 초기화
+  comboCount = 0; comboMaxThisGame = 0; _comboDeadline = 0; _comboActive = false;
+  _lastPlaceColor = null; _comboBgFast = false;
+  if (_comboTimerRAF) { cancelAnimationFrame(_comboTimerRAF); _comboTimerRAF = null; }
+  updateComboUI();
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
 
@@ -3286,32 +3419,44 @@ function commitPlace(piece,r0,c0,trayIdx) {
       const r=r0+dr, c=c0+dc;
       if (piece.isEraser||piece.isEraser2||piece.isEraser3) {
         eraserUsed=true; eraserCount++;
-        // 잠긴 칸 해제 시 lockedCells 목록에서 제거
         lockedCells=lockedCells.filter(([lr,lc])=>!(lr===r&&lc===c));
         board[r][c]=null; sndErase();
       } else {
         board[r][c]=piece.color;
-        const perScore = Math.round((getActiveSkin()==='star' ? 110 : 100) * (1 + 0.1 * _effectStar));
-        score += perScore;
         placed++; placedTotal++;
       }
     });
     if (placed>0) {
-      const perScore = Math.round((getActiveSkin()==='star' ? 110 : 100) * (1 + 0.1 * _effectStar));
-      sndPlace(); spawnScorePop(r0,c0,placed*perScore);
+      // 콤보 배율 계산
+      const mult = getComboMultiplier();
+      const baseScore = Math.round((getActiveSkin()==='star' ? 110 : 100) * (1 + 0.1 * _effectStar));
+      const finalScore = Math.round(baseScore * placed * mult);
+      score += finalScore;
+      sndPlace();
+      spawnScorePop(r0, c0, baseScore * placed, mult > 1 ? mult : 0);
+      // 콤보 셀 시각 효과 (2x 이상: 노란 테두리)
+      if (comboCount >= 2) {
+        piece.cells.forEach(([dr,dc]) => {
+          const cel = document.getElementById(`c${r0+dr}_${c0+dc}`);
+          if (cel) { cel.classList.add('combo-yellow'); setTimeout(()=>cel.classList.remove('combo-yellow'),600); }
+        });
+      }
     }
   }
 
-  // 연속 배치 추적 (combo_3 업적)
-  if (placed>0) {
-    consecutivePlacements++;
-    if (consecutivePlacements>=3 && !getAchieved().includes('combo_3')) {
-      saveAchievement('combo_3');
-      showAchBadge([ACHIEVEMENTS.find(a=>a.id==='combo_3')],0);
+  // 콤보 업데이트 (배치 완료 후)
+  if (placed > 0 || piece.isEraser || piece.isEraser2 || piece.isEraser3 || piece.isBomb) {
+    const isSpecial = piece.isEraser || piece.isEraser2 || piece.isEraser3 || piece.isBomb;
+    if (placed > 0) {
+      // 같은 색 +1초
+      const sameColor = (_lastPlaceColor && _lastPlaceColor === piece.color);
+      triggerCombo(sameColor ? 4000 : 3000);
+      _lastPlaceColor = piece.color;
+    } else if (isSpecial) {
+      // 특수 구슬: 콤보 유지 (타이머 리셋하지 않음)
     }
-  } else {
-    consecutivePlacements=0;
   }
+
 
   // nextPiece를 현재 슬롯에 넣고, 새 nextPiece 생성
   tray[trayIdx] = nextPiece;
@@ -3589,16 +3734,182 @@ function triggerBounceStar(r0,c0,cells) {
 // ════════════════════════════════════════════
 // SCORE POP
 // ════════════════════════════════════════════
-function spawnScorePop(r,c,pts) {
-  const el=document.getElementById('game-board');
-  const rect=el.getBoundingClientRect();
-  const div=document.createElement('div');
-  div.className='score-pop';
-  div.textContent='+'+pts;
-  div.style.left=(rect.left+PADDING+c*STEP+CELL_SIZE/2)+'px';
-  div.style.top=(rect.top+PADDING+r*STEP)+'px';
+function spawnScorePop(r, c, pts, comboMult) {
+  const el = document.getElementById('game-board');
+  const rect = el.getBoundingClientRect();
+  const div = document.createElement('div');
+  const isMax = comboCount >= 10;
+  div.className = 'score-pop' + (isMax ? ' combo-gold' : '');
+  if (comboMult && comboMult > 1) {
+    const finalPts = Math.round(pts * comboMult);
+    div.textContent = '+' + pts + ' ×' + comboMult.toFixed(1) + ' = +' + finalPts;
+  } else {
+    div.textContent = '+' + pts;
+  }
+  div.style.left = (rect.left + PADDING + c * STEP + CELL_SIZE / 2) + 'px';
+  div.style.top  = (rect.top  + PADDING + r * STEP) + 'px';
   document.body.appendChild(div);
-  setTimeout(()=>div.remove(),950);
+  setTimeout(() => div.remove(), 1100);
+}
+
+// ════════════════════════════════════════════
+// COMBO SYSTEM
+// ════════════════════════════════════════════
+const COMBO_WINDOW = 3000; // 기본 3초
+
+function getComboMultiplier() {
+  if (comboCount >= 10) return 3.0;
+  if (comboCount >= 5)  return 2.0;
+  if (comboCount >= 3)  return 1.5;
+  if (comboCount >= 2)  return 1.2;
+  return 1.0;
+}
+
+function triggerCombo(windowMs) {
+  const prevCombo = comboCount;
+  comboCount++;
+  if (comboCount > comboMaxThisGame) comboMaxThisGame = comboCount;
+
+  _comboDeadline = Date.now() + (windowMs || COMBO_WINDOW);
+  _comboActive   = true;
+
+  // 업적 체크
+  const ach = getAchieved();
+  if (comboCount >= 3  && !ach.includes('combo_3'))   { saveAchievement('combo_3');   showAchBadge([ACHIEVEMENTS.find(a=>a.id==='combo_3')],0); }
+  if (comboCount >= 5  && !ach.includes('combo_5'))   { saveAchievement('combo_5');   showAchBadge([ACHIEVEMENTS.find(a=>a.id==='combo_5')],0); }
+  if (comboCount >= 10 && !ach.includes('combo_max')) { saveAchievement('combo_max'); showAchBadge([ACHIEVEMENTS.find(a=>a.id==='combo_max')],0); }
+
+  // 단계별 팝업 메시지
+  const mult = getComboMultiplier();
+  if      (comboCount >= 10 && prevCombo < 10) showComboPopup('MAX COMBO! 🔥', true);
+  else if (comboCount === 5)  showComboPopup('+100% 콤보!');
+  else if (comboCount === 3)  showComboPopup('+50% 콤보!');
+  else if (comboCount === 2)  showComboPopup('+20% 콤보!');
+
+  // 화면 테두리 효과 (3x~)
+  if (comboCount >= 3) {
+    const gs = document.getElementById('game-screen');
+    gs.classList.remove('combo-ring');
+    void gs.offsetWidth;
+    gs.classList.add('combo-ring');
+    setTimeout(() => gs.classList.remove('combo-ring'), 550);
+  }
+
+  // BGM 가속 (5x~)
+  if (comboCount >= 5 && !_comboBgFast) {
+    _comboBgFast = true;
+    bgStop(); bgStart();
+  }
+
+  // MAX COMBO 전체 효과 (처음 달성 시)
+  if (comboCount >= 10 && prevCombo < 10) {
+    triggerMaxComboFX();
+  }
+
+  updateComboUI();
+  startComboTimer();
+}
+
+function showComboPopup(text, isMax) {
+  if (isMax) {
+    const el = document.getElementById('max-combo-text');
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+  } else {
+    showCharBubble(text);
+  }
+}
+
+function triggerMaxComboFX() {
+  // 무지개 파동
+  const ov = document.getElementById('combo-rainbow-overlay');
+  ov.classList.remove('show');
+  void ov.offsetWidth;
+  ov.classList.add('show');
+  setTimeout(() => ov.classList.remove('show'), 950);
+  // 특별 효과음
+  sndComboMax();
+}
+
+function sndComboMax() {
+  if (_isMuted) return;
+  resumeAC();
+  [523,659,784,1047,1319].forEach((freq,i) => {
+    setTimeout(() => playTone(freq,'triangle',.25,.12,600), i * 80);
+  });
+}
+
+function breakCombo() {
+  if (!_comboActive || comboCount === 0) return;
+  comboCount     = 0;
+  _comboActive   = false;
+  _comboDeadline = 0;
+  _lastPlaceColor= null;
+
+  // BGM 복귀
+  if (_comboBgFast) {
+    _comboBgFast = false;
+    bgStop(); bgStart();
+  }
+
+  // 구슬 흔들림 + "콤보 종료" 팝업
+  document.querySelectorAll('.cell.filled').forEach(el => {
+    el.classList.add('marble-shake');
+    setTimeout(() => el.classList.remove('marble-shake'), 300);
+  });
+  const ep = document.getElementById('combo-end-pop');
+  ep.classList.remove('show');
+  void ep.offsetWidth;
+  ep.classList.add('show');
+  setTimeout(() => ep.classList.remove('show'), 600);
+
+  updateComboUI();
+}
+
+function startComboTimer() {
+  if (_comboTimerRAF) cancelAnimationFrame(_comboTimerRAF);
+  function tick() {
+    if (!_comboActive || !gameActive || isPaused) return;
+    const remaining = _comboDeadline - Date.now();
+    if (remaining <= 0) {
+      breakCombo();
+      return;
+    }
+    // 타이머 바 업데이트
+    const pct = Math.max(0, Math.min(1, remaining / COMBO_WINDOW));
+    const fill  = document.getElementById('combo-bar-fill');
+    if (fill) {
+      fill.style.width = (pct * 100) + '%';
+      fill.className = 'combo-bar-fill';
+      if (remaining < 1000)      fill.classList.add('red');
+      else if (remaining < 2000) fill.classList.add('orange');
+    }
+    _comboTimerRAF = requestAnimationFrame(tick);
+  }
+  _comboTimerRAF = requestAnimationFrame(tick);
+}
+
+function updateComboUI() {
+  const wrap  = document.getElementById('combo-wrap');
+  const label = document.getElementById('combo-label');
+  const count = document.getElementById('combo-count');
+  const fill  = document.getElementById('combo-bar-fill');
+  if (!wrap) return;
+  if (comboCount > 0) {
+    wrap.classList.add('visible');
+    count.textContent = comboCount;
+    // 숫자 bounce 애니메이션
+    label.classList.remove('combo-bounce');
+    void label.offsetWidth;
+    label.classList.add('combo-bounce');
+    // 타이머 바 꽉 찬 상태로 리셋
+    if (fill) { fill.style.width = '100%'; fill.className = 'combo-bar-fill'; }
+  } else {
+    wrap.classList.remove('visible');
+    if (fill) { fill.style.width = '100%'; fill.className = 'combo-bar-fill'; }
+  }
 }
 
 // ════════════════════════════════════════════
@@ -3729,6 +4040,8 @@ function doWin() {
 
   gameActive=false;
   clearInterval(timerID);
+  if (_comboTimerRAF) { cancelAnimationFrame(_comboTimerRAF); _comboTimerRAF = null; }
+  _comboActive = false;
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
   bgStop();
@@ -3784,6 +4097,14 @@ function doWin() {
       if (dailyBonus>0) bonusTxt+=(bonusTxt?' · ':'')+'📅 일일 미션 +500점!';
       document.getElementById('clear-bonus').textContent=bonusTxt;
       document.getElementById('clear-score').textContent='0';
+      // 최고 콤보 표시
+      const ccs = document.getElementById('clear-combo-stat');
+      if (ccs) {
+        if (comboMaxThisGame >= 2) {
+          ccs.textContent = '최고 콤보: 🔥 ' + comboMaxThisGame + 'x';
+          ccs.style.display = '';
+        } else { ccs.style.display = 'none'; }
+      }
 
       setTimeout(()=>{
         showScreen('clear');
@@ -3841,6 +4162,8 @@ let _csCallback = null;
 function handleLevelWin() {
   gameActive = false;
   clearInterval(timerID);
+  if (_comboTimerRAF) { cancelAnimationFrame(_comboTimerRAF); _comboTimerRAF = null; }
+  _comboActive = false;
   bgStop();
   sndFanfare();
 
@@ -3860,6 +4183,8 @@ function handleLevelWin() {
   const winStreak = (parseInt(localStorage.getItem('marble_adaptive_win')||'0') + 1);
   localStorage.setItem('marble_adaptive_win', winStreak);
   localStorage.setItem('marble_adaptive_fail', '0');
+  // 최고 콤보 표시 준비 (컷씬 콜백에서 사용)
+  const _comboStatForClear = comboMaxThisGame;
   if (winStreak >= 3) showCharBubble('🔥 3연속 성공! 실력이 늘고 있어요!');
 
   // 다음 레벨 해제
@@ -4060,6 +4385,8 @@ function spawnFlyingMarbles() {
 function doGameOver() {
   gameActive=false;
   clearInterval(timerID);
+  if (_comboTimerRAF) { cancelAnimationFrame(_comboTimerRAF); _comboTimerRAF = null; }
+  _comboActive = false;
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
   bgStop();
@@ -4092,6 +4419,11 @@ function togglePause() {
   resumeAC();
   isPaused=!isPaused;
   showScreen(isPaused?'pause':'game');
+  // 콤보 타이머: 일시정지 해제 시 재개, 일시정지 시 마감 시간 연장
+  if (!isPaused && _comboActive) startComboTimer();
+  if (isPaused && _comboActive) {
+    if (_comboTimerRAF) { cancelAnimationFrame(_comboTimerRAF); _comboTimerRAF = null; }
+  }
 }
 
 function quitGame() {
