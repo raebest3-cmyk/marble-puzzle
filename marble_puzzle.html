@@ -606,6 +606,53 @@ body {
 .game-btn:active { transform:scale(.88) !important; }
 #undo-btn:disabled { opacity:.32; cursor:not-allowed; }
 #undo-btn:disabled:hover  { transform:none !important; background:rgba(255,255,255,.86) !important; }
+.game-btn-badge {
+  position:absolute; top:-5px; right:-5px;
+  background:#e91e63; color:#fff; border-radius:50%;
+  width:17px; height:17px; font-size:.6em; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  line-height:1; pointer-events:none;
+}
+.game-btn { position:relative; }
+/* 힌트 글로우 */
+@keyframes hintGlow {
+  0%,100% { box-shadow:inset 0 0 0 2px rgba(76,175,80,0); background:inherit; }
+  50%     { box-shadow:inset 0 0 0 3px rgba(76,175,80,.9), 0 0 8px rgba(76,175,80,.4); background:rgba(76,175,80,.22); }
+}
+.hint-glow { animation:hintGlow .65s ease-in-out 5 !important; }
+/* 가이드 화살표 */
+@keyframes guideArrowBounce {
+  from { transform:translateX(-50%) translateY(0); }
+  to   { transform:translateX(-50%) translateY(-7px); }
+}
+.guide-arrow-overlay {
+  position:absolute; bottom:-24px; left:50%; transform:translateX(-50%);
+  font-size:17px; animation:guideArrowBounce .55s ease-in-out infinite alternate;
+  pointer-events:none; z-index:20; filter:drop-shadow(0 1px 3px rgba(0,0,0,.4));
+}
+/* 적응형 난이도 팝업 */
+#adaptive-popup {
+  display:none; position:fixed; inset:0; z-index:9000;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.55); backdrop-filter:blur(4px);
+}
+#adaptive-popup.show { display:flex; }
+.adaptive-box {
+  background:#fff; border-radius:22px; padding:28px 26px 22px;
+  max-width:320px; width:88vw; text-align:center;
+  box-shadow:0 12px 40px rgba(0,0,0,.28);
+  animation:screenFadeIn .22s ease-out both;
+}
+.adaptive-icon { font-size:3em; margin-bottom:10px; }
+.adaptive-title { font-size:1.15em; font-weight:900; color:#e91e63; margin-bottom:8px; }
+.adaptive-desc  { font-size:.85em; color:#555; margin-bottom:16px; line-height:1.5; }
+.adaptive-btns  { display:flex; gap:10px; justify-content:center; }
+.adaptive-btns button {
+  padding:9px 20px; border:none; border-radius:12px; font-size:.9em;
+  font-weight:700; cursor:pointer;
+}
+.adaptive-btns .btn-yes { background:#e91e63; color:#fff; }
+.adaptive-btns .btn-no  { background:#f3f3f3; color:#555; }
 
 /* ── Pause Screen ── */
 #pause-screen { background:rgba(233,30,99,.88); backdrop-filter:blur(6px);
@@ -1661,10 +1708,25 @@ body {
   </div>
 </div>
 <div id="game-btn-group">
-  <button id="undo-btn"  class="game-btn" onclick="undoMove()" disabled title="되돌리기">↩</button>
+  <button id="undo-btn"  class="game-btn" onclick="undoMove()" disabled title="되돌리기">↩<span class="game-btn-badge" id="undo-badge">2</span></button>
+  <button id="hint-btn"  class="game-btn" onclick="doHint()"   title="힌트">💡<span class="game-btn-badge" id="hint-badge">1</span></button>
+  <button id="freeswap-btn" class="game-btn" onclick="doFreeSwap()" title="조각 교체">🔀<span class="game-btn-badge" id="freeswap-badge">1</span></button>
   <button id="shop-btn"  class="game-btn" onclick="showShop()"  title="구슬 상점">🛍️</button>
   <button id="help-btn"  class="game-btn" onclick="showGameHelp()" title="도움말">❓</button>
   <button id="pause-btn" class="game-btn" onclick="togglePause()" title="일시정지">⏸</button>
+</div>
+
+<!-- ══ Adaptive Difficulty Popup ══ -->
+<div id="adaptive-popup">
+  <div class="adaptive-box">
+    <div class="adaptive-icon">😥</div>
+    <div class="adaptive-title">조금 어려우신가요?</div>
+    <div class="adaptive-desc">3번 연속 실패했어요.<br>조각 크기를 줄이고 시간을 +30초 드릴까요?</div>
+    <div class="adaptive-btns">
+      <button class="btn-yes" onclick="applyAdaptiveEase()">네, 쉽게 해주세요</button>
+      <button class="btn-no"  onclick="closeAdaptivePopup()">괜찮아요</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ Settings Popup ══ -->
@@ -1974,7 +2036,9 @@ const GAME_EFFECTS = [
   { id:'rainbow', icon:'🌈', name:'무지개 효과',    cost:750,  desc:'클리어 시 시간 보너스 2배\n(1회만)',  multi:false },
   { id:'fire',    icon:'🔥', name:'불꽃 효과',      cost:500,  desc:'폭탄 구슬 1개\n즉시 대기줄에 추가',  multi:true  },
   { id:'clover',  icon:'🍀', name:'클로버 효과',    cost:350,  desc:'힌트(막힘 감지) 1회 추가',            multi:true  },
-  { id:'swap',    icon:'🔄', name:'퍼즐전환 효과',  cost:1000, desc:'대기줄 조각 교체\n3회 추가 (🔄 버튼)', multi:true  },
+  { id:'swap',     icon:'🔄', name:'퍼즐전환 효과',  cost:1000, desc:'대기줄 조각 교체\n3회 추가 (🔄 버튼)', multi:true  },
+  { id:'hint-add', icon:'💡', name:'힌트 추가',      cost:100,  desc:'힌트 1회 추가\n(💡 버튼)',             multi:true  },
+  { id:'undo-add', icon:'↩',  name:'되돌리기 추가',  cost:80,   desc:'되돌리기 1회 추가\n(↩ 버튼)',         multi:true  },
 ];
 
 // ════════════════════════════════════════════
@@ -2211,6 +2275,21 @@ let _effectClover  = 0;   // 클로버: 구매 횟수 (배지용)
 let _effectShopPaused = false; // 효과 상점 열 때 게임 일시정지 여부
 let _swapMenuIdx  = -1;   // 퍼즐전환 대상 슬롯 인덱스
 let _swapOptions  = [];   // 퍼즐전환 선택지
+// ── 힌트 시스템 ──
+let freeHintsLeft  = 1;   // 무료 힌트 남은 횟수 (게임 중 초기화)
+let _hintPenalty   = false; // 힌트 사용 시 별점 최대 2개 페널티
+let _hintTimer     = null;  // 힌트 glow 타이머
+// ── 무료 조각 교체 ──
+let freeSwapLeft   = 1;   // 무료 교체 남은 횟수
+let _swapPenalty   = false; // 조각 교체 사용 시 별점 최대 2개 페널티
+// ── 되돌리기 토큰 ──
+let undoTokens     = 2;   // 게임당 되돌리기 가능 횟수
+// ── 가이드 모드 ──
+let _guideMode     = false;
+let _guidePlaceCount = 0;
+// ── 적응형 난이도 ──
+let _adaptiveEasy  = false;
+let _adaptiveMaxSzOverride = null;
 
 const ESCAPE_LINES = [
   { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
@@ -2410,6 +2489,19 @@ function startGame(diff) {
   diamondBonus = (getActiveSkin()==='diamond') ? 2 : 0;
   consecutivePlacements = 0;
   stuckPopupTriggered = false;
+  // 힌트/교체/되돌리기 초기화
+  freeHintsLeft  = 1;
+  _hintPenalty   = false;
+  if (_hintTimer) { clearTimeout(_hintTimer); _hintTimer = null; }
+  freeSwapLeft   = 1;
+  _swapPenalty   = false;
+  undoTokens     = 2;
+  // 가이드 모드: Lv.1 레벨 모드이고 처음 플레이 시
+  _guidePlaceCount = 0;
+  _guideMode = (difficulty==='level' && currentLevelIdx===0 && !localStorage.getItem('marble_guide_done'));
+  // 적응형 난이도 초기화 (새 게임 시 이전 게임 이지 상태 유지하지 않음)
+  _adaptiveEasy = false;
+  _adaptiveMaxSzOverride = null;
   const taWarn=document.getElementById('ta-warn');
   if (taWarn) taWarn.style.display='none';
 
@@ -2436,8 +2528,13 @@ function startGame(diff) {
   renderNextPreview();
   updateHUD();
   updateUndoBtn();
+  updateHintBtn();
+  updateFreeSwapBtn();
   resetEscapeBar();
   showScreen('game');
+
+  // 가이드 모드: 첫 배치 힌트 자동 실행
+  if (_guideMode) setTimeout(doHint, 600);
 
   clearInterval(timerID);
   timerID=setInterval(tick,1000);
@@ -2541,7 +2638,7 @@ function renderBoard() {
   for (let r=0;r<GRID;r++) for (let c=0;c<GRID;c++) {
     const el=document.getElementById(`c${r}_${c}`);
     if (!el) continue;
-    el.classList.remove('ok','bad','sparkle','rainbow-wave');
+    el.classList.remove('ok','bad','sparkle','rainbow-wave','hint-glow');
     const cur=board[r][c];
     el.classList.toggle('filled', !!cur);
     if (cur) {
@@ -2774,11 +2871,11 @@ const SPECIAL_TIPS = {
 function mkPiece(forceNormal) {
   if (!forceNormal) {
     const r = Math.random();
-    if (r < 0.08)      return {cells:[[0,0]],color:'m-eraser',isEraser:true};
-    if (r < 0.23)      return {cells:[[0,0],[0,1]],color:'m-eraser2',isEraser2:true};
-    if (r < 0.31)      return {cells:[[0,0],[0,1],[0,2]],color:'m-eraser3',isEraser3:true,rotation:0};
+    if (r < 0.15)      return {cells:[[0,0]],color:'m-eraser',isEraser:true};
+    if (r < 0.27)      return {cells:[[0,0],[0,1]],color:'m-eraser2',isEraser2:true};
+    if (r < 0.35)      return {cells:[[0,0],[0,1],[0,2]],color:'m-eraser3',isEraser3:true,rotation:0};
     // 🔥 불꽃 구슬: 폭탄 확률 2배 (10% → 20%)
-    const bombThresh = 0.31 + (getActiveSkin()==='fire' ? 0.20 : 0.10);
+    const bombThresh = 0.35 + (getActiveSkin()==='fire' ? 0.20 : 0.10);
     if (r < bombThresh) return {cells:[[0,0]],color:'m-bomb',isBomb:true};
   }
   let minSz,maxSz;
@@ -2796,6 +2893,8 @@ function mkPiece(forceNormal) {
     else if (curLevel===4){ minSz=4; maxSz=5; }
     else                  { minSz=5; maxSz=5; }
   }
+  // 적응형 난이도: maxSz-1 오버라이드
+  if (_adaptiveMaxSzOverride !== null) maxSz = Math.max(minSz, _adaptiveMaxSzOverride);
   const sz=minSz+Math.floor(Math.random()*(maxSz-minSz+1));
   const shapes=SHAPES[Math.min(sz,5)];
   const shape=shapes[Math.floor(Math.random()*shapes.length)];
@@ -2824,18 +2923,19 @@ function saveUndoState() {
     tray:  tray.map(p=>p?{...p, cells:p.cells.map(c=>[...c])}:null),
     score, placedTotal, curLevel
   };
-  undoAvail=true;
+  undoAvail = undoTokens > 0;
   updateUndoBtn();
 }
 
 function undoMove() {
-  if (!undoAvail||!undoState) return;
+  if (!undoAvail||!undoState||undoTokens<=0) return;
   board=undoState.board;
   tray=undoState.tray;
   score=undoState.score;
   placedTotal=undoState.placedTotal;
   curLevel=undoState.curLevel;
   undoState=null; undoAvail=false;
+  undoTokens--;
   updateUndoBtn();
   // nextPiece 재생성 (되돌리기 후 tray 상태 기준)
   const _fn=tray.some(p=>p&&(p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
@@ -2846,7 +2946,12 @@ function undoMove() {
 
 function updateUndoBtn() {
   const btn=document.getElementById('undo-btn');
-  if (btn) btn.disabled=!undoAvail;
+  const badge=document.getElementById('undo-badge');
+  if (btn) btn.disabled=(!undoAvail || undoTokens<=0);
+  if (badge) {
+    badge.textContent=undoTokens;
+    badge.style.display = undoTokens>0 ? '' : 'none';
+  }
 }
 
 // ════════════════════════════════════════════
@@ -3152,6 +3257,17 @@ function commitPlace(piece,r0,c0,trayIdx) {
   if (board.flat().filter(Boolean).length===GRID*GRID) { setTimeout(doWin,180); return; }
   // 막힌 상태 감지 (새 트레이 렌더 후 확인)
   setTimeout(checkStuck, 150);
+  // 가이드 모드: 첫 3배치 힌트 자동 실행
+  if (_guideMode && placed > 0) {
+    _guidePlaceCount++;
+    if (_guidePlaceCount < 3) {
+      setTimeout(doHint, 500);
+    } else {
+      _guideMode = false;
+      localStorage.setItem('marble_guide_done','1');
+      showCharBubble('👍 이제 혼자서도 할 수 있어요!');
+    }
+  }
 }
 
 // ════════════════════════════════════════════
@@ -3206,6 +3322,104 @@ function giveEraser() {
     showCharBubble('💝 지우개를 드렸어요!');
   }
   renderTray();
+}
+
+// ════════════════════════════════════════════
+// HINT SYSTEM
+// ════════════════════════════════════════════
+function doHint() {
+  if (!gameActive || isPaused) return;
+  if (freeHintsLeft <= 0) return;
+  freeHintsLeft--;
+  _hintPenalty = true;
+  updateHintBtn();
+
+  // 트레이의 첫 번째 조각이 놓일 수 있는 모든 위치 표시
+  if (_hintTimer) clearTimeout(_hintTimer);
+  document.querySelectorAll('.cell.hint-glow').forEach(c => c.classList.remove('hint-glow'));
+  const piece = tray.find(p => p);
+  if (piece) {
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        if (canPlace(piece, r, c)) {
+          // 조각의 모든 셀에 glow 적용
+          piece.cells.forEach(([dr, dc]) => {
+            const el = document.getElementById(`c${r+dr}_${c+dc}`);
+            if (el) el.classList.add('hint-glow');
+          });
+        }
+      }
+    }
+    showCharBubble('💡 초록색 위치에 놓을 수 있어요!');
+  }
+  _hintTimer = setTimeout(() => {
+    document.querySelectorAll('.cell.hint-glow').forEach(c => c.classList.remove('hint-glow'));
+    _hintTimer = null;
+  }, 3000);
+}
+
+function updateHintBtn() {
+  const btn   = document.getElementById('hint-btn');
+  const badge = document.getElementById('hint-badge');
+  if (btn)   btn.disabled = (freeHintsLeft <= 0);
+  if (badge) {
+    badge.textContent = freeHintsLeft;
+    badge.style.display = freeHintsLeft > 0 ? '' : 'none';
+  }
+}
+
+// ════════════════════════════════════════════
+// FREE SWAP SYSTEM
+// ════════════════════════════════════════════
+function doFreeSwap() {
+  if (!gameActive || isPaused || freeSwapLeft <= 0) return;
+  // 선택된 슬롯이 있으면 그 슬롯 교체, 없으면 첫 번째 비어있지 않은 슬롯
+  const idx = (selectedTrayIdx !== null && tray[selectedTrayIdx])
+    ? selectedTrayIdx
+    : tray.findIndex(p => p);
+  if (idx < 0) return;
+  freeSwapLeft--;
+  _swapPenalty = true;
+  updateFreeSwapBtn();
+  const _hasSpecial = tray.some(p => p && (p.isEraser||p.isEraser2||p.isEraser3||p.isBomb));
+  tray[idx] = mkPiece(_hasSpecial);
+  renderTray();
+  showCharBubble('🔀 조각이 교체됐어요!');
+}
+
+function updateFreeSwapBtn() {
+  const btn   = document.getElementById('freeswap-btn');
+  const badge = document.getElementById('freeswap-badge');
+  if (btn)   btn.disabled = (freeSwapLeft <= 0);
+  if (badge) {
+    badge.textContent = freeSwapLeft;
+    badge.style.display = freeSwapLeft > 0 ? '' : 'none';
+  }
+}
+
+// ════════════════════════════════════════════
+// ADAPTIVE DIFFICULTY
+// ════════════════════════════════════════════
+function applyAdaptiveEase() {
+  document.getElementById('adaptive-popup').classList.remove('show');
+  _adaptiveEasy = true;
+  // maxSz를 현재 레벨 기준 -1로 오버라이드
+  if (difficulty === 'level') {
+    const lv = LEVELS[currentLevelIdx];
+    _adaptiveMaxSzOverride = Math.max(lv.minSz, lv.maxSz - 1);
+  } else {
+    // 현재 조각 크기보다 1 작게 (최소 2)
+    _adaptiveMaxSzOverride = 3;
+  }
+  timeLeft += 30;
+  updateHUD();
+  localStorage.setItem('marble_adaptive_fail', '0');
+  showCharBubble('😊 조금 쉽게 해드렸어요! +30초');
+}
+
+function closeAdaptivePopup() {
+  document.getElementById('adaptive-popup').classList.remove('show');
+  localStorage.setItem('marble_adaptive_fail', '0');
 }
 
 // ════════════════════════════════════════════
@@ -3456,7 +3670,8 @@ function doWin() {
   let bonus=winTime*10;
   const rainbowActive = getActiveSkin()==='rainbow' || _effectRainbow;
   if (rainbowActive) bonus*=2;
-  const stars=winTime>=60?3:winTime>=30?2:1;
+  const rawStars=winTime>=60?3:winTime>=30?2:1;
+  const stars = (_hintPenalty||_swapPenalty) ? Math.min(rawStars,2) : rawStars;
 
   // 1. Rainbow wave on all cells
   for (let r=0;r<GRID;r++) for (let c=0;c<GRID;c++) {
@@ -3490,6 +3705,10 @@ function doWin() {
       // 포인트 적립: 점수 10% + 별 보너스
       const starPts=[50,100,200][stars-1];
       addPoints(Math.floor(score/10)+starPts);
+      // 적응형 난이도: 성공 스트릭
+      const _ws=(parseInt(localStorage.getItem('marble_adaptive_win')||'0')+1);
+      localStorage.setItem('marble_adaptive_win',_ws);
+      localStorage.setItem('marble_adaptive_fail','0');
 
       let bonusTxt=bonus>0?'⏱ 시간 보너스 +'+bonus+'점':'';
       if (rainbowActive) bonusTxt+=(bonusTxt?' · ':'')+'🌈 무지개 2배 보너스!';
@@ -3557,8 +3776,9 @@ function handleLevelWin() {
   sndFanfare();
 
   const winTime = timeLeft;
-  const stars = winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.5) ? 3
-               : winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.25) ? 2 : 1;
+  const rawStarsLv = winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.5) ? 3
+                   : winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.25) ? 2 : 1;
+  const stars = (_hintPenalty||_swapPenalty) ? Math.min(rawStarsLv,2) : rawStarsLv;
 
   // 별점 / 포인트 저장
   saveLevelStars(currentLevelIdx, stars);
@@ -3566,6 +3786,12 @@ function handleLevelWin() {
   addCumulativeScore(score);
   const starPts = [50,100,200][stars-1];
   addPoints(Math.floor(score/10) + starPts);
+
+  // 적응형 난이도: 성공 스트릭 증가
+  const winStreak = (parseInt(localStorage.getItem('marble_adaptive_win')||'0') + 1);
+  localStorage.setItem('marble_adaptive_win', winStreak);
+  localStorage.setItem('marble_adaptive_fail', '0');
+  if (winStreak >= 3) showCharBubble('🔥 3연속 성공! 실력이 늘고 있어요!');
 
   // 다음 레벨 해제
   saveLevelProgress(currentLevelIdx + 2); // +1(next level idx) +1(1-based)
@@ -3770,6 +3996,10 @@ function doGameOver() {
   bgStop();
   saveHS();
   addPoints(Math.floor(score/10));
+  // 적응형 난이도: 실패 스트릭 증가
+  const failStreak = (parseInt(localStorage.getItem('marble_adaptive_fail')||'0') + 1);
+  localStorage.setItem('marble_adaptive_fail', failStreak);
+  localStorage.setItem('marble_adaptive_win', '0');
   const gs=document.getElementById('game-screen');
   gs.style.transition='filter .7s';
   gs.style.filter='grayscale(1) brightness(.6)';
@@ -3778,6 +4008,10 @@ function doGameOver() {
     document.getElementById('go-score').textContent=score;
     document.getElementById('go-hs-val').textContent=getHS();
     showScreen('gameover');
+    // 3회 연속 실패 시 적응형 팝업 표시
+    if (failStreak >= 3) {
+      setTimeout(()=>document.getElementById('adaptive-popup').classList.add('show'), 800);
+    }
   },900);
 }
 
@@ -4083,13 +4317,15 @@ function closeEffectShop() {
 
 function getEffectCount(id) {
   switch (id) {
-    case 'star':    return _effectStar;
-    case 'rainbow': return _effectRainbow ? 1 : 0;
-    case 'swap':    return _effectSwap;
-    case 'flower':  return _effectFlower;
-    case 'diamond': return _effectDiamond;
-    case 'fire':    return _effectFire;
-    case 'clover':  return _effectClover;
+    case 'star':     return _effectStar;
+    case 'rainbow':  return _effectRainbow ? 1 : 0;
+    case 'swap':     return _effectSwap;
+    case 'flower':   return _effectFlower;
+    case 'diamond':  return _effectDiamond;
+    case 'fire':     return _effectFire;
+    case 'clover':   return _effectClover;
+    case 'hint-add': return freeHintsLeft;
+    case 'undo-add': return undoTokens;
   }
   return 0;
 }
@@ -4203,6 +4439,16 @@ function buyEffect(id) {
       _effectSwap += 3;
       renderTray();
       showCharBubble(`🔄 조각 교체 ${_effectSwap}회 가능!`);
+      break;
+    case 'hint-add':
+      freeHintsLeft++;
+      updateHintBtn();
+      showCharBubble('💡 힌트 +1회!');
+      break;
+    case 'undo-add':
+      undoTokens++;
+      updateUndoBtn();
+      showCharBubble('↩ 되돌리기 +1회!');
       break;
   }
 
