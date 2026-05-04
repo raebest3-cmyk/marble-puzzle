@@ -249,6 +249,89 @@ body {
 .extend-btns button:last-child { background:#f5f5f5; color:#888; }
 .extend-btns button:active { transform:scale(.94); }
 
+/* ── Attendance Popup ── */
+#attend-popup {
+  display:none; position:fixed; inset:0; z-index:9700;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.52); backdrop-filter:blur(5px);
+}
+#attend-popup.show { display:flex; }
+.attend-box {
+  background:#fff; border-radius:28px; padding:24px 22px 22px;
+  max-width:340px; width:92vw; text-align:center;
+  box-shadow:0 16px 50px rgba(0,0,0,.28);
+  animation:screenFadeIn .28s cubic-bezier(.34,1.3,.64,1) both;
+}
+.attend-title {
+  font-size:1.15em; font-weight:900; color:#e91e63; margin-bottom:14px;
+}
+/* 7일 캘린더 */
+.attend-calendar {
+  display:flex; justify-content:center; gap:7px; margin-bottom:16px;
+}
+.attend-day {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-size:.7em; color:#aaa;
+}
+.attend-day-icon {
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.35em; background:#f5f5f5;
+}
+.attend-day-icon.done  { background:#e8f5e9; }
+.attend-day-icon.today { background:#fce4ec; animation:attendTodayPulse 1.2s ease-in-out infinite; }
+@keyframes attendTodayPulse {
+  0%,100% { transform:scale(1);    box-shadow:0 0 0 0 rgba(233,30,99,.3); }
+  50%     { transform:scale(1.08); box-shadow:0 0 0 6px rgba(233,30,99,.0); }
+}
+/* 스트릭 & 포인트 */
+.attend-streak {
+  font-size:1.1em; font-weight:900; color:#FF6B00; margin-bottom:8px;
+}
+.attend-reward {
+  font-size:1.6em; font-weight:900; color:#7b1fa2;
+  margin-bottom:6px; letter-spacing:.3px;
+}
+.attend-next {
+  font-size:.78em; color:#888; margin-bottom:16px; line-height:1.5;
+}
+.attend-reward-extra {
+  font-size:.82em; color:#e91e63; font-weight:700;
+  background:#fce4ec; border-radius:12px; padding:5px 14px;
+  display:inline-block; margin-bottom:12px;
+}
+.attend-claim-btn {
+  width:100%; padding:14px; border:none; border-radius:18px;
+  background:linear-gradient(135deg,#e91e63,#f06292); color:#fff;
+  font-family:'Jua',sans-serif; font-size:1.05em; font-weight:900;
+  cursor:pointer; box-shadow:0 4px 14px rgba(233,30,99,.35);
+  transition:transform .12s;
+}
+.attend-claim-btn:active { transform:scale(.95); }
+
+/* ── 시작화면 출석 현황 배지 ── */
+#attend-status-bar {
+  font-size:.76em; color:rgba(255,255,255,.92);
+  background:rgba(0,0,0,.14); border-radius:14px;
+  padding:5px 14px; margin-top:6px; letter-spacing:.3px;
+  display:inline-block;
+}
+
+/* ── 달빛 구슬 shimmer ── */
+@keyframes moonShimmer {
+  0%,100% { filter:brightness(1)   drop-shadow(0 0 3px rgba(180,210,255,.5)); }
+  50%     { filter:brightness(1.18) drop-shadow(0 0 9px rgba(180,210,255,.9)); }
+}
+.skin-moon .marble-body { animation:moonShimmer 2.2s ease-in-out infinite; }
+
+/* ── 출석 통계 (설정 화면) ── */
+.attend-stats-box {
+  background:#f9f9f9; border-radius:14px; padding:10px 14px;
+  font-size:.8em; color:#555; text-align:left; margin-top:-4px;
+}
+.attend-stats-box div { padding:3px 0; }
+.attend-stats-box strong { color:#c2185b; }
+
 /* ── HUD ── */
 #hud {
   display:flex; align-items:center; justify-content:center;
@@ -1792,6 +1875,8 @@ body {
     <button class="smenu-btn smenu-back" onclick="hideSpecialModeMenu()">← 뒤로가기</button>
   </div>
   <div id="cal-debug" style="font-size:.7em;color:#aaa;margin-top:6px;text-align:center;"></div>
+  <!-- 출석 현황 배지 -->
+  <div id="attend-status-bar"></div>
   <!-- 일일미션 (숨김, JS에서 필요시 사용) -->
   <div class="daily-mission" id="daily-mission-wrap" style="display:none">
     <div class="dm-label">📅 오늘의 미션</div>
@@ -1902,8 +1987,22 @@ body {
     <button class="settings-row-btn" onclick="closeStartSettings();showCalibration()">📱 터치 보정</button>
     <button class="settings-row-btn" onclick="closeStartSettings();showPwaPopup(true)">📲 홈 화면에 추가</button>
     <button class="settings-row-btn" onclick="closeStartSettings();playOpening()">🎬 오프닝 보기</button>
+    <div class="attend-stats-box" id="settings-attend-stats"></div>
     <button class="settings-row-btn settings-danger" onclick="confirmResetData()">🗑️ 데이터 초기화</button>
     <button class="settings-close-btn" onclick="closeStartSettings()">✕ 닫기</button>
+  </div>
+</div>
+
+<!-- ══ Attendance Popup ══ -->
+<div id="attend-popup">
+  <div class="attend-box">
+    <div class="attend-title">🎁 오늘의 출석 보상!</div>
+    <div class="attend-calendar" id="attend-calendar"></div>
+    <div class="attend-streak" id="attend-streak-txt"></div>
+    <div class="attend-reward" id="attend-reward-txt"></div>
+    <div class="attend-reward-extra" id="attend-extra-txt" style="display:none"></div>
+    <div class="attend-next" id="attend-next-txt"></div>
+    <button class="attend-claim-btn" onclick="claimAttendance()">받기! 🎉</button>
   </div>
 </div>
 
@@ -2204,6 +2303,7 @@ const SKINS = [
   { id:'rainbow', icon:'🌈', name:'무지개 구슬',      cost:1500, perm:false, desc:'클리어 보너스 2배' },
   { id:'fire',    icon:'🔥', name:'불꽃 구슬',        cost:1000, perm:false, desc:'폭탄 등장 확률 2배' },
   { id:'clover',  icon:'🍀', name:'네잎클로버 구슬',  cost:700,  perm:false, desc:'자동 힌트 1회 추가' },
+  { id:'moon',    icon:'🌙', name:'달빛 구슬',        cost:0,    perm:true,  desc:'은은한 달빛 shimmer\n(외형 전용)', attend:true },
 ];
 
 // ── 일일 미션 ──
@@ -2520,6 +2620,7 @@ function showScreen(name) {
     if (_dbg) _dbg.textContent = _ox
       ? `저장된 보정값: X=${parseFloat(_ox).toFixed(2)}칸  Y=${parseFloat(_oy).toFixed(2)}칸`
       : '(보정값 없음 — 터치 보정 버튼을 눌러 설정하세요)';
+    if (typeof updateAttendStatusBar === 'function') updateAttendStatusBar();
   }
 }
 
@@ -2563,6 +2664,18 @@ function hideSpecialModeMenu() {
 function showStartSettings() {
   const btn = document.getElementById('mute-btn');
   if (btn) btn.textContent = _isMuted ? '🔇 배경음악: 꺼짐' : '🔊 배경음악: 켜짐';
+  // 출석 통계 렌더링
+  const statsEl = document.getElementById('settings-attend-stats');
+  if (statsEl) {
+    const streak    = parseInt(localStorage.getItem('marble_streak')||'0');
+    const bestStr   = parseInt(localStorage.getItem('marble_best_streak')||'0');
+    const totalDays = parseInt(localStorage.getItem('marble_total_attend')||'0');
+    statsEl.innerHTML =
+      `<div>📅 출석 기록</div>` +
+      `<div>현재 연속: <strong>${streak}일</strong></div>` +
+      `<div>최고 연속: <strong>${bestStr}일</strong></div>` +
+      `<div>총 출석일: <strong>${totalDays}일</strong></div>`;
+  }
   document.getElementById('settings-popup').classList.add('show');
 }
 function closeStartSettings() {
@@ -4561,7 +4674,12 @@ function setActiveSkin(id) { localStorage.setItem('marble_skin',id); }
 function getPurchases()  { return JSON.parse(localStorage.getItem('marble_purchases')||'{}'); }
 function isSkinOwned(id) {
   if (id==='circle') return true;
+  if (id==='moon')   return isMoonSkinUnlocked();
   const p=getPurchases(); return !!(p[id] && Date.now()-p[id]<86400000);
+}
+function isMoonSkinUnlocked() {
+  return parseInt(localStorage.getItem('marble_streak')||'0') >= 7
+      || !!localStorage.getItem('marble_moon_unlocked');
 }
 function getSkinRemainingMs(id) {
   const p=getPurchases(); if (!p[id]) return 0;
@@ -4582,8 +4700,13 @@ function buySkin(id, cost) {
 // ── 오버레이 SVG (star·flower·diamond) ──
 function applySkinOverlay(marbleEl, color, size) {
   const skin=getActiveSkin();
-  // rainbow/fire/clover 는 CSS 애니메이션으로 처리
+  // rainbow/fire/clover/moon 는 CSS 애니메이션으로 처리
   if (['circle','rainbow','fire','clover'].includes(skin)) return;
+  if (skin==='moon') {
+    const isSpecial=SPECIAL_COLORS.has(color)||color==='m-obstacle';
+    if (!isSpecial) marbleEl.classList.add('skin-moon');
+    return;
+  }
   const isSpecial=SPECIAL_COLORS.has(color)||color==='m-obstacle';
   if (isSpecial) return;
   const ns='http://www.w3.org/2000/svg';
@@ -4685,6 +4808,23 @@ function drawSkinPreview(skinId, container) {
     stem.setAttribute('x1','26'); stem.setAttribute('y1','26');
     stem.setAttribute('x2','26'); stem.setAttribute('y2','47');
     stem.setAttribute('stroke','#2e7d32'); stem.setAttribute('stroke-width','3'); svg.appendChild(stem);
+  } else if (skinId==='moon') {
+    const defs=document.createElementNS(ns,'defs');
+    const lg=document.createElementNS(ns,'radialGradient');
+    lg.setAttribute('id','mng'); lg.setAttribute('cx','35%'); lg.setAttribute('cy','35%'); lg.setAttribute('r','65%');
+    [['0%','#e8f4ff'],['50%','#b0c9f0'],['100%','#7099d4']].forEach(([off,col])=>{
+      const s=document.createElementNS(ns,'stop'); s.setAttribute('offset',off); s.setAttribute('stop-color',col); lg.appendChild(s);
+    });
+    defs.appendChild(lg); svg.appendChild(defs);
+    const c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx','26'); c.setAttribute('cy','26'); c.setAttribute('r','22');
+    c.setAttribute('fill','url(#mng)'); svg.appendChild(c);
+    // 크레이터
+    [[18,20,5],[32,32,3.5],[22,34,2.5]].forEach(([x,y,r])=>{
+      const cr=document.createElementNS(ns,'circle');
+      cr.setAttribute('cx',x); cr.setAttribute('cy',y); cr.setAttribute('r',r);
+      cr.setAttribute('fill','rgba(100,140,200,.25)'); svg.appendChild(cr);
+    });
   }
   container.appendChild(svg);
 }
@@ -4921,9 +5061,13 @@ function renderShop() {
     const rem=owned&&!skin.perm?getSkinRemainingMs(skin.id):0;
     const canAfford=pts>=skin.cost;
 
+    // 출석 전용 스킨
+    const isAttendSkin = !!skin.attend;
+    const attendUnlocked = isAttendSkin ? isMoonSkinUnlocked() : false;
+
     const card=document.createElement('div');
     card.className='skin-card'
-      +(isActive?' sk-active':owned&&!skin.perm?' sk-owned':!owned&&!canAfford?' sk-locked':'');
+      +(isActive?' sk-active':owned&&!skin.perm&&!isAttendSkin?' sk-owned':(!owned&&!canAfford&&!isAttendSkin)||(!attendUnlocked&&isAttendSkin)?' sk-locked':'');
 
     const prev=document.createElement('div'); prev.className='skin-preview';
     drawSkinPreview(skin.id,prev); card.appendChild(prev);
@@ -4932,24 +5076,34 @@ function renderShop() {
     nm.textContent=skin.icon+' '+skin.name; card.appendChild(nm);
 
     const dsc=document.createElement('div'); dsc.className='skin-desc';
-    dsc.textContent=skin.desc; card.appendChild(dsc);
+    dsc.textContent=skin.desc.replace(/\\n/g,'\n'); card.appendChild(dsc);
 
-    if (owned&&!skin.perm) {
+    if (owned&&!skin.perm&&!isAttendSkin) {
       const t=document.createElement('div');
       t.className='skin-timer'+(rem<3600000?' expiring':'');
       t.textContent='⏰ '+formatRem(rem); card.appendChild(t);
     }
-    if (!skin.perm) {
+    if (!skin.perm&&!isAttendSkin) {
       const pr=document.createElement('div'); pr.className='skin-price';
       pr.textContent='💎 '+skin.cost+'p / 24시간'; card.appendChild(pr);
     }
+    if (isAttendSkin) {
+      const pr=document.createElement('div'); pr.className='skin-price';
+      pr.textContent = attendUnlocked ? '✅ 7일 출석 달성!' : '🔒 7일 연속 출석 달성 시 해금';
+      card.appendChild(pr);
+    }
     const nd=document.createElement('div'); nd.className='skin-need';
-    if (!skin.perm&&!owned&&!canAfford) nd.textContent='💎 '+(skin.cost-pts)+'p 더 필요해요';
+    if (!skin.perm&&!owned&&!canAfford&&!isAttendSkin) nd.textContent='💎 '+(skin.cost-pts)+'p 더 필요해요';
     card.appendChild(nd);
 
     const btn=document.createElement('button'); btn.className='skin-btn';
     if (isActive) {
       btn.textContent='✓ 사용 중'; btn.className+=' btn-using';
+    } else if (isAttendSkin && !attendUnlocked) {
+      btn.textContent='잠금 해제 안됨'; btn.className+=' btn-poor';
+    } else if (isAttendSkin && attendUnlocked) {
+      btn.textContent='선택하기'; btn.className+=' btn-select';
+      btn.onclick=()=>{ setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
     } else if (owned) {
       btn.textContent='선택하기'; btn.className+=' btn-select';
       btn.onclick=()=>{ setActiveSkin(skin.id); renderShop(); renderBoard(); renderTray(); };
@@ -5278,6 +5432,161 @@ if (!localStorage.getItem('marble_touch_offset_x') && ('ontouchstart' in window)
   showScreen('start');
 } else {
   playOpening();
+}
+// 출석 체크 (시작 화면 진입 시 자동 실행)
+setTimeout(checkAttendance, 800);
+
+// ════════════════════════════════════════════
+// ATTENDANCE SYSTEM
+// ════════════════════════════════════════════
+function _todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-'
+    + String(d.getMonth()+1).padStart(2,'0') + '-'
+    + String(d.getDate()).padStart(2,'0');
+}
+function _yesterdayStr() {
+  const d = new Date(Date.now() - 86400000);
+  return d.getFullYear() + '-'
+    + String(d.getMonth()+1).padStart(2,'0') + '-'
+    + String(d.getDate()).padStart(2,'0');
+}
+function _dateKey(str) { return 'marble_attendance_' + str.replace(/-/g,''); }
+
+function checkAttendance() {
+  const today = _todayStr();
+  if (localStorage.getItem(_dateKey(today))) {
+    // 이미 출석 완료 — 상태 배지만 갱신
+    updateAttendStatusBar();
+    return;
+  }
+  // 스트릭 계산
+  const lastDate = localStorage.getItem('marble_last_attend');
+  let streak = parseInt(localStorage.getItem('marble_streak')||'0');
+  if (lastDate === _yesterdayStr()) {
+    streak += 1;
+  } else if (lastDate && lastDate !== today) {
+    streak = 1; // 연속 끊김
+  } else if (!lastDate) {
+    streak = 1; // 첫 접속
+  }
+  localStorage.setItem('marble_streak', streak);
+  const best = parseInt(localStorage.getItem('marble_best_streak')||'0');
+  if (streak > best) localStorage.setItem('marble_best_streak', streak);
+
+  // 팝업 렌더링 후 표시
+  renderAttendPopup(streak);
+  document.getElementById('attend-popup').classList.add('show');
+}
+
+function renderAttendPopup(streak) {
+  // 캘린더 7일치
+  const cal = document.getElementById('attend-calendar');
+  cal.innerHTML = '';
+  const today = _todayStr();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000);
+    const ds = d.getFullYear() + '-'
+      + String(d.getMonth()+1).padStart(2,'0') + '-'
+      + String(d.getDate()).padStart(2,'0');
+    const isToday = ds === today;
+    const attended = !!localStorage.getItem(_dateKey(ds));
+    const dayLabel = ['일','월','화','수','목','금','토'][d.getDay()];
+    const cell = document.createElement('div');
+    cell.className = 'attend-day';
+    const icon = document.createElement('div');
+    icon.className = 'attend-day-icon' + (isToday ? ' today' : attended ? ' done' : '');
+    icon.textContent = isToday ? '🎁' : attended ? '✅' : '⬜';
+    const lbl = document.createElement('div');
+    lbl.textContent = dayLabel;
+    cell.appendChild(icon); cell.appendChild(lbl);
+    cal.appendChild(cell);
+  }
+
+  // 스트릭 텍스트
+  document.getElementById('attend-streak-txt').textContent =
+    streak > 1 ? `🔥 ${streak}일 연속 출석 중!` : '🎉 오늘 첫 출석이에요!';
+
+  // 보상 계산
+  const { pts, extra } = getAttendReward(streak);
+  document.getElementById('attend-reward-txt').textContent = `💎 +${pts}p 획득!`;
+
+  const extraEl = document.getElementById('attend-extra-txt');
+  if (extra) { extraEl.textContent = extra; extraEl.style.display = ''; }
+  else { extraEl.style.display = 'none'; }
+
+  // 다음 마일스톤
+  document.getElementById('attend-next-txt').textContent = getNextMilestoneText(streak);
+}
+
+function getAttendReward(streak) {
+  let pts = 100, extra = '';
+  if (streak >= 30) { pts = 2000; extra = '👑 "구슬 마스터" 칭호 해금!'; }
+  else if (streak >= 14) { pts = 1000; extra = '🎊 2주 개근! 특별 보너스!'; }
+  else if (streak >= 7)  { pts = 500;  extra = '🌙 달빛 구슬 스킨 해금!'; }
+  else if (streak >= 3)  { pts = 200;  extra = '3일 연속! 🎉'; }
+  return { pts, extra };
+}
+
+function getNextMilestoneText(streak) {
+  const milestones = [3, 7, 14, 30];
+  const labels = ['3일 → 200p', '7일 → 500p+🌙스킨', '14일 → 1000p', '30일 → 2000p+칭호'];
+  for (let i = 0; i < milestones.length; i++) {
+    if (streak < milestones[i]) {
+      const diff = milestones[i] - streak;
+      return `다음 보상까지: ${diff}일 후\n(${labels[i]})`;
+    }
+  }
+  return '🏆 모든 마일스톤 달성!';
+}
+
+function claimAttendance() {
+  const today = _todayStr();
+  const streak = parseInt(localStorage.getItem('marble_streak')||'1');
+  const { pts, extra } = getAttendReward(streak);
+
+  // 포인트 지급
+  addPoints(pts);
+  // 출석 기록
+  localStorage.setItem(_dateKey(today), '1');
+  localStorage.setItem('marble_last_attend', today);
+  const total = parseInt(localStorage.getItem('marble_total_attend')||'0') + 1;
+  localStorage.setItem('marble_total_attend', total);
+
+  // 7일 달빛 구슬 해금
+  if (streak >= 7) localStorage.setItem('marble_moon_unlocked', '1');
+  // 30일 칭호 해금
+  if (streak >= 30) localStorage.setItem('marble_title', '구슬 마스터');
+
+  document.getElementById('attend-popup').classList.remove('show');
+
+  // 팝업 닫은 후 배지 업데이트
+  updateAttendStatusBar();
+  const pe = document.getElementById('hud-pts');
+  if (pe) pe.textContent = getPoints();
+
+  // 획득 연출
+  const cel = document.createElement('div'); cel.className = 'buy-cel';
+  cel.textContent = `🎁 출석 보상 +${pts}p 획득!`;
+  document.body.appendChild(cel); setTimeout(() => cel.remove(), 1600);
+}
+
+function updateAttendStatusBar() {
+  const bar = document.getElementById('attend-status-bar');
+  if (!bar) return;
+  const today   = _todayStr();
+  const done    = !!localStorage.getItem(_dateKey(today));
+  const streak  = parseInt(localStorage.getItem('marble_streak')||'0');
+  const pts     = getPoints();
+  const title   = localStorage.getItem('marble_title');
+  const titleTxt = title ? ` ⭐ ${title}` : '';
+  if (done) {
+    bar.textContent = `✅ 오늘 출석 완료 | 💎 ${pts.toLocaleString()}p${titleTxt}`;
+  } else {
+    bar.textContent = streak > 0
+      ? `🔥 ${streak}일 연속 출석 중 | 💎 ${pts.toLocaleString()}p${titleTxt}`
+      : `📅 오늘 출석하면 100p!`;
+  }
 }
 
 // ════════════════════════════════════════════
