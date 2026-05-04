@@ -880,6 +880,103 @@ body {
 @keyframes buyPop { 0%{transform:translate(-50%,-50%) scale(.5) rotate(-18deg);opacity:0}
   70%{transform:translate(-50%,-50%) scale(1.2) rotate(4deg);opacity:1}
   100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1} }
+/* ── Effect Shop Popup (게임 중) ── */
+#effect-shop-popup {
+  display:none; position:fixed; inset:0; z-index:8000;
+  align-items:flex-start; justify-content:center;
+  background:rgba(0,0,0,.58); backdrop-filter:blur(4px);
+  overflow-y:auto; padding:14px 0 20px;
+}
+#effect-shop-popup.show { display:flex; }
+.eshop-box {
+  background:#fff; border-radius:22px; padding:16px 13px;
+  max-width:400px; width:94vw;
+  box-shadow:0 14px 44px rgba(0,0,0,.3);
+  animation:screenFadeIn .22s ease-out both;
+}
+.eshop-header { text-align:center; margin-bottom:10px; }
+.eshop-title { font-family:'Jua',sans-serif; font-size:1.1em; color:#e91e63; font-weight:900; }
+.eshop-sub { font-size:.68em; color:#aaa; margin-top:2px; }
+.eshop-pts-bar {
+  background:linear-gradient(135deg,#e91e63,#f06292); border-radius:12px;
+  padding:7px 14px; color:#fff; font-size:.85em; font-weight:700;
+  text-align:center; margin-bottom:10px;
+}
+.eshop-pts-bar strong { font-size:1.2em; letter-spacing:.3px; }
+.eshop-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.eshop-card {
+  background:#fff; border:2px solid #f48fb1; border-radius:14px;
+  padding:10px 8px 9px; text-align:center; position:relative;
+  transition:transform .12s, box-shadow .12s;
+}
+.eshop-card:not(.eshop-disabled):hover { transform:translateY(-2px); box-shadow:0 4px 14px rgba(233,30,99,.18); }
+.eshop-card.eshop-disabled { opacity:.55; }
+.eshop-icon { font-size:1.8em; margin-bottom:3px; line-height:1; }
+.eshop-name { font-size:.78em; font-weight:900; color:#c2185b; margin-bottom:3px; }
+.eshop-desc { font-size:.6em; color:#666; line-height:1.45; margin-bottom:5px; min-height:3em; }
+.eshop-price { font-size:.7em; color:#7b1fa2; font-weight:700; margin-bottom:6px; }
+.eshop-btn {
+  width:100%; padding:5px 6px; border:none; border-radius:14px; cursor:pointer;
+  font-family:inherit; font-size:.7em; font-weight:700; transition:transform .1s;
+  background:linear-gradient(135deg,#e91e63,#f06292); color:#fff;
+}
+.eshop-btn:active { transform:scale(.93); }
+.eshop-btn.eshop-poor { background:#eee; color:#aaa; cursor:not-allowed; }
+.eshop-btn.eshop-done { background:#a5d6a7; color:#1b5e20; cursor:default; }
+.eshop-applied {
+  position:absolute; top:4px; right:4px;
+  background:#e91e63; color:#fff; font-size:.52em; font-weight:900;
+  padding:2px 5px; border-radius:8px; line-height:1.4; white-space:nowrap;
+}
+.eshop-close-btn {
+  width:100%; padding:11px; border:none; border-radius:18px; cursor:pointer;
+  font-family:inherit; font-size:.95em; font-weight:700;
+  background:#f5f5f5; color:#666; transition:transform .1s;
+}
+.eshop-close-btn:active { transform:scale(.95); }
+
+/* ── Swap Badge on Tray Slot ── */
+.swap-badge {
+  position:absolute; top:-5px; right:-5px; z-index:10;
+  background:#e91e63; color:#fff; border:2px solid #fff;
+  border-radius:50%; width:22px; height:22px; font-size:.7em;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(233,30,99,.4); line-height:1;
+}
+.swap-badge:active { transform:scale(.88); }
+
+/* ── Swap Menu Popup ── */
+#swap-menu-popup {
+  display:none; position:fixed; inset:0; z-index:9600;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.55); backdrop-filter:blur(4px);
+}
+#swap-menu-popup.show { display:flex; }
+.swap-box {
+  background:#fff; border-radius:22px; padding:22px 18px 18px;
+  max-width:340px; width:90vw; text-align:center;
+  box-shadow:0 14px 44px rgba(0,0,0,.28);
+  animation:screenFadeIn .22s ease-out both;
+}
+.swap-title { font-family:'Jua',sans-serif; font-size:1.05em; color:#e91e63; font-weight:900; margin-bottom:3px; }
+.swap-sub { font-size:.7em; color:#aaa; margin-bottom:14px; }
+.swap-options { display:flex; gap:12px; justify-content:center; margin-bottom:14px; flex-wrap:wrap; }
+.swap-option-card {
+  border:2.5px solid #f48fb1; border-radius:14px; padding:9px; cursor:pointer;
+  transition:transform .12s, border-color .12s, box-shadow .12s;
+  background:#fff; position:relative; min-width:52px; min-height:52px;
+  display:flex; align-items:center; justify-content:center;
+}
+.swap-option-card:hover { border-color:#e91e63; transform:translateY(-3px);
+  box-shadow:0 5px 14px rgba(233,30,99,.22); }
+.swap-option-inner { position:relative; }
+.swap-cancel {
+  padding:9px 24px; border:none; border-radius:18px; cursor:pointer;
+  font-family:inherit; font-size:.88em; font-weight:700;
+  background:#f5f5f5; color:#888;
+}
+.swap-cancel:active { transform:scale(.95); }
+
 /* Skin-specific marble effects */
 .marble.skin-rainbow { animation:rainbowAnim 1.6s linear infinite !important; }
 .marble.skin-fire { animation:firePulse 1s ease-in-out infinite !important; }
@@ -1680,6 +1777,29 @@ body {
   </div>
 </div>
 
+<!-- ══ Effect Shop Popup (게임 중 상점) ══ -->
+<div id="effect-shop-popup">
+  <div class="eshop-box">
+    <div class="eshop-header">
+      <div class="eshop-title">🛒 이번 게임 특수 효과</div>
+      <div class="eshop-sub">게임이 끝나면 모든 효과가 사라져요</div>
+    </div>
+    <div class="eshop-pts-bar">💎 보유 포인트: <strong id="eshop-pts-val">0</strong>p</div>
+    <div class="eshop-grid" id="eshop-grid"></div>
+    <button class="eshop-close-btn" onclick="closeEffectShop()">← 게임으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- ══ Swap Menu Popup ══ -->
+<div id="swap-menu-popup">
+  <div class="swap-box">
+    <div class="swap-title">🔄 조각 교체</div>
+    <div class="swap-sub" id="swap-sub-text">원하는 조각을 선택하세요 (남은 횟수: <span id="swap-remain">0</span>회)</div>
+    <div class="swap-options" id="swap-options-grid"></div>
+    <button class="swap-cancel" onclick="closeSwapMenu()">취소</button>
+  </div>
+</div>
+
 <!-- ══ Hall of Fame Screen ══ -->
 <div id="hof-screen" class="screen">
   <div class="hof-box">
@@ -1845,6 +1965,17 @@ const DAILY_MISSIONS = [
 ];
 
 const TA_INTERVAL = 30; // 타임어택: 30초마다 자동배치
+
+// ── 게임 중 구매 가능한 특수 효과 ──
+const GAME_EFFECTS = [
+  { id:'star',    icon:'⭐', name:'별 효과',        cost:150,  desc:'배치 점수 +10%\n(중복 구매 시 누적)',  multi:true  },
+  { id:'flower',  icon:'🌸', name:'꽃 효과',        cost:250,  desc:'타이머 +1분 즉시 추가',               multi:true  },
+  { id:'diamond', icon:'💎', name:'다이아몬드 효과', cost:400, desc:'지우개 구슬 2개\n즉시 대기줄에 추가', multi:true  },
+  { id:'rainbow', icon:'🌈', name:'무지개 효과',    cost:750,  desc:'클리어 시 시간 보너스 2배\n(1회만)',  multi:false },
+  { id:'fire',    icon:'🔥', name:'불꽃 효과',      cost:500,  desc:'폭탄 구슬 1개\n즉시 대기줄에 추가',  multi:true  },
+  { id:'clover',  icon:'🍀', name:'클로버 효과',    cost:350,  desc:'힌트(막힘 감지) 1회 추가',            multi:true  },
+  { id:'swap',    icon:'🔄', name:'퍼즐전환 효과',  cost:1000, desc:'대기줄 조각 교체\n3회 추가 (🔄 버튼)', multi:true  },
+];
 
 // ════════════════════════════════════════════
 // DYNAMIC BOARD HELPERS
@@ -2069,6 +2200,17 @@ let stuckPopupTriggered = false; // 막힘 팝업 발생 여부 (no_special 업�
 let _expWarnShown   = false;
 let _extendCount    = 0;
 let _extendShown    = false;
+// 게임 중 상점 효과
+let _effectStar    = 0;   // 별: 구매 횟수 (×10% 누적)
+let _effectRainbow = false; // 무지개: 클리어 보너스 2배
+let _effectSwap    = 0;   // 퍼즐전환: 남은 교체 횟수
+let _effectFlower  = 0;   // 꽃: 구매 횟수 (배지용)
+let _effectDiamond = 0;   // 다이아몬드: 구매 횟수 (배지용)
+let _effectFire    = 0;   // 불꽃: 구매 횟수 (배지용)
+let _effectClover  = 0;   // 클로버: 구매 횟수 (배지용)
+let _effectShopPaused = false; // 효과 상점 열 때 게임 일시정지 여부
+let _swapMenuIdx  = -1;   // 퍼즐전환 대상 슬롯 인덱스
+let _swapOptions  = [];   // 퍼즐전환 선택지
 
 const ESCAPE_LINES = [
   { pct:0.01, text:'오? 뭔가 열리는 것 같아...! 어서!!' },
@@ -2255,6 +2397,13 @@ function startGame(diff) {
   _expWarnShown= false;
   _extendCount = 0;
   _extendShown = false;
+  _effectStar    = 0;
+  _effectRainbow = false;
+  _effectSwap    = 0;
+  _effectFlower  = 0;
+  _effectDiamond = 0;
+  _effectFire    = 0;
+  _effectClover  = 0;
   // 🍀 클로버 구슬: 힌트 +1
   hintBonus = (getActiveSkin()==='clover') ? 1 : 0;
   // 💎 다이아몬드 구슬: 지우개 힌트 +2
@@ -2566,6 +2715,17 @@ function renderTray() {
         _lastTap = { idx, time: now };
       }
     }, {passive:false});
+
+    // 퍼즐전환 배지
+    if (_effectSwap > 0) {
+      const swapBtn = document.createElement('button');
+      swapBtn.className = 'swap-badge';
+      swapBtn.title = '조각 교체';
+      swapBtn.textContent = '🔄';
+      swapBtn.addEventListener('click',  e => { e.stopPropagation(); showSwapMenu(idx); });
+      swapBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); showSwapMenu(idx); }, {passive:false});
+      slot.appendChild(swapBtn);
+    }
 
     slot.addEventListener('mousedown', e=>beginDrag(idx,e));
     slot.addEventListener('touchstart',e=>beginDrag(idx,e),{passive:false});
@@ -2957,12 +3117,15 @@ function commitPlace(piece,r0,c0,trayIdx) {
         board[r][c]=null; sndErase();
       } else {
         board[r][c]=piece.color;
-        // ⭐ 별 구슬: 점수 10% 추가
-        score += getActiveSkin()==='star' ? 110 : 100;
+        const perScore = Math.round((getActiveSkin()==='star' ? 110 : 100) * (1 + 0.1 * _effectStar));
+        score += perScore;
         placed++; placedTotal++;
       }
     });
-    if (placed>0) { sndPlace(); spawnScorePop(r0,c0,placed*100); }
+    if (placed>0) {
+      const perScore = Math.round((getActiveSkin()==='star' ? 110 : 100) * (1 + 0.1 * _effectStar));
+      sndPlace(); spawnScorePop(r0,c0,placed*perScore);
+    }
   }
 
   // 연속 배치 추적 (combo_3 업적)
@@ -3289,9 +3452,10 @@ function doWin() {
   sndFanfare();
 
   const winTime=timeLeft;
-  // 🌈 무지개 구슬: 클리어 보너스 2배
+  // 🌈 무지개 구슬/효과: 클리어 보너스 2배
   let bonus=winTime*10;
-  if (getActiveSkin()==='rainbow') bonus*=2;
+  const rainbowActive = getActiveSkin()==='rainbow' || _effectRainbow;
+  if (rainbowActive) bonus*=2;
   const stars=winTime>=60?3:winTime>=30?2:1;
 
   // 1. Rainbow wave on all cells
@@ -3328,7 +3492,7 @@ function doWin() {
       addPoints(Math.floor(score/10)+starPts);
 
       let bonusTxt=bonus>0?'⏱ 시간 보너스 +'+bonus+'점':'';
-      if (getActiveSkin()==='rainbow') bonusTxt+=(bonusTxt?' · ':'')+'🌈 무지개 2배 보너스!';
+      if (rainbowActive) bonusTxt+=(bonusTxt?' · ':'')+'🌈 무지개 2배 보너스!';
       if (dailyBonus>0) bonusTxt+=(bonusTxt?' · ':'')+'📅 일일 미션 +500점!';
       document.getElementById('clear-bonus').textContent=bonusTxt;
       document.getElementById('clear-score').textContent='0';
@@ -3892,12 +4056,212 @@ function drawSkinPreview(skinId, container) {
 
 // ── 상점 ──
 function showShop() {
-  if (gameActive && !isPaused) togglePause();
-  renderShop();
-  showScreen('shop');
+  if (gameActive) {
+    showEffectShop();
+  } else {
+    renderShop();
+    showScreen('shop');
+  }
 }
 function goBackFromShop() {
-  if (isPaused) showScreen('game'); else showScreen('start');
+  showScreen('start');
+}
+
+// ════════════════════════════════════════════
+// EFFECT SHOP (게임 중 상점)
+// ════════════════════════════════════════════
+function showEffectShop() {
+  _effectShopPaused = !isPaused;
+  if (!isPaused) togglePause();
+  renderEffectShop();
+  document.getElementById('effect-shop-popup').classList.add('show');
+}
+function closeEffectShop() {
+  document.getElementById('effect-shop-popup').classList.remove('show');
+  if (_effectShopPaused && isPaused) togglePause();
+}
+
+function getEffectCount(id) {
+  switch (id) {
+    case 'star':    return _effectStar;
+    case 'rainbow': return _effectRainbow ? 1 : 0;
+    case 'swap':    return _effectSwap;
+    case 'flower':  return _effectFlower;
+    case 'diamond': return _effectDiamond;
+    case 'fire':    return _effectFire;
+    case 'clover':  return _effectClover;
+  }
+  return 0;
+}
+
+function renderEffectShop() {
+  const pts = getPoints();
+  const pv = document.getElementById('eshop-pts-val');
+  if (pv) pv.textContent = pts;
+  const grid = document.getElementById('eshop-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  GAME_EFFECTS.forEach(ef => {
+    const count = getEffectCount(ef.id);
+    const bought = count > 0;
+    const maxed  = !ef.multi && bought;
+    const canAfford = pts >= ef.cost;
+
+    const card = document.createElement('div');
+    card.className = 'eshop-card' + (maxed || (!canAfford && !bought) ? ' eshop-disabled' : '');
+
+    // 적용 중 배지
+    if (bought) {
+      const badge = document.createElement('div');
+      badge.className = 'eshop-applied';
+      if (ef.id === 'star')    badge.textContent = `×${count} 적용`;
+      else if (ef.id === 'swap') badge.textContent = `남은 ${count}회`;
+      else if (!ef.multi)      badge.textContent = '적용 중';
+      else                     badge.textContent = `×${count} 구매`;
+      card.appendChild(badge);
+    }
+
+    const icon = document.createElement('div'); icon.className = 'eshop-icon';
+    icon.textContent = ef.icon; card.appendChild(icon);
+
+    const nm = document.createElement('div'); nm.className = 'eshop-name';
+    nm.textContent = ef.name; card.appendChild(nm);
+
+    const desc = document.createElement('div'); desc.className = 'eshop-desc';
+    desc.textContent = ef.desc; card.appendChild(desc);
+
+    const price = document.createElement('div'); price.className = 'eshop-price';
+    price.textContent = '💎 ' + ef.cost + 'p'; card.appendChild(price);
+
+    const btn = document.createElement('button'); btn.className = 'eshop-btn';
+    if (maxed) {
+      btn.textContent = '✓ 적용됨'; btn.className += ' eshop-done';
+    } else if (!canAfford) {
+      btn.textContent = '포인트 부족'; btn.className += ' eshop-poor';
+    } else {
+      btn.textContent = '구매 ' + ef.cost + 'p';
+      btn.onclick = () => buyEffect(ef.id);
+    }
+    card.appendChild(btn);
+    grid.appendChild(card);
+  });
+}
+
+function buyEffect(id) {
+  const ef = GAME_EFFECTS.find(e => e.id === id);
+  if (!ef || getPoints() < ef.cost) return;
+  if (!ef.multi && getEffectCount(id) > 0) return;
+  spendPoints(ef.cost);
+
+  switch (id) {
+    case 'star':
+      _effectStar++;
+      showCharBubble(`⭐ 점수 +${_effectStar * 10}% 적용!`);
+      break;
+    case 'flower': {
+      _effectFlower++;
+      timeLeft += 60;
+      const tv = document.getElementById('timer-val');
+      tv.style.color = '#2e7d32';
+      setTimeout(() => { if (timeLeft > 30) tv.style.color = ''; }, 2500);
+      showCharBubble('🌸 시간 +1분!');
+      updateHUD();
+      break;
+    }
+    case 'diamond': {
+      _effectDiamond++;
+      let added = 0;
+      for (let i = 0; i < 4 && added < 2; i++) {
+        if (tray[i] && !tray[i].isEraser && !tray[i].isEraser2 && !tray[i].isEraser3 && !tray[i].isBomb) {
+          tray[i] = {cells:[[0,0]], color:'m-eraser', isEraser:true};
+          added++;
+        }
+      }
+      renderTray();
+      showCharBubble('💎 지우개 2개 추가!');
+      break;
+    }
+    case 'rainbow':
+      _effectRainbow = true;
+      showCharBubble('🌈 클리어 보너스 2배!');
+      break;
+    case 'fire': {
+      _effectFire++;
+      const bi = tray.findIndex(p => p && !p.isEraser && !p.isEraser2 && !p.isEraser3 && !p.isBomb);
+      if (bi >= 0) tray[bi] = {cells:[[0,0]], color:'m-bomb', isBomb:true};
+      renderTray();
+      showCharBubble('🔥 폭탄 구슬 추가!');
+      break;
+    }
+    case 'clover':
+      _effectClover++;
+      hintBonus++;
+      showCharBubble('🍀 힌트 +1회!');
+      break;
+    case 'swap':
+      _effectSwap += 3;
+      renderTray();
+      showCharBubble(`🔄 조각 교체 ${_effectSwap}회 가능!`);
+      break;
+  }
+
+  const cel = document.createElement('div'); cel.className = 'buy-cel';
+  cel.textContent = ef.icon + ' ' + ef.name + ' 적용! 🎉';
+  document.body.appendChild(cel); setTimeout(() => cel.remove(), 1400);
+  renderEffectShop();
+}
+
+// ════════════════════════════════════════════
+// SWAP MENU (퍼즐전환)
+// ════════════════════════════════════════════
+function showSwapMenu(trayIdx) {
+  if (_effectSwap <= 0 || !gameActive) return;
+  _swapMenuIdx = trayIdx;
+  _swapOptions = [mkPiece(true), mkPiece(true), mkPiece(true)];
+  document.getElementById('swap-remain').textContent = _effectSwap;
+  renderSwapMenu();
+  document.getElementById('swap-menu-popup').classList.add('show');
+}
+function renderSwapMenu() {
+  const grid = document.getElementById('swap-options-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  _swapOptions.forEach((piece, i) => {
+    const maxR = Math.max(...piece.cells.map(c => c[0]));
+    const maxC = Math.max(...piece.cells.map(c => c[1]));
+    const cs = TRAY_CELL + 2;
+    const rawW = (maxC+1)*cs + 4, rawH = (maxR+1)*cs + 4;
+    const w = Math.max(50, rawW), h = Math.max(50, rawH);
+
+    const card = document.createElement('div');
+    card.className = 'swap-option-card';
+    card.onclick = () => doSwap(i);
+
+    const inner = document.createElement('div');
+    inner.className = 'swap-option-inner';
+    inner.style.cssText = `position:relative;width:${w}px;height:${h}px;`;
+    piece.cells.forEach(([r,c]) => {
+      const m = mkMarbleEl(piece.color, TRAY_CELL, 'normal');
+      m.style.left = (c*cs + Math.floor((w-rawW)/2)) + 'px';
+      m.style.top  = (r*cs + Math.floor((h-rawH)/2)) + 'px';
+      inner.appendChild(m);
+    });
+    card.appendChild(inner);
+    grid.appendChild(card);
+  });
+}
+function doSwap(optionIdx) {
+  if (_swapMenuIdx < 0 || _swapMenuIdx >= tray.length) return;
+  tray[_swapMenuIdx] = _swapOptions[optionIdx];
+  _effectSwap--;
+  closeSwapMenu();
+  renderTray();
+  showCharBubble(`🔄 조각 교체! (남은 횟수: ${_effectSwap}회)`);
+}
+function closeSwapMenu() {
+  document.getElementById('swap-menu-popup').classList.remove('show');
+  _swapMenuIdx = -1;
 }
 
 function renderShop() {
