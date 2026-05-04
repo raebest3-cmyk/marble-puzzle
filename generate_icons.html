@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>아이콘 생성기</title>
+<style>
+body { font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+       background:#FFB6C1; display:flex; flex-direction:column;
+       align-items:center; justify-content:center; min-height:100vh;
+       gap:20px; padding:20px; }
+h2  { color:#c2185b; font-size:1.4em; }
+.wrap { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+.card { background:#fff; border-radius:18px; padding:16px;
+        text-align:center; box-shadow:0 4px 16px rgba(0,0,0,.15); }
+.card p { font-size:.85em; color:#888; margin-top:8px; }
+button {
+  padding:12px 28px; border:none; border-radius:14px;
+  background:#e91e63; color:#fff; font-size:1em; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+button:hover { background:#c2185b; }
+</style>
+</head>
+<body>
+<h2>🔮 구슬퍼즐 아이콘 생성기</h2>
+<div class="wrap">
+  <div class="card">
+    <canvas id="c192" width="192" height="192"></canvas>
+    <p>icon-192.png</p>
+  </div>
+  <div class="card">
+    <canvas id="c512" width="512" height="512"></canvas>
+    <p>icon-512.png</p>
+  </div>
+</div>
+<button onclick="downloadAll()">⬇️ 아이콘 다운로드</button>
+
+<script>
+function drawIcon(canvas) {
+  const s = canvas.width;
+  const ctx = canvas.getContext('2d');
+  const r = s * 0.12; // 모서리 반경
+
+  // 배경 (둥근 사각형)
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(s - r, 0);
+  ctx.quadraticCurveTo(s, 0, s, r);
+  ctx.lineTo(s, s - r);
+  ctx.quadraticCurveTo(s, s, s - r, s);
+  ctx.lineTo(r, s);
+  ctx.quadraticCurveTo(0, s, 0, s - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, s, s);
+  grad.addColorStop(0, '#FFB6C1');
+  grad.addColorStop(1, '#FF8FAB');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  const cx = s / 2;
+  const unit = s / 16;
+
+  // 철창 (세로 막대 4개 + 가로 막대 2개)
+  const barTop    = unit * 2.2;
+  const barBottom = unit * 10.5;
+  const barLeft   = unit * 4;
+  const barRight  = unit * 12;
+  const barW      = unit * 0.7;
+  const bars      = [4.5, 6.2, 7.9, 9.6, 11.3];
+
+  ctx.fillStyle = 'rgba(60,30,10,0.75)';
+  bars.forEach(bx => {
+    const x = unit * bx;
+    roundRect(ctx, x - barW/2, barTop, barW, barBottom - barTop, barW/2);
+    ctx.fill();
+  });
+  // 가로 막대
+  [barTop + unit*0.6, barTop + (barBottom - barTop) * 0.48].forEach(by => {
+    roundRect(ctx, barLeft, by - barW/2, barRight - barLeft, barW, barW/2);
+    ctx.fill();
+  });
+
+  // 구슬 (파란 원)
+  const ballR = unit * 2.8;
+  const ballCY = unit * 7.5;
+  const ballGrad = ctx.createRadialGradient(
+    cx - ballR * 0.3, ballCY - ballR * 0.3, ballR * 0.1,
+    cx, ballCY, ballR
+  );
+  ballGrad.addColorStop(0, '#81D4FA');
+  ballGrad.addColorStop(0.5, '#29B6F6');
+  ballGrad.addColorStop(1, '#0277BD');
+  ctx.beginPath();
+  ctx.arc(cx, ballCY, ballR, 0, Math.PI * 2);
+  ctx.fillStyle = ballGrad;
+  ctx.fill();
+
+  // 구슬 하이라이트
+  ctx.beginPath();
+  ctx.arc(cx - ballR * 0.28, ballCY - ballR * 0.28, ballR * 0.38, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fill();
+
+  // 눈 (왼쪽, 오른쪽)
+  const eyeY = ballCY - ballR * 0.15;
+  const eyeOff = ballR * 0.38;
+  const eyeR = ballR * 0.14;
+  ctx.fillStyle = '#1a1a2e';
+  [[cx - eyeOff, eyeY], [cx + eyeOff, eyeY]].forEach(([ex, ey]) => {
+    ctx.beginPath(); ctx.arc(ex, ey, eyeR, 0, Math.PI * 2); ctx.fill();
+    // 눈 하이라이트
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(ex - eyeR*0.3, ey - eyeR*0.3, eyeR*0.35, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1a1a2e';
+  });
+
+  // 웃는 입
+  ctx.beginPath();
+  ctx.arc(cx, ballCY + ballR * 0.1, ballR * 0.45, 0.2, Math.PI - 0.2);
+  ctx.strokeStyle = '#1a1a2e';
+  ctx.lineWidth = unit * 0.38;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // 텍스트 "구슬퍼즐"
+  const fontSize = unit * 1.55;
+  ctx.font = `900 ${fontSize}px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // 텍스트 그림자
+  ctx.fillStyle = 'rgba(150,0,50,0.3)';
+  ctx.fillText('구슬퍼즐', cx + unit*0.12, unit * 13.3 + unit*0.12);
+  ctx.fillStyle = '#c2185b';
+  ctx.fillText('구슬퍼즐', cx, unit * 13.3);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadAll() {
+  ['192', '512'].forEach(sz => {
+    const c = document.getElementById('c' + sz);
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = 'icon-' + sz + '.png';
+    a.click();
+  });
+}
+
+// 페이지 로드 시 자동 렌더링 및 다운로드
+window.addEventListener('load', () => {
+  drawIcon(document.getElementById('c192'));
+  drawIcon(document.getElementById('c512'));
+  setTimeout(downloadAll, 600);
+});
+</script>
+</body>
+</html>
