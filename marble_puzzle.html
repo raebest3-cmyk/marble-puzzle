@@ -2189,7 +2189,7 @@ body {
       <button class="btn btn-pink" onclick="finishCalibration()">시작하기</button>
     </div>
     <div id="cal-actions" style="display:flex;gap:8px;justify-content:center;margin-top:6px">
-      <button class="btn btn-white" onclick="showScreen('start')">건너뛰기</button>
+      <button class="btn btn-white" onclick="showScreen('start');setTimeout(checkAttendance,800)">건너뛰기</button>
     </div>
   </div>
 </div>
@@ -5351,6 +5351,7 @@ function showCalDone() {
 
 function finishCalibration() {
   showScreen('start');
+  setTimeout(checkAttendance, 800);
 }
 
 // ════════════════════════════════════════════
@@ -5404,6 +5405,7 @@ function skipOpening() {
   _opTimers.forEach(clearTimeout); _opTimers=[];
   localStorage.setItem('marble_opening_seen','1');
   showScreen('start');
+  setTimeout(checkAttendance, 800);
 }
 
 // ════════════════════════════════════════════
@@ -5428,13 +5430,15 @@ document.getElementById('start-hs-val').textContent=getHS();
 initDailyMission();
 if (!localStorage.getItem('marble_touch_offset_x') && ('ontouchstart' in window)) {
   showCalibration();
+  // 출석 체크: finishCalibration() / 건너뛰기 버튼에서 실행
 } else if (localStorage.getItem('marble_opening_seen')) {
   showScreen('start');
+  // 출석 체크: 시작 화면 진입 후 실행
+  setTimeout(checkAttendance, 800);
 } else {
   playOpening();
+  // 출석 체크: skipOpening() 에서 실행
 }
-// 출석 체크 (시작 화면 진입 시 자동 실행)
-setTimeout(checkAttendance, 800);
 
 // ════════════════════════════════════════════
 // ATTENDANCE SYSTEM
@@ -5454,29 +5458,34 @@ function _yesterdayStr() {
 function _dateKey(str) { return 'marble_attendance_' + str.replace(/-/g,''); }
 
 function checkAttendance() {
-  const today = _todayStr();
-  if (localStorage.getItem(_dateKey(today))) {
-    // 이미 출석 완료 — 상태 배지만 갱신
-    updateAttendStatusBar();
-    return;
-  }
-  // 스트릭 계산
-  const lastDate = localStorage.getItem('marble_last_attend');
-  let streak = parseInt(localStorage.getItem('marble_streak')||'0');
-  if (lastDate === _yesterdayStr()) {
-    streak += 1;
-  } else if (lastDate && lastDate !== today) {
-    streak = 1; // 연속 끊김
-  } else if (!lastDate) {
-    streak = 1; // 첫 접속
-  }
-  localStorage.setItem('marble_streak', streak);
-  const best = parseInt(localStorage.getItem('marble_best_streak')||'0');
-  if (streak > best) localStorage.setItem('marble_best_streak', streak);
+  try {
+    const today = _todayStr();
+    if (localStorage.getItem(_dateKey(today))) {
+      // 이미 출석 완료 — 상태 배지만 갱신
+      updateAttendStatusBar();
+      return;
+    }
+    // 스트릭 계산
+    const lastDate = localStorage.getItem('marble_last_attend');
+    let streak = parseInt(localStorage.getItem('marble_streak')||'0');
+    if (lastDate === _yesterdayStr()) {
+      streak += 1;
+    } else if (lastDate && lastDate !== today) {
+      streak = 1; // 연속 끊김
+    } else if (!lastDate) {
+      streak = 1; // 첫 접속
+    }
+    localStorage.setItem('marble_streak', streak);
+    const best = parseInt(localStorage.getItem('marble_best_streak')||'0');
+    if (streak > best) localStorage.setItem('marble_best_streak', streak);
 
-  // 팝업 렌더링 후 표시
-  renderAttendPopup(streak);
-  document.getElementById('attend-popup').classList.add('show');
+    // 팝업 렌더링 후 표시
+    renderAttendPopup(streak);
+    const popup = document.getElementById('attend-popup');
+    if (popup) popup.classList.add('show');
+  } catch(e) {
+    console.error('[출석] checkAttendance 오류:', e);
+  }
 }
 
 function renderAttendPopup(streak) {
