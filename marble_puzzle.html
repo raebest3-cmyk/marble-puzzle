@@ -415,7 +415,11 @@ body {
 #piece-tray { display:flex; gap:10px; margin-top:0; padding:10px 12px;
   background:rgba(255,255,255,.65); border-radius:20px; min-height:80px;
   align-items:center; justify-content:center; flex-wrap:nowrap;
-  box-shadow:0 3px 14px rgba(200,50,100,.12); overflow:visible; }
+  box-shadow:0 3px 14px rgba(200,50,100,.12); overflow:visible;
+  max-width:calc(100vw - 20px); }
+@media (max-width:360px) {
+  #piece-tray { gap:5px; padding:8px 7px; }
+}
 
 /* ── Tray Area (tray + NEXT preview wrapper) ── */
 #tray-area { display:flex; gap:8px; align-items:center; margin-top:11px; }
@@ -1912,7 +1916,7 @@ function bgStart() {
     if (!_bgOn) return;
     // BPM 100(600ms) 기본, 잔여시간 30초 이하이면 BPM 140(429ms)으로 전환
     const interval = (gameActive && timeLeft <= 30) ? 429 : 600;
-    if (mel[i%mel.length]) playTone(mel[i%mel.length],'sine',.04,.28);
+    if (mel[i%mel.length]) playTone(mel[i%mel.length],'sine',.12,.28);
     i++; _bgT.push(setTimeout(next, interval));
   }
   next();
@@ -2049,7 +2053,7 @@ function startGame(diff) {
     activeColors = ALL_COLORS.slice(0, lv.colors);
     curLevel     = lv.n;
   } else {
-    const timeMap = { easy:180, normal:120, hard:60, timeattack:120 };
+    const timeMap = { easy:180, normal:180, hard:60, timeattack:120 };
     timeLeft     = timeMap[difficulty];
     if (getActiveSkin()==='flower') timeLeft+=60;
     activeColors = difficulty==='easy' ? EASY_COLORS : [...ALL_COLORS];
@@ -2259,7 +2263,7 @@ function mkFaceSVG(mood) {
 // ════════════════════════════════════════════
 // MARBLE DOM ELEMENT
 // ════════════════════════════════════════════
-const TRAY_CELL =28;
+const TRAY_CELL = 22;
 const GHOST_CELL=46;
 
 const SPECIAL_COLORS = new Set(['m-eraser','m-eraser2','m-eraser3','m-bomb','m-locked']);
@@ -2564,13 +2568,15 @@ function beginDrag(idx, e) {
   showGhost(pos.x, pos.y);
 }
 
+let _previewRafId = null;
 function onMove(e) {
   if (!drag) return;
   e.preventDefault();
   const pos = evPos(e);
   drag.x = pos.x; drag.y = pos.y;
   showGhost(pos.x, pos.y);
-  previewBoard(pos.x, pos.y);
+  if (_previewRafId) cancelAnimationFrame(_previewRafId);
+  _previewRafId = requestAnimationFrame(() => { _previewRafId = null; previewBoard(pos.x, pos.y); });
 }
 
 function onUp(e) {
