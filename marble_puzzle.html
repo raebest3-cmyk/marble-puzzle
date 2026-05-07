@@ -5658,9 +5658,21 @@ function closePwaPopup(neverShow) {
   if (neverShow) localStorage.setItem('marble_pwa_skip', '1');
 }
 
-// Service Worker 등록
+// Service Worker 등록 + 업데이트 감지 자동 새로고침
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'activated') {
+            window.location.reload();
+          }
+        });
+      });
+      reg.update();
+    })
+    .catch(() => {});
 }
 
 // 첫 실행 후 3초 뒤 PWA 팝업 (미설치 & 미억제 시)
