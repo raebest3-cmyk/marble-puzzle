@@ -1332,6 +1332,30 @@ body {
 .lv-card-lock { font-size:1.8em; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); opacity:.7; }
 .lv-card-clear { position:absolute; top:5px; right:7px; font-size:.7em; background:rgba(0,255,100,.3); border-radius:8px; padding:2px 6px; }
 
+/* ── Stage Select Panel ── */
+#ls-lv-panel, #ls-st-panel {
+  display:flex; flex-direction:column; align-items:center;
+  width:100%; max-width:420px;
+}
+#stage-grid {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+  width:100%; max-width:420px; padding:0 4px;
+}
+.st-card {
+  background:rgba(255,255,255,.18); border-radius:16px; padding:14px 10px;
+  color:#fff; text-align:center; cursor:pointer;
+  border:2px solid rgba(255,255,255,.3);
+  transition:transform .15s, background .15s;
+  position:relative; overflow:hidden; min-height:100px;
+}
+.st-card:hover { background:rgba(255,255,255,.3); transform:translateY(-3px); }
+.st-card.st-locked { opacity:.45; cursor:default; filter:grayscale(.6); }
+.st-card.st-locked:hover { transform:none; background:rgba(255,255,255,.18); }
+.st-card-num  { font-size:1.2em; font-weight:900; line-height:1; margin-bottom:4px; }
+.st-card-desc { font-size:.72em; opacity:.85; margin:3px 0; line-height:1.4; }
+.st-card-stars{ font-size:.9em; margin-top:5px; letter-spacing:1px; }
+.st-card-lock { font-size:1.8em; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); opacity:.7; }
+
 /* ══════════════════════════════════════════
    CUTSCENE SCREEN
    ══════════════════════════════════════════ */
@@ -2061,7 +2085,9 @@ body {
   <div class="clear-bonus-txt" id="clear-bonus"></div>
   <div class="clear-bonus-txt" id="clear-combo-stat" style="display:none;color:#FF6B00;font-weight:900;"></div>
   <div class="btn-row">
+    <button class="btn btn-pink" id="clear-next-btn" onclick="goNextStage()" style="display:none">▶ 다음 스테이지</button>
     <button class="btn btn-pink"  onclick="retryGame()">🔄 다시 하기</button>
+    <button class="btn btn-white" id="clear-levelsel-btn" onclick="showLevelSelect()" style="display:none">🗺️ 레벨 선택</button>
     <button class="btn btn-white" onclick="showScreen('start')">🏠 처음으로</button>
   </div>
 </div>
@@ -2158,12 +2184,24 @@ body {
 
 <!-- ══ Level Select Screen ══ -->
 <div id="level-select-screen" class="screen">
-  <div class="ls-header">
-    <div class="ls-title">🔮 레벨 선택</div>
-    <div class="ls-sub">이전 레벨을 클리어하면 다음 레벨이 열려요!</div>
+  <!-- 1단계: 레벨 선택 -->
+  <div id="ls-lv-panel" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:420px">
+    <div class="ls-header">
+      <div class="ls-title">🔮 레벨 선택</div>
+      <div class="ls-sub">레벨을 선택하면 스테이지가 열려요!</div>
+    </div>
+    <div id="level-grid"></div>
+    <button class="btn btn-white" style="margin-top:14px;flex-shrink:0" onclick="showScreen('start')">← 돌아가기</button>
   </div>
-  <div id="level-grid"></div>
-  <button class="btn btn-white" style="margin-top:14px;flex-shrink:0" onclick="showScreen('start')">← 돌아가기</button>
+  <!-- 2단계: 스테이지 선택 -->
+  <div id="ls-st-panel" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:420px">
+    <div class="ls-header">
+      <div class="ls-title" id="ls-st-title">Lv.1 - 3×3</div>
+      <div class="ls-sub">스테이지를 선택하세요!</div>
+    </div>
+    <div id="stage-grid"></div>
+    <button class="btn btn-white" style="margin-top:14px;flex-shrink:0" onclick="showLvPanel()">← 뒤로가기</button>
+  </div>
 </div>
 
 <!-- ══ Cutscene Screen ══ -->
@@ -2253,6 +2291,41 @@ const LEVELS = [
   { n:7, grid:9,  colors:4, minSz:5, maxSz:5, time:120, obstacles:1, locked:0 },
   { n:8, grid:10, colors:4, minSz:5, maxSz:5, time:90,  obstacles:3, locked:2 },
 ];
+
+// ── 스테이지 정의 (8Lv × 3St = 24) ──
+const STAGE_DEFS = {
+  '1-1':{ lv:1,st:1,grid:3, colors:2,minSz:2,maxSz:2,time:300, locked:[],              obstacles:[] },
+  '1-2':{ lv:1,st:2,grid:3, colors:2,minSz:2,maxSz:2,time:300, locked:[[1,1]],          obstacles:[] },
+  '1-3':{ lv:1,st:3,grid:3, colors:2,minSz:2,maxSz:2,time:300, locked:[],              obstacles:[[0,0]] },
+
+  '2-1':{ lv:2,st:1,grid:4, colors:2,minSz:2,maxSz:3,time:240, locked:[],              obstacles:[] },
+  '2-2':{ lv:2,st:2,grid:4, colors:2,minSz:2,maxSz:3,time:240, locked:[[0,3],[3,0]],   obstacles:[] },
+  '2-3':{ lv:2,st:3,grid:4, colors:2,minSz:2,maxSz:3,time:240, locked:[],              obstacles:[[0,0],[3,3]] },
+
+  '3-1':{ lv:3,st:1,grid:5, colors:3,minSz:2,maxSz:3,time:240, locked:[],              obstacles:[] },
+  '3-2':{ lv:3,st:2,grid:5, colors:3,minSz:2,maxSz:3,time:240, locked:[[1,1],[3,3]],   obstacles:[[2,4]] },
+  '3-3':{ lv:3,st:3,grid:5, colors:3,minSz:2,maxSz:3,time:240, locked:[[2,2]],          obstacles:[[0,2],[2,0],[2,4],[4,2]] },
+
+  '4-1':{ lv:4,st:1,grid:6, colors:3,minSz:3,maxSz:4,time:180, locked:[],              obstacles:[] },
+  '4-2':{ lv:4,st:2,grid:6, colors:3,minSz:3,maxSz:4,time:180, locked:[[0,0],[2,3],[5,5]], obstacles:[[1,5],[4,0]] },
+  '4-3':{ lv:4,st:3,grid:6, colors:3,minSz:3,maxSz:4,time:180, locked:[[1,1],[4,4]],   obstacles:[[0,3],[2,0],[3,5],[5,2]] },
+
+  '5-1':{ lv:5,st:1,grid:7, colors:4,minSz:3,maxSz:5,time:180, locked:[],              obstacles:[] },
+  '5-2':{ lv:5,st:2,grid:7, colors:4,minSz:3,maxSz:5,time:180, locked:[[1,1],[3,3],[5,5]], obstacles:[[0,6],[3,0],[6,3]] },
+  '5-3':{ lv:5,st:3,grid:7, colors:4,minSz:3,maxSz:5,time:180, locked:[[1,1],[1,5],[3,3],[5,1],[5,5]], obstacles:[[0,3],[2,1],[2,5],[4,1],[4,5]] },
+
+  '6-1':{ lv:6,st:1,grid:8, colors:4,minSz:4,maxSz:5,time:180, locked:[],              obstacles:[] },
+  '6-2':{ lv:6,st:2,grid:8, colors:4,minSz:4,maxSz:5,time:180, locked:[[0,0],[2,5],[5,2],[7,7]], obstacles:[[1,3],[3,6],[6,1],[4,4]] },
+  '6-3':{ lv:6,st:3,grid:8, colors:4,minSz:4,maxSz:5,time:180, locked:[[0,2],[0,5],[3,0],[3,7],[4,0],[4,7]], obstacles:[[2,2],[2,5],[5,2],[5,5],[1,0],[6,7]] },
+
+  '7-1':{ lv:7,st:1,grid:9, colors:4,minSz:5,maxSz:5,time:180, locked:[],              obstacles:[] },
+  '7-2':{ lv:7,st:2,grid:9, colors:4,minSz:5,maxSz:5,time:180, locked:[[1,1],[1,7],[4,4],[7,1],[7,7]], obstacles:[[0,4],[4,0],[4,8],[8,4],[2,4]] },
+  '7-3':{ lv:7,st:3,grid:9, colors:4,minSz:5,maxSz:5,time:180, locked:[[0,2],[0,6],[2,0],[2,8],[6,0],[6,8],[8,2],[8,6]], obstacles:[[1,4],[4,1],[4,7],[7,4],[3,3],[3,5],[5,3],[5,5]] },
+
+  '8-1':{ lv:8,st:1,grid:10,colors:4,minSz:5,maxSz:5,time:180, locked:[],              obstacles:[] },
+  '8-2':{ lv:8,st:2,grid:10,colors:4,minSz:5,maxSz:5,time:180, locked:[[0,0],[0,9],[4,4],[5,5],[9,0],[9,9]], obstacles:[[2,2],[2,7],[4,0],[5,9],[7,2],[7,7],[0,4],[9,5]] },
+  '8-3':{ lv:8,st:3,grid:10,colors:4,minSz:5,maxSz:5,time:180, locked:[[0,2],[0,7],[2,0],[2,9],[4,4],[5,5],[7,0],[7,9],[9,2],[9,7]], obstacles:[[1,5],[3,1],[3,8],[4,0],[5,9],[6,1],[6,8],[8,4],[0,5],[9,4]] },
+};
 
 const ALL_COLORS   = ['m-yellow','m-green','m-ivory','m-blue'];
 const EASY_COLORS  = ['m-yellow','m-green','m-blue'];
@@ -2349,30 +2422,58 @@ function updateBoardCSS() {
   root.style.setProperty('--g', GRID);
 }
 
-// ── 레벨 진행 상황 ──
+// ── 레벨 진행 상황 (레거시 호환 유지) ──
 function getLevelProgress()    { return parseInt(localStorage.getItem('marble_lv_progress')||'1'); }
 function saveLevelProgress(n)  { if(n>getLevelProgress()) localStorage.setItem('marble_lv_progress',n); }
 function isLevelUnlocked(idx)  { return idx < getLevelProgress(); }
 function getLevelStars(idx)    { return parseInt(localStorage.getItem(`marble_lv_stars_${idx}`)||'0'); }
 function saveLevelStars(idx,s) { if(s>getLevelStars(idx)) localStorage.setItem(`marble_lv_stars_${idx}`,s); }
 
-// ── 스토리 모드 진입 ──
-function startLevelGame(idx) {
-  currentLevelIdx = idx;
-  const lv = LEVELS[idx];
-  GRID = lv.grid;
+// ── 스테이지 별점 ──
+function getStageStars(lv,st)  { return parseInt(localStorage.getItem('marble_stars_'+lv+'-'+st)||'0'); }
+function saveStageStars(lv,st,s){
+  const k='marble_stars_'+lv+'-'+st;
+  if(s>getStageStars(lv,st)) localStorage.setItem(k,s);
+}
+// ── 스테이지 잠금 해제 조건 ──
+function isStageUnlocked(lv,st){
+  if(lv===1&&st===1) return true;
+  if(st===1) return getStageStars(lv-1,3)>0;
+  return getStageStars(lv,st-1)>0;
+}
+// ── 레벨 카드용: 3스테이지 중 얻은 총 별 수 ──
+function getLevelTotalStars(lv){
+  return getStageStars(lv,1)+getStageStars(lv,2)+getStageStars(lv,3);
+}
+
+// ── 스테이지 게임 시작 ──
+function startStageGame(lv, st) {
+  const key = lv + '-' + st;
+  const cfg = STAGE_DEFS[key];
+  if (!cfg) return;
+  currentLevelIdx = lv - 1;
+  currentStage    = st;
+  GRID      = cfg.grid;
   CELL_SIZE = computeCellSize(GRID);
-  STEP = CELL_SIZE + GAP;
+  STEP      = CELL_SIZE + GAP;
   updateBoardCSS();
-  difficulty = 'level';
+  difficulty       = 'level';
   window._lastDiff = 'level';
   startGame('level');
 }
 
+// ── 레거시 호환 (특별모드 재도전 등) ──
+function startLevelGame(idx) { startStageGame(idx+1, 1); }
+
 // ── 레벨 선택 화면 렌더링 ──
 function showLevelSelect() {
   renderLevelCards();
+  showLvPanel();
   showScreen('level-select');
+}
+function showLvPanel() {
+  document.getElementById('ls-lv-panel').style.display='flex';
+  document.getElementById('ls-st-panel').style.display='none';
 }
 function renderLevelCards() {
   const grid = document.getElementById('level-grid');
@@ -2381,7 +2482,6 @@ function renderLevelCards() {
   const prog = getLevelProgress();
   LEVELS.forEach((lv, idx) => {
     const unlocked = isLevelUnlocked(idx);
-    const stars = getLevelStars(idx);
     const card = document.createElement('div');
     card.className = 'lv-card' + (unlocked ? '' : ' lv-locked');
     const timeStr = lv.time >= 60 ? `${Math.floor(lv.time/60)}분` + (lv.time%60 ? `${lv.time%60}초` : '') : `${lv.time}초`;
@@ -2390,27 +2490,74 @@ function renderLevelCards() {
       <div class="lv-card-num">Lv.${lv.n}</div>
       <div class="lv-card-grid">${lv.grid}×${lv.grid} (${lv.grid*lv.grid}칸)</div>
       <div class="lv-card-time">⏱ ${timeStr} · ${colorNames[lv.colors]||lv.colors+'색'}</div>
-      <div class="lv-card-stars">${stars>0?'★'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆'}</div>
-      ${unlocked && stars>0 ? '<div class="lv-card-clear">CLEAR</div>' : ''}
+      <div class="lv-card-stars">${renderLvStars(lv.n)}</div>
+      ${(getStageStars(lv.n,1)>0&&getStageStars(lv.n,2)>0&&getStageStars(lv.n,3)>0)?'<div class="lv-card-clear">ALL CLEAR</div>':''}
       ${!unlocked ? '<div class="lv-card-lock">🔒</div>' : ''}
     `;
-    if (unlocked) card.addEventListener('click', ()=>setLevelDiff(idx));
+    if (unlocked) card.addEventListener('click', ()=>showStagePanel(lv.n));
     grid.appendChild(card);
   });
 }
-function setLevelDiff(idx) {
+
+function renderLvStars(lv) {
+  // 3스테이지 각 별점을 미니 도트로 표시
+  let s = '';
+  for (let st=1;st<=3;st++) {
+    const n = getStageStars(lv,st);
+    s += (n>=1?'★':'☆')+(n>=2?'★':'☆')+(n>=3?'★':'☆')+' ';
+  }
+  return '<span style="font-size:.65em;letter-spacing:0">'+s.trim()+'</span>';
+}
+
+function showStagePanel(lv) {
+  const lvDef = LEVELS.find(l=>l.n===lv);
+  const title = document.getElementById('ls-st-title');
+  if (title && lvDef) title.textContent = 'Lv.'+lv+' — '+lvDef.grid+'×'+lvDef.grid+' 판';
+  renderStageCards(lv);
+  document.getElementById('ls-lv-panel').style.display='none';
+  document.getElementById('ls-st-panel').style.display='flex';
+}
+
+function renderStageCards(lv) {
+  const grid = document.getElementById('stage-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let st=1;st<=3;st++) {
+    const unlocked = isStageUnlocked(lv,st);
+    const stars = getStageStars(lv,st);
+    const cfg = STAGE_DEFS[lv+'-'+st];
+    const card = document.createElement('div');
+    card.className = 'st-card' + (unlocked?'':' st-locked');
+    const hasObs = cfg && cfg.obstacles.length>0;
+    const hasLk  = cfg && cfg.locked.length>0;
+    let descTxt = hasLk&&hasObs?'잠긴칸+장애물':hasLk?'잠긴칸':hasObs?'장애물':'빈 판';
+    card.innerHTML = `
+      <div class="st-card-num">${lv}-${st}</div>
+      <div class="st-card-desc">${descTxt}</div>
+      <div class="st-card-stars">${stars>0?'★'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆'}</div>
+      ${!unlocked?'<div class="st-card-lock">🔒</div>':''}
+    `;
+    if (unlocked) card.addEventListener('click', ()=>setStageAndStart(lv,st));
+    grid.appendChild(card);
+  }
+}
+
+function setStageAndStart(lv,st) {
   if (!localStorage.getItem('marble_tut_done')) {
-    _tutCallback = ()=>startLevelGame(idx);
+    _tutCallback = ()=>startStageGame(lv,st);
     document.getElementById('tutorial-overlay').classList.add('show');
     tutGoto(1);
   } else {
-    startLevelGame(idx);
+    startStageGame(lv,st);
   }
+}
+function setLevelDiff(idx) {
+  showStagePanel(idx+1);
 }
 
 // ── 재도전 ──
 function retryGame() {
-  if (difficulty === 'level') startLevelGame(currentLevelIdx);
+  if (difficulty === 'level') startStageGame(currentLevelIdx+1, currentStage);
   else startGame(window._lastDiff || 'easy');
 }
 
@@ -2527,6 +2674,7 @@ let difficulty   = 'normal';
 let activeColors = [...ALL_COLORS];
 let curLevel     = 1;
 let currentLevelIdx = 0; // 레벨 모드: LEVELS[] 인덱스 (0-based)
+let currentStage = 1; // 1~3
 let timeLeft     = 120;
 let gameActive   = false;
 let isPaused     = false;
@@ -2755,12 +2903,15 @@ function startGame(diff) {
   if (getActiveSkin()!=='circle' && !isSkinOwned(getActiveSkin())) setActiveSkin('circle');
 
   if (difficulty === 'level') {
-    // ── 레벨 모드: LEVELS 설정 사용 ──
-    const lv = LEVELS[currentLevelIdx];
-    timeLeft     = lv.time;
+    // ── 레벨 모드: STAGE_DEFS 사용 ──
+    const _stKey = (currentLevelIdx+1) + '-' + currentStage;
+    const _stCfg = STAGE_DEFS[_stKey] || LEVELS[currentLevelIdx];
+    timeLeft     = _stCfg.time;
     if (getActiveSkin()==='flower') timeLeft += 60;
-    activeColors = ALL_COLORS.slice(0, lv.colors);
-    curLevel     = lv.n;
+    activeColors = ALL_COLORS.slice(0, _stCfg.colors);
+    curLevel     = currentLevelIdx + 1;
+    // minSz/maxSz를 스테이지 설정으로 덮어씀 (mkPiece에서 참조)
+    window._stageCfg = _stCfg;
   } else {
     const timeMap = { easy:180, normal:180, hard:60, timeattack:120 };
     timeLeft     = timeMap[difficulty];
@@ -2827,9 +2978,12 @@ function startGame(diff) {
 
   if (difficulty==='hard') placeObstacles(3);
   if (difficulty==='level') {
-    const lv = LEVELS[currentLevelIdx];
-    if (lv.obstacles > 0) placeObstacles(lv.obstacles);
-    if (lv.locked    > 0) placeLocked(lv.locked);
+    const _stKey2 = (currentLevelIdx+1)+'-'+currentStage;
+    const _stCfg2 = STAGE_DEFS[_stKey2];
+    if (_stCfg2) {
+      if (_stCfg2.obstacles.length>0) placeSpecificObstacles(_stCfg2.obstacles);
+      if (_stCfg2.locked.length>0)    placeSpecificLocked(_stCfg2.locked);
+    }
   }
 
   buildBoard();
@@ -2871,6 +3025,26 @@ function placeObstacles(count) {
       placed++;
     }
   }
+}
+
+// ── 고정 위치 장애물 배치 ──
+function placeSpecificObstacles(positions) {
+  positions.forEach(([r,c]) => {
+    if (r<GRID && c<GRID && !board[r][c]) {
+      board[r][c] = 'm-obstacle';
+      obstacles.push([r,c]);
+    }
+  });
+}
+// ── 고정 위치 잠긴칸 배치 ──
+function placeSpecificLocked(positions) {
+  positions.forEach(([r,c]) => {
+    if (r<GRID && c<GRID && !board[r][c]) {
+      board[r][c] = 'm-locked';
+      lockedCells.push([r,c]);
+    }
+  });
+  renderBoard();
 }
 
 // ════════════════════════════════════════════
@@ -3217,8 +3391,8 @@ function mkPiece(forceNormal) {
   else if (difficulty==='hard')       { minSz=3; maxSz=5; }
   else if (difficulty==='timeattack') { minSz=2; maxSz=5; }
   else if (difficulty==='level') {
-    const lv = LEVELS[currentLevelIdx];
-    minSz = lv.minSz; maxSz = lv.maxSz;
+    const _lvcfg = (difficulty==='level' && window._stageCfg) ? window._stageCfg : LEVELS[currentLevelIdx];
+    minSz = _lvcfg.minSz; maxSz = _lvcfg.maxSz;
   }
   else { // normal: 레벨별 조각 크기 (기존 5단계)
     if      (curLevel<=1) { minSz=2; maxSz=4; }
@@ -3751,8 +3925,8 @@ function applyAdaptiveEase() {
   _adaptiveEasy = true;
   // maxSz를 현재 레벨 기준 -1로 오버라이드
   if (difficulty === 'level') {
-    const lv = LEVELS[currentLevelIdx];
-    _adaptiveMaxSzOverride = Math.max(lv.minSz, lv.maxSz - 1);
+    const _lv = window._stageCfg || LEVELS[currentLevelIdx];
+    _adaptiveMaxSzOverride = Math.max(_lv.minSz, _lv.maxSz - 1);
   } else {
     // 현재 조각 크기보다 1 작게 (최소 2)
     _adaptiveMaxSzOverride = 3;
@@ -4239,6 +4413,11 @@ function doWin() {
       }
 
       setTimeout(()=>{
+        // 특별 모드: 다음스테이지/레벨선택 버튼 숨기기
+        const _nb=document.getElementById('clear-next-btn');
+        const _lb=document.getElementById('clear-levelsel-btn');
+        if(_nb) _nb.style.display='none';
+        if(_lb) _lb.style.display='none';
         showScreen('clear');
         showStarRating(stars);
         // 점수 카운트업 애니메이션 (0 → 최종 점수)
@@ -4304,8 +4483,13 @@ function handleLevelWin() {
                    : winTime >= Math.floor(LEVELS[currentLevelIdx].time * 0.25) ? 2 : 1;
   const stars = (_hintPenalty||_swapPenalty) ? Math.min(rawStarsLv,2) : rawStarsLv;
 
-  // 별점 / 포인트 저장
-  saveLevelStars(currentLevelIdx, stars);
+  // 스테이지 별점 저장 + 다음 스테이지/레벨 해제
+  const _lv = currentLevelIdx + 1;
+  const _st = currentStage;
+  saveStageStars(_lv, _st, stars);
+  saveLevelStars(currentLevelIdx, stars); // 레거시 호환
+  saveLevelProgress(currentLevelIdx + 2);
+
   saveHS();
   addCumulativeScore(score);
   const starPts = [50,100,200][stars-1];
@@ -4319,9 +4503,6 @@ function handleLevelWin() {
   const _comboStatForClear = comboMaxThisGame;
   if (winStreak >= 3) showCharBubble('🔥 3연속 성공! 실력이 늘고 있어요!');
 
-  // 다음 레벨 해제
-  saveLevelProgress(currentLevelIdx + 2); // +1(next level idx) +1(1-based)
-
   // Rainbow wave
   for (let r=0;r<GRID;r++) for (let c=0;c<GRID;c++) {
     if (!board[r][c]||board[r][c]==='m-obstacle'||board[r][c]==='m-locked') continue;
@@ -4332,11 +4513,12 @@ function handleLevelWin() {
     },(r+c)*38);
   }
 
-  const isLast = currentLevelIdx >= LEVELS.length - 1;
+  const _isLv8St3 = (currentLevelIdx >= LEVELS.length-1) && (currentStage >= 3);
+  const _isLastSt = currentStage >= 3;
 
   setTimeout(()=>{
-    if (isLast) {
-      // 마지막 레벨: 엔딩 컷씬 → 엔딩 화면
+    if (_isLv8St3) {
+      // Lv.8-3 클리어: 엔딩
       checkAndShowAchievements(winTime, true);
       showCutscene(currentLevelIdx, ()=>{
         document.getElementById('ending-score').textContent='0';
@@ -4344,14 +4526,70 @@ function handleLevelWin() {
         setTimeout(()=>countupAnim(document.getElementById('ending-score'),0,score,1400),350);
         setTimeout(()=>showNameInputPopup(score,()=>{}),1800);
       });
-    } else {
-      // 다음 레벨 컷씬 → 레벨 선택 화면
+    } else if (_isLastSt) {
+      // 스테이지 3 클리어: 컷씬 → 레벨 선택
       checkAndShowAchievements(winTime, false);
-      showCutscene(currentLevelIdx, ()=>{
-        showLevelSelect();
-      });
+      showCutscene(currentLevelIdx, ()=>{ showLevelSelect(); });
+    } else {
+      // 스테이지 1~2 클리어: 클리어 화면 + 다음 스테이지 버튼
+      checkAndShowAchievements(winTime, false);
+      _showStageClearScreen(stars, winTime);
     }
   }, 700);
+}
+
+function _showStageClearScreen(stars, winTime) {
+  const lv = currentLevelIdx + 1;
+  const st = currentStage;
+  const nextLv = (st >= 3) ? lv+1 : lv;
+  const nextSt = (st >= 3) ? 1 : st+1;
+  const hasNext = STAGE_DEFS[(nextLv)+'-'+(nextSt)] !== undefined;
+
+  // 다음 스테이지 버튼
+  const nextBtn = document.getElementById('clear-next-btn');
+  if (nextBtn) {
+    if (hasNext) {
+      nextBtn.style.display = '';
+      nextBtn.textContent = (st >= 3) ? ('▶ Lv.'+(nextLv)+'-1 시작!') : ('▶ '+lv+'-'+(st+1)+' 다음 스테이지');
+    } else {
+      nextBtn.style.display = 'none';
+    }
+  }
+  // 레벨선택 버튼 표시
+  const lvBtn = document.getElementById('clear-levelsel-btn');
+  if (lvBtn) lvBtn.style.display = '';
+
+  const bonus = winTime * 10;
+  const rainbowActive = getActiveSkin()==='rainbow' || _effectRainbow;
+  const finalBonus = rainbowActive ? bonus*2 : bonus;
+  score += finalBonus;
+  saveHS();
+  addCumulativeScore(score);
+  const starPts = [50,100,200][stars-1];
+  addPoints(Math.floor(score/10)+starPts);
+
+  document.getElementById('clear-bonus').textContent =
+    (finalBonus>0 ? '⏱ 시간 보너스 +'+finalBonus+'점' : '') +
+    (rainbowActive ? ' · 🌈 2배!' : '');
+  document.getElementById('clear-score').textContent = '0';
+  const ccs = document.getElementById('clear-combo-stat');
+  if (ccs) {
+    if (comboMaxThisGame>=2) { ccs.textContent='최고 콤보: 🔥'+comboMaxThisGame+'x'; ccs.style.display=''; }
+    else ccs.style.display='none';
+  }
+  showScreen('clear');
+  showStarRating(stars);
+  setTimeout(()=>{ countupAnim(document.getElementById('clear-score'),0,score,1200); },350);
+}
+
+function goNextStage() {
+  const lv = currentLevelIdx + 1;
+  const st = currentStage;
+  if (st < 3) {
+    startStageGame(lv, st+1);
+  } else if (lv < 8) {
+    startStageGame(lv+1, 1);
+  }
 }
 
 function showCutscene(levelIdx, callback) {
